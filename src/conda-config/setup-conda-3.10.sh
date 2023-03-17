@@ -32,12 +32,24 @@ fi
 sha256sum -c ../SHA256SUMS || exit 1
 
 # Install Miniconda
-/usr/bin/bash ${conda_exe} -b -p "${conda_path}"
+# Check if the install path exists and request upgrade if it does
+if [ -d "${conda_path}" ]; then
+  # shellcheck disable=SC2162
+  read -p "${conda_path} exists, Upgrade Miniconda? [Y/N]" query
+  if [ "$query" == "Y" ] || [ "$query" == "y" ]; then
+    /usr/bin/bash ${conda_exe} -u
+  else
+    echo "Miniconda not upgraded, exiting"
+    exit 1
+  fi
+else
+  /usr/bin/bash ${conda_exe} -b -p "${conda_path}"
+fi
 source "${conda_path}/bin/activate"
 conda init
 
 # Install Conda modules into the base environment
-# Create the miniconda Python 3.7 Environment
+# Create the miniconda Python 3.10 Environment
 conda create --name sas-2 python=3.10
 
 echo "Close and Re-Open your terminal window and run:"
