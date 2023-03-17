@@ -20,7 +20,7 @@ conda_path="${HOME}/.local/miniconda3"
 tmp_dir=./tmp
 
 if [ ! -d ${tmp_dir} ]; then
-  mkdir ${tmp_dir}
+    mkdir ${tmp_dir}
 fi
 
 # Get miniconda installer and verify download
@@ -34,16 +34,16 @@ sha256sum -c ../SHA256SUMS || exit 1
 # Install Miniconda
 # Check if the install path exists and request upgrade if it does
 if [ -d "${conda_path}" ]; then
-  # shellcheck disable=SC2162
-  read -p "${conda_path} exists, Upgrade Miniconda? [Y/N]" query
-  if [ "$query" == "Y" ] || [ "$query" == "y" ]; then
-    /usr/bin/bash ${conda_exe} -u
-  else
-    echo "Miniconda not upgraded, exiting"
-    exit 1
-  fi
+    # shellcheck disable=SC2162
+    read -p "${conda_path} exists, Upgrade Miniconda? [Y/N]" query
+    if [ "$query" == "Y" ] || [ "$query" == "y" ]; then
+        /usr/bin/bash ${conda_exe} -u -p "${conda_path}"
+    else
+        echo "Miniconda not upgraded, exiting"
+        exit 1
+    fi
 else
-  /usr/bin/bash ${conda_exe} -b -p "${conda_path}"
+    /usr/bin/bash ${conda_exe} -b -p "${conda_path}"
 fi
 source "${conda_path}/bin/activate"
 conda init
