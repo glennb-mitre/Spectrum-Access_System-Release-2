@@ -15,17 +15,24 @@
 
 # Script to uninstall Miniconda
 
-conda_dirs="${HOME}/.local/miniconda3 ${HOME}/miniconda3 ${HOME}/.conda ${HOME}/.condarc"
+conda_dirs="${HOME}/.local/miniconda3 ${HOME}/.conda ${HOME}/.condarc"
 
 read -r -p "This will remove all Miniconda installations and environments. Are you sure? [YES|no] " query
 if [ "${query}" == "YES" ]; then
-    # Remove conda initialization from .bashrc
+    echo "Remove conda initialization from .bashrc"
     sed -i '/# >>> conda initialize >>>/,/# <<< conda initialize <<</d' "${HOME}/.bashrc"
 
     # Remove the conda environment
+    echo -n "Removing "
     for conda in ${conda_dirs}; do
+        echo -n "${conda} "
         if [ -d "${conda}" ]; then
             rm -rf "${conda}"
+        else
+            rm -f "${conda}"
         fi
     done
+    echo ""
+else
+    echo "Aborting, no files  or configurations deleted."
 fi

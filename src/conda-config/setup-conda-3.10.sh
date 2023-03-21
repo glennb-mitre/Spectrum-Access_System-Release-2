@@ -15,6 +15,7 @@
 
 # Miniconda setup script
 # Installs and configures Miniconda for Spectrum Access System, Release 2 development
+# This script is not idempotent. It should only be run once to install Miniconda3.
 
 # Provide a usage statement for the setup script
 usage(){
@@ -53,7 +54,7 @@ while getopts "c:d:p:s:h" opt; do
 done
 shift $((OPTIND-1))
 
-
+pushd .
 if [ ! -d ${tmp_dir} ]; then
     mkdir ${tmp_dir}
 fi
@@ -97,9 +98,10 @@ if [ ! -L "${DATADIR}" ]; then
     ln -sf "${DATADIR}" ./Common-Data
 fi
 
+# Create the miniconda sas-2 environment
 # Install Conda modules into the base environment
-# Create the miniconda Python 3.10 Environment
-conda create --name sas-2 python=3.10
+popd
+conda env create --file environment.yml
 
 echo "Close and Re-Open your terminal window and run:"
 echo "conda activate sas-2"
