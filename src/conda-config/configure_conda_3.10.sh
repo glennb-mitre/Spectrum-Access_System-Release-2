@@ -16,30 +16,6 @@
 # Script to configure Conda environment for Spectrum Access Systems Release 2 development
 # This script is not idempotent.
 
-usage(){
-    echo "Usage: ${0} -d <Path to Common-Data> (Default: /usr/local/src/winnf/Common-Data/)"
-    echo "            -s <Path to base source directory (e.g., src)"
-    exit 1
-}
-
-# Path where the Common-Data repository is installed
-DATADIR="/usr/local/src/winnf/Common-Data/"
-
-# Process command line options
-while getopts "d:s:h" opt; do
-    case ${opt} in
-        d) DATADIR=${OPTARG}
-           ;;
-        s) SRCDIR=${OPTARG}
-           ;;
-        h) usage
-           ;;
-        *) usage
-           ;;
-    esac
-done
-shift $((OPTIND-1))
-
 # Varify the active environment
 conda_env=$(conda info | grep "active environment" | awk -F' : ' '{print $2}')
 if [ "${conda_env}" != "sas-2" ]; then
@@ -47,21 +23,8 @@ if [ "${conda_env}" != "sas-2" ]; then
     exit 1
 fi
 
-# Link Common Data Repository
-if [ -z "${SRCDIR}" ]; then
-    read -r -p "Enter source directory root (e.g. src): " SRCDIR
-fi
-if [ ! -d "${HOME}/${SRCDIR}/winnf" ]; then
-    mkdir -p "${HOME}/${SRCDIR}/winnf" || exit 9
-fi
-cd "${HOME}/${SRCDIR}/winnf" || exit 9
-
-# Set up links to common data
-if [ ! -L "${DATADIR}" ]; then
-    ln -sf "${DATADIR}" ./Common-Data
-fi
-
 # Install reference models and libs
+
 conda install -y numpy
 
 # Install test harness packages
@@ -72,6 +35,6 @@ conda install -y pyopenssl
 # Install common-data packages
 conda install -y six
 conda install -y shapely
-conda install -y pykml
 conda install -y gdal
+pip3 install pykml
 pip3 install cmake
