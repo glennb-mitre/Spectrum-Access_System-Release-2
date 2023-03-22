@@ -22,9 +22,8 @@ class SAS1Antenna:
     """
 
     def __init__(self, hor_dirs, ant_azimuth, hor_pattern, ant_gain=0.0):
-        """Constructor for a SAS1Antenna model
-
-        :param hor_dirs: A single or list of ray directions (degrees) in the horizontal plane.
+        """Constructor for a SAS1 Antenna model
+        :param hor_dirs: A single or list of ray directions (degrees) in the horizontal plane
         :type hor_dirs: float
         :param ant_azimuth: Antenna azimuth (degrees)
         :type ant_azimuth: float
