@@ -42,3 +42,28 @@ class SAS1Antenna:
         self.ant_azimuth = ant_azimuth
         self.hor_pattern = hor_pattern
         self.ant_gain = ant_gain
+
+    def get_antenna_pattern_gains(self):
+        """Compute the gain for a given 1D antenna pattern.
+
+        Directions and azimuth are defined compared to the north in clockwise directions and
+        shall be within [0..360] degrees
+
+        :return A single or list of the antenna gain(s) in dB.
+        :rtype float
+        """
+        bore_angle = self.hor_dirs - self.ant_azimuth
+        # Normalize bore-angle to the range [0..360] degrees
+        bore_angle[bore_angle >= 360] -= 360
+        bore_angle[bore_angle < 0] += 360
+        idx0 = bore_angle.astype
+        alpha = bore_angle - idx0
+        idx1 = idx0 + 1
+        idx1[idx1 >= 360] -= 360
+        gains = (1 - alpha) * self.hor_pattern[idx0] + alpha * self.hor_pattern[idx1]
+        gains += self.ant_gain
+
+        if self.is_scalar:
+            return gains[0]
+        else:
+            return gains
