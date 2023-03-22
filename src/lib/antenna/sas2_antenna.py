@@ -32,7 +32,7 @@ class SAS1Antenna:
             - clockwise increments of 1 degree.
             - 0 degree corresponds to the antenna boresight.
             - values are 'gain' (and not attenuation)
-        :type hor_pattern: float
+        :type hor_pattern: list
         :param ant_gain: Additional antenna gain in dBi. To be used if not included in the pattern
             (i.e., when using a normalized pattern). (Default: 0)
         :type ant_gain: float, optional
