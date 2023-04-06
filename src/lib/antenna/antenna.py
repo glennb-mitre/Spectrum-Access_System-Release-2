@@ -1,4 +1,4 @@
-#    Copyright 2017 SAS Project Authors. All Rights Reserved.
+#    Copyright 2023 SAS Project Authors. All Rights Reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -36,6 +36,27 @@ from __future__ import print_function
 import numpy as np
 
 def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern, ver_pattern, downtilt):
+   
+   """REL2-R3-SGN-52105: Method B1 based antenna gain calculation.
+      Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively) derived 
+      from the CBSD Registration parameters.
+      
+      Directions and azimuth are defined compared to the north in clockwise
+      direction and shall be within [0..360] degrees.
+      
+      Inputs:
+        dirs:           Horizontal and vertical directions (degrees) at which the gain needs to be calculated
+                        Either a scalar or an iterable.
+        ant_az:         Antenna azimuth (degrees).
+        peak_ant_gain:  cbsd antenna gain(dBi) at boresight
+        hor_pattern:    antenna gain pattern in horizontal plane
+        ver_pattern:    antenna gain pattern in vertical plane
+        donwtilt:       Antenna mechanical downtilt
+
+      Returns:
+        The CBSD two dimensional antenna gains (in dB) relative to peak antenna gain
+        Either a scalar if dirs is scalar or an ndarray otherwise.
+   """
 
    alpha = dirs['hor']
    theta_r = alpha - ant_az
@@ -59,8 +80,31 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
 
    return gain_two_dimensional
 
-def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, beamwidth_hor, beamwidth_ver,
-                                       fbr):
+def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth, ver_beamwidth, fbr):
+   
+   """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation
+  Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively) derived 
+  from the CBSD Registration parameters.
+
+  Directions and azimuth are defined compared to the north in clockwise
+  direction and shall be within [0..360] degrees.
+  
+  Inputs:
+
+  dirs:           Horizontal and vertical directions (degrees) at which the gain needs to be calculated
+                  Either a scalar or an iterable.
+  ant_az:         antenna azimuth (degrees).
+  peak_ant_gain:  cbsd antenna gain(dBi) at boresight
+  hor_beamwidth:  antenna 3dB beamwidth in horizontal plane
+  ver_beamwidth:  antenna 3dB beamwidth in vertical plane
+  donwtilt:       antenna mechanical downtilt(degrees)
+  fbr:            antenna front-to-back-ratio(dB)
+
+  Returns:
+  The CBSD two dimensional antenna gains (in dB) relative to peak antenna gain
+  Either a scalar if dirs is scalar or an ndarray otherwise."""
+   
+   
    alpha = dirs['hor']
    theta_r = alpha - ant_az
    theta_r = np.atleast_1d(theta_r)
@@ -74,8 +118,8 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, be
    dirs_relative_boresight['hor'] = theta_r
    dirs_relative_boresight['ver'] = phi_r
 
-   [g_h_theta_r,g_v_phi_r] = GetStandardAntennaGainsHorAndVer(dirs_relative_boresight, ant_az, peak_ant_gain, downtilt, beamwidth_hor,
-                                                              beamwidth_ver, ant_fbr = fbr)  
+   [g_h_theta_r,g_v_phi_r] = GetStandardAntennaGainsHorAndVer(dirs_relative_boresight, ant_az, peak_ant_gain, 
+                                                              downtilt, hor_beamwidth, ver_beamwidth, ant_fbr = fbr)  
 
    #in degrees
    theta_0 = 0 
@@ -90,12 +134,12 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, be
    dirs_180['hor'] = theta_180
    dirs_phi_r_sup['ver'] = phi_r_sup
 
-   [g_h_theta_0,_] = GetStandardAntennaGainsHorAndVer(dirs_0,ant_az,peak_ant_gain,ant_hor_beamwidth = beamwidth_hor,
+   [g_h_theta_0,_] = GetStandardAntennaGainsHorAndVer(dirs_0,ant_az,peak_ant_gain,ant_hor_beamwidth = hor_beamwidth,
                                                       ant_fbr = fbr)
    
-   [g_h_theta_180,_] = GetStandardAntennaGainsHorAndVer(dirs_180,ant_az,peak_ant_gain,ant_hor_beamwidth = beamwidth_hor,
+   [g_h_theta_180,_] = GetStandardAntennaGainsHorAndVer(dirs_180,ant_az,peak_ant_gain,ant_hor_beamwidth = hor_beamwidth,
                                                         ant_fbr = fbr)
-   [_,g_v_phi_r_sup] = GetStandardAntennaGainsHorAndVer(dirs_phi_r_sup,ant_az,peak_ant_gain, ant_mech_downtilt = downtilt, ant_ver_beamwidth = beamwidth_ver,
+   [_,g_v_phi_r_sup] = GetStandardAntennaGainsHorAndVer(dirs_phi_r_sup,ant_az,peak_ant_gain, ant_mech_downtilt = downtilt, ant_ver_beamwidth = ver_beamwidth,
                                                         ant_fbr = fbr)
    
    g_cbsd = GetTwoDimensionalAntennaGain(dirs,g_h_theta_r,g_v_phi_r,g_v_phi_r_sup,g_h_theta_0,g_h_theta_180,peak_ant_gain)
@@ -106,6 +150,30 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, be
    return gain_two_dimensional
 
 def MethodDbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidth, fbr):
+   
+   """REL2-R3-SGN-52107: Method D based Antenna Gain Calculation:
+    Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively), where the horizontal 
+    antenna pattern (denoted as GH(theta)) is recorded in the CBSD Antenna Pattern Database, and the vertical antenna 
+    pattern is derived from the CBSD Registration parameters. 
+
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.
+
+    Inputs:
+
+    dirs:           Horizontal and vertical directions (degrees) at which the gain needs to be calculated
+                    Either a scalar or an iterable.
+    ant_az:         antenna azimuth (degrees).
+    peak_ant_gain:  cbsd antenna gain(dBi) at boresight
+    hor_patt:       antenna gain pattern in horizontal database
+    ver_beamwidth:  antenna 3dB beamwidth in vertical plane
+    donwtilt:       antenna mechanical downtilt(degrees)
+    fbr:            antenna front-to-back-ratio(dB)
+
+    Returns:
+    The CBSD two dimensional antenna gains (in dB) relative to peak antenna gain.
+    Either a scalar if dirs is scalar or an ndarray otherwise.
+   """
   
    alpha = dirs['hor']
    theta_r = alpha - ant_az
@@ -139,8 +207,8 @@ def MethodDbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt, do
    g_h_theta_0 = hor_patt['gain'][0]
    g_h_theta_180 = hor_patt['gain'][179]
 
-   [_,g_v_phi_r] = GetStandardAntennaGainsHorAndVer(dirs_relative_boresight, ant_az, peak_ant_gain, ant_mech_downtilt = downtilt, ant_ver_beamwidth = ver_beamwidth,
-                                                    ant_fbr = fbr)
+   [_,g_v_phi_r] = GetStandardAntennaGainsHorAndVer(dirs_relative_boresight, ant_az, peak_ant_gain, ant_mech_downtilt = downtilt, 
+                                                    ant_ver_beamwidth = ver_beamwidth, ant_fbr = fbr)
    [_,g_v_phi_r_sup] = GetStandardAntennaGainsHorAndVer(dirs_phi_r_sup,ant_az, peak_ant_gain, ant_mech_downtilt = downtilt,
                                                         ant_ver_beamwidth = ver_beamwidth, ant_fbr = fbr)
    g_cbsd = GetTwoDimensionalAntennaGain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r, g_v_phi_r_sup, g_h_theta_0, g_h_theta_180, peak_ant_gain)
@@ -149,6 +217,26 @@ def MethodDbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt, do
    return gain_two_dimensional
 
 def MethodEbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt):
+   
+   """REL2-R3-SGN-52108: Method E based Antenna Gain Calculation:
+    Use of the horizontal antenna pattern (denoted as GH(theta)) recorded in the CBSD 
+    Antenna Pattern Database. No vertical antenna pattern information is used.
+
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.    
+    
+    Inputs:
+
+    dirs:           Horizontal and vertical directions (degrees) at which the gain needs to be calculated
+                    Either a scalar or an iterable.
+    ant_az:         antenna azimuth (degrees).
+    peak_ant_gain:  peak antenna gain(dBi)
+    hor_patt:       antenna gain pattern in horizontal database
+    
+    Returns:
+    The CBSD  antenna gains (in dB) in vertical plane relative to peak antenna gain, 
+    Either a scalar if dirs is scalar or an ndarray otherwise.
+   """
    
    alpha = dirs['hor']
    theta_r = alpha - ant_az
@@ -184,33 +272,32 @@ def MethodEbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt):
  
 def GetStandardAntennaGainsHorAndVer(dirs,ant_azimuth = None,peak_ant_gain = 0,ant_mech_downtilt = None,ant_hor_beamwidth = None,ant_ver_beamwidth = None,
                                     ant_fbr = None):
-  """Computes the antenna gain pattern using both horizontal and vertical properties.
+  """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation, step a
+  Computes the antenna gain pattern using both horizontal and vertical properties.
   
 
   Directions and azimuth are defined compared to the north in clockwise
   direction and shall be within [0..360] degrees.
 
   Inputs:
-    hor_dirs:       Ray directions in horizontal plane (degrees).
-                    Either a scalar or an iterable.
-    ver_dirs:       Ray directions in vertical plane (degrees).
-                    Either a scalar or an iterable.
-    ant_azimuth:     Antenna azimuth (degrees).
-    ant_elevation:   Antenna elevation (degrees).
-    ant_hor_beamwidth:  Antenna 3dB cutoff beamwidth (degrees) in horizontal plane
-                    If None, then antenna is isotropic (default).
-    ant_ver_beamwidth:  Antenna 3dB cutoff beamwidth (degrees) in vertical plane
-                    If None, then antenna is isotropic (default).
-    ant_mech_downtilt: Antenna mechanical downtilt(value withtin range 0 to +-15 degrees)
-    
-    peak_ant_gain:       Antenna gain (dBi)at boresight
+
+  dirs:               Horizontal and vertical directions (degrees) at which the gain needs to be calculated
+                      Either a scalar or an iterable.
+  ant_az:             antenna azimuth (degrees).
+  peak_ant_gain:      peak antenna gain(dBi)
+  ant_hor_beamwidth:  antenna 3dB beamwidth in horizontal plane
+  ant_ver_beamwidth:  antenna 3dB beamwidth in vertical plane
+  ant_mech_donwtilt:  antenna mechanical downtilt(degrees), limited to +-15 degrees
+  ant_fbr:            antenna front-to-back-ratio(dB)
 
   Returns:
-    The CBSD antenna gains (in dBi).
-    Either a scalar if hor_dirs and ver_dirs are scalar or an ndarray otherwise.
+  g_h_theta_r:  cbsd horizontal antenna gain(dB) at theta_r angle relative to peak antenna gain
+  g_v_phi_r:    cbsd vertical antenna gain(dB) at phi_r angle, relative to peak antenna gain 
+    
+  Either a scalar if dirs is scalar or an ndarray otherwise.
   """
-  hor_gain  = []
-  ver_gain = []
+  g_h_theta_r  = []
+  g_v_phi_r = []
 
   if(ant_fbr is None):
     ant_fbr = 20
@@ -226,9 +313,7 @@ def GetStandardAntennaGainsHorAndVer(dirs,ant_azimuth = None,peak_ant_gain = 0,a
     else:
       g_h_theta_r = -min([12 * (theta_r / float(ant_hor_beamwidth))**2,ant_fbr])
       g_h_theta_r += peak_ant_gain
-    
-      hor_gain = g_h_theta_r
-  
+ 
   if 'ver' in dirs_keys:
     phi_r = dirs['ver']  
     phi_r = np.atleast_1d(phi_r)
@@ -238,35 +323,31 @@ def GetStandardAntennaGainsHorAndVer(dirs,ant_azimuth = None,peak_ant_gain = 0,a
     else:     
       g_v_phi_r = -min([12 * (phi_r / float(ant_ver_beamwidth))**2,ant_fbr])
       g_v_phi_r += peak_ant_gain   
-
-      ver_gain = g_v_phi_r
-
   
-  return hor_gain,ver_gain
+  return g_h_theta_r,g_v_phi_r
+
 
 def GetAntennaGainsFromGivenPattern(dirs,hor_pattern = None, ver_pattern = None, ant_azimuth = None,ant_mech_downtilt = None):
-
 
   """ REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
 
   Computes the gain at a given direction from a given antenna pattern(horizontal and vertical).
    
-  Output gains will be calculated in horizontal and vertical dimension.
-
   Directions and azimuth are defined compared to the north in clockwise
   direction and shall be within [0..360] degrees.
 
   Inputs:
     hor_pattern: contains horizontal plane angles and associated gains 
-    ver_pattern: contains horizontal plane angles and associated gains 
-    hor_dir:  azimuth angle of the cbsd towards the receiver, relative to true north
-    ver_dir:  elevation angle of the cbsd towrads the receiver
+    ver_pattern: contains vertical plane angles and associated gains 
+    
     ant_azimuth:     Antenna azimuth (degrees).
-    ant_elevation:   Antenna elevation (degrees).
-
+    ant_mechanical_downtilt: antenna mechanical downtilt(degrees), limited to +-15 degrees
+  
   Outputs:
-    cbsd gain in horizontal and vertical plains at the given directions
+    g_h_theta_r:  cbsd horizontal antenna gain(dB) at theta_r angle relative to peak antenna gain
+    g_v_phi_r:    cbsd vertical antenna gain(dB) at phi_r angle, relative to peak antenna gain 
+    g_v_phi_rsup: cbsd vertical antenna gain(dB) at supplementary angle of phi_r(180-phi_r), relative to peak antenna gain
   """
   
   hor_dir = dirs['hor']
@@ -367,19 +448,23 @@ def GetTwoDimensionalAntennaGain(dirs,hor_gain,ver_gain,ver_gain_sup_angle,hor_g
   direction and shall be within [0..360] degrees.
 
   Inputs:
-    hor_dirs:       Ray directions in horizontal plane (degrees).
-                    Either a scalar or an iterable.
-    ver_dirs:       Ray directions in vertical plane (degrees).
-                    Either a scalar or an iterable.
-    ant_azimuth:     Antenna azimuth (degrees).
-    ant_elevation:   Antenna elevation (degrees).
-    ant_hor_beamwidth:  Antenna 3dB cutoff beamwidth (degrees) in horizontal plane
-                    If None, then antenna is isotropic (default).
-    ant_ver_beamwidth:  Antenna 3dB cutoff beamwidth (degrees) in vertical plane
-                    If None, then antenna is isotropic (default).
-    ant_mech_downtilt: Antenna mechanical downtilt(value withtin range 0 to +-15 degrees)
+    dirs:                Horizontal and vertical directions at which antenna gain is to be calculated (degrees)                     
+                         Either a scalar or an iterable.
+    hor_gain:            antenn relative gain(w.r.t peak antenna gaina) at the given direction(theta_R) in horizontal plane(dB)
+    ver_gain:            antenn relative gain(w.r.t peak antenna gaina) at the given direction(phi_R) in vertical plane(dB)
+    ver_gain_sup_angle:  antenn relative gain(w.r.t peak antenna gaina) at the supplementary angle of given direction(180-phi_R) in vertical plane(dB)
+    ant_hor_beamwidth:   Antenna 3dB cutoff beamwidth (degrees) in horizontal plane
+                         If None, then antenna is isotropic (default).
+    ant_ver_beamwidth:   Antenna 3dB cutoff beamwidth (degrees) in vertical plane
+                         If None, then antenna is isotropic (default).
+    hor_gain_0:          antenna gain at 0 degree (G(0))
+    hor_gain_180:        antenna gain at 180 degrees(G(180))
     
     peak_ant_gain:       Antenna gain (dBi)at boresight
+  
+  Outputs:
+    gain_two_dimensional: cbsd two dimensional antenna gain(dB) relative to peak antenna gain
+
   """
   hor_dir = dirs['hor']
 
