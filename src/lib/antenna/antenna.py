@@ -51,7 +51,7 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
         peak_ant_gain:  cbsd antenna gain(dBi) at boresight
         hor_pattern:    antenna gain pattern in horizontal plane
         ver_pattern:    antenna gain pattern in vertical plane
-        donwtilt:       Antenna mechanical downtilt
+        donwtilt:       Antenna mechanical downtilt(degrees), limited to +-15 degrees
 
       Returns:
         The CBSD two dimensional antenna gains (in dB) relative to peak antenna gain
@@ -63,6 +63,11 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
    theta_r = np.atleast_1d(theta_r)   
    theta_r[theta_r > 180] -= 360
    theta_r[theta_r < -180] += 360
+
+   if downtilt<-15:
+      downtilt = -15
+   if downtilt>15:
+      downtilt = 15
 
    beta = dirs['ver']
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)
@@ -113,6 +118,11 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, ho
 
    beta = dirs['ver']
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)
+
+   if downtilt<-15:
+      downtilt = -15
+   if downtilt>15:
+      downtilt = 15
 
    dirs_relative_boresight = {}
    dirs_relative_boresight['hor'] = theta_r
@@ -183,6 +193,11 @@ def MethodDbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt, do
 
    beta = dirs['ver']
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)  
+
+   if downtilt<-15:
+      downtilt = -15
+   if downtilt>15:
+      downtilt = 15
 
    dirs_relative_boresight = {}
    dirs_relative_boresight['hor'] = theta_r
