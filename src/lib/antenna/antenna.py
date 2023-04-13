@@ -59,6 +59,7 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
    """
 
    alpha = dirs['hor']
+   #azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    theta_r = alpha - ant_az
    theta_r = np.atleast_1d(theta_r)   
    theta_r[theta_r > 180] -= 360
@@ -70,14 +71,19 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
       downtilt = 15
 
    beta = dirs['ver']
+   #vertical angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)
 
    dirs_relative_boresight = {}
    dirs_relative_boresight['hor'] = theta_r
    dirs_relative_boresight['ver'] = phi_r
   
+   #REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
+   
+   #horizontal gain at thetaR, G_H (thetaR), vertical gains at phiR and at 180-phiR angle, G_V (phiR) and G_V (180-phiR)
    [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = GetAntennaGainsFromGivenPattern(dirs_relative_boresight,hor_pattern,ver_pattern, 
                                                                              ant_az, downtilt)
+   #REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
    g_cbsd = GetTwoDimensionalAntennaGain(dirs,g_h_theta_r,g_v_phi_r,g_v_phi_rsup,
                                         hor_pattern['gain'][0],hor_pattern['gain'][179],peak_ant_gain)
 
@@ -102,7 +108,7 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, ho
   peak_ant_gain:  cbsd antenna gain(dBi) at boresight
   hor_beamwidth:  antenna 3dB beamwidth in horizontal plane
   ver_beamwidth:  antenna 3dB beamwidth in vertical plane
-  donwtilt:       antenna mechanical downtilt(degrees)
+  donwtilt:       antenna mechanical downtilt(degrees), positive below horizon. 
   fbr:            antenna front-to-back-ratio(dB)
 
   Returns:
@@ -111,12 +117,14 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, ho
    
    
    alpha = dirs['hor']
+   #azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    theta_r = alpha - ant_az
    theta_r = np.atleast_1d(theta_r)
    theta_r[theta_r > 180] -= 360
    theta_r[theta_r < -180] += 360
 
    beta = dirs['ver']
+   #vertical angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)
 
    if downtilt<-15:
@@ -128,13 +136,14 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, ho
    dirs_relative_boresight['hor'] = theta_r
    dirs_relative_boresight['ver'] = phi_r
 
+   #horizontal gain at thetaR, vertical gains at phiR
    [g_h_theta_r,g_v_phi_r] = GetStandardAntennaGainsHorAndVer(dirs_relative_boresight, ant_az, peak_ant_gain, 
                                                               downtilt, hor_beamwidth, ver_beamwidth, ant_fbr = fbr)  
 
    #in degrees
    theta_0 = 0 
    theta_180 = 180 
-   phi_r_sup = 180-phi_r
+   phi_r_sup = 180-phi_r #supplemnetary angle of phi
   
    dirs_0 = {}
    dirs_180 = {}
@@ -144,14 +153,16 @@ def MethodCbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, downtilt, ho
    dirs_180['hor'] = theta_180
    dirs_phi_r_sup['ver'] = phi_r_sup
 
+   #horizontal gain at 0 degrees, G_H (0)
    [g_h_theta_0,_] = GetStandardAntennaGainsHorAndVer(dirs_0,ant_az,peak_ant_gain,ant_hor_beamwidth = hor_beamwidth,
                                                       ant_fbr = fbr)
-   
+   #horizontal gain at 180 degrees, G_H (180)
    [g_h_theta_180,_] = GetStandardAntennaGainsHorAndVer(dirs_180,ant_az,peak_ant_gain,ant_hor_beamwidth = hor_beamwidth,
                                                         ant_fbr = fbr)
+   #vertical gain at 180-phiR vertical angle, G_V (180-phiR)
    [_,g_v_phi_r_sup] = GetStandardAntennaGainsHorAndVer(dirs_phi_r_sup,ant_az,peak_ant_gain, ant_mech_downtilt = downtilt, ant_ver_beamwidth = ver_beamwidth,
                                                         ant_fbr = fbr)
-   
+   #REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
    g_cbsd = GetTwoDimensionalAntennaGain(dirs,g_h_theta_r,g_v_phi_r,g_v_phi_r_sup,g_h_theta_0,g_h_theta_180,peak_ant_gain)
 
 
@@ -186,12 +197,14 @@ def MethodDbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt, do
    """
   
    alpha = dirs['hor']
+   #azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    theta_r = alpha - ant_az
    theta_r = np.atleast_1d(theta_r)
    theta_r[theta_r > 180] -= 360
    theta_r[theta_r < -180] += 360
 
    beta = dirs['ver']
+   #vertical of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)  
 
    if downtilt<-15:
@@ -217,15 +230,20 @@ def MethodDbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt, do
    dirs_180['hor'] = theta_180
    dirs_phi_r_sup['ver'] = phi_r_sup 
    
-
+  #horizontal gain at thetaR angle, G_H (thetaR)
    [g_h_theta_r,_,_] = GetAntennaGainsFromGivenPattern(dirs_relative_boresight, hor_pattern = hor_patt, ant_azimuth = ant_az)
-   g_h_theta_0 = hor_patt['gain'][0]
-   g_h_theta_180 = hor_patt['gain'][179]
-
+   # G_H(0)
+   g_h_theta_0 = hor_patt['gain'][0] 
+   # G_H(180)
+   g_h_theta_180 = hor_patt['gain'][179] 
+   
+   # G_V(phiR)
    [_,g_v_phi_r] = GetStandardAntennaGainsHorAndVer(dirs_relative_boresight, ant_az, peak_ant_gain, ant_mech_downtilt = downtilt, 
-                                                    ant_ver_beamwidth = ver_beamwidth, ant_fbr = fbr)
+                                                    ant_ver_beamwidth = ver_beamwidth, ant_fbr = fbr) 
+   #G_V(180-phiR)
    [_,g_v_phi_r_sup] = GetStandardAntennaGainsHorAndVer(dirs_phi_r_sup,ant_az, peak_ant_gain, ant_mech_downtilt = downtilt,
-                                                        ant_ver_beamwidth = ver_beamwidth, ant_fbr = fbr)
+                                                        ant_ver_beamwidth = ver_beamwidth, ant_fbr = fbr) 
+   #REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
    g_cbsd = GetTwoDimensionalAntennaGain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r, g_v_phi_r_sup, g_h_theta_0, g_h_theta_180, peak_ant_gain)
    gain_two_dimensional = g_cbsd
    
@@ -254,6 +272,7 @@ def MethodEbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt):
    """
    
    alpha = dirs['hor']
+   #azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    theta_r = alpha - ant_az
    theta_r = np.atleast_1d(theta_r)   
    theta_r[theta_r > 180] -= 360
@@ -273,13 +292,17 @@ def MethodEbasedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_patt):
    dirs_0['hor'] = theta_0
    dirs_180['hor'] = theta_180 
 
+   #horizontal gain at thetaR angle, G_H (thetaR)
    [g_h_theta_r,_,_] = GetAntennaGainsFromGivenPattern(dirs_relative_boresight, hor_pattern = hor_patt, ant_azimuth = ant_az)
+   # G_H(0)
    g_h_theta_0 = hor_patt['gain'][0]
+   # G_H(180)
    g_h_theta_180 = hor_patt['gain'][179]
 
    g_v_phi_r = 0
    g_v_phi_r_sup = 0
-   
+
+   #REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
    g_cbsd = GetTwoDimensionalAntennaGain(dirs_relative_boresight,g_h_theta_r,g_v_phi_r,g_v_phi_r_sup,g_h_theta_0,g_h_theta_180,peak_ant_gain)
    gain_two_dimensional = g_cbsd
 
