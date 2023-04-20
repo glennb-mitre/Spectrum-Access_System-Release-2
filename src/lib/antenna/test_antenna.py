@@ -23,12 +23,12 @@ def test_pattern_gain():
     gain = antenna.GetAntennaPatternGains(40.5, 0, pattern)
     assert gain == 40.5
     gain = antenna.GetAntennaPatternGains(40.2, 20, pattern)
-    assert gain == 20.2
+    assert gain == pytest.approx(20.2, 0.00000000000001)
     hor_dirs = [10.5, 42.2, 25]
     gains = antenna.GetAntennaPatternGains(hor_dirs, 0, pattern)
     assert np.max(np.abs(gains - np.array([10.5, 42.2, 25]))) == 0
     gains = antenna.GetAntennaPatternGains(hor_dirs, 20, pattern)
-    assert np.max(np.abs(gains - np.array([350.5, 22.2, 5]))) == 0
+    assert np.max(np.abs(gains - np.array([350.5, 22.2, 5]))) == pytest.approx(0,0.0000001)
     gains = antenna.GetAntennaPatternGains(hor_dirs, 20, pattern, 10)
     assert np.max(np.abs(gains - np.array([360.5, 32.2, 15]))) == 0
     # Vectorized vs scalar
@@ -105,7 +105,7 @@ def test_fss_gain():
                           32-25*np.log10(9.1),
                           32-25*np.log10(9.3),
                           32-25*np.log10(47),
-                          -10]))) == 0
+                          -10]))) == pytest.approx(0,0.0000001)
     #   * tangential
     gains = antenna.GetFssAntennaGains(hor_dirs, ver_dirs,
                                        20, 0, 30, 1, 0)
@@ -119,7 +119,7 @@ def test_fss_gain():
                           8,
                           32-25*np.log10(9.3),
                           32-25*np.log10(47),
-                          -10]))) == 0
+                          -10]))) == pytest.approx(0,0.0000001)
     # - diff in ver plane only
     gains = antenna.GetFssAntennaGains(ver_dirs, hor_dirs,
                                        0, 20, 30, 0, 1)
@@ -131,4 +131,4 @@ def test_fss_gain():
                           32-25*np.log10(9.1),
                           32-25*np.log10(9.3),
                           32-25*np.log10(47),
-                          -10]))) == 0
+                          -10]))) == pytest.approx(0,0.0000001)
