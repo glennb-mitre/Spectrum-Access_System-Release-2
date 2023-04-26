@@ -4,6 +4,7 @@ from __future__ import print_function
 
 import numpy as np
 import unittest
+import csv
 
 import antenna
 
@@ -187,20 +188,81 @@ class TestEnhancedAntenna(unittest.TestCase):
   def test_MethodB1basedAntennaGainCalculation(self):
       
       hor_pattern = {}
-      hor_pattern['angle'] = list(range(-180,180,1))
-      hor_pattern['gain'] = list(range(0,360,1))
-      
+      #hor_antenna_patt_filename = '3GHz_450bHG_SM_BH_INT_AZ.csv'
+      hor_antenna_patt_filename = 'simulated_data_az.csv'
+      angles = []
+      gains = []
+      with open(hor_antenna_patt_filename,'r') as csvfile:
+         csv_reader = csv.reader(csvfile,delimiter='\t')
+         for row in csv_reader:
+            if any(row):
+              angles.append(float(row[0]))            
+              gains.append(float(row[1]))
+      hor_pattern['angle'] = list(angles)
+      hor_pattern['gain'] = list(gains)
+     
+
       ver_pattern = {}
-      ver_pattern['angle'] = list(range(-90,270,1))
-      ver_pattern['gain'] = list(range(0,360,1))
+      ver_antenna_patt_filename = 'simulated_data_el.csv'
+      angles = []
+      gains = []      
+      with open(ver_antenna_patt_filename) as csvfile:
+         csv_reader = csv.reader(csvfile,delimiter='\t')
+         for row in csv_reader:
+            if any(row):
+              angles.append(float(row[0]))            
+              gains.append(float(row[1]))              
+      ver_pattern['angle'] = list(angles)
+      ver_pattern['gain'] = list(gains)
 
-      ant_azimuth = 20
-      ant_mech_downtilt = 5
-      peak_ant_gain = 10
+      two_dimensional_gain_filename = 'simulated_data_two_dimensional_gain.csv'
+      gain_two_dimensional =[]
+      with open(two_dimensional_gain_filename) as csvfile:
+         csv_reader = csv.reader(csvfile,delimiter='\t')
+         for row in csv_reader:
+            if any(row):
+                       
+              gain_two_dimensional.append(row)              
+         
+      
+      #hor_pattern['angle'] = list(range(-180,180,1))
+      #hor_pattern['gain'] = list(range(0,360,1))
+      
+      
+      #ver_pattern['angle'] = list(range(-90,270,1))
+      #ver_pattern['gain'] = list(range(0,360,1))
 
-      dirs = {'hor':20.5,'ver':10.5}
+      #ant_azimuth = 20
+      #ant_mech_downtilt = 5
+      #peak_ant_gain = 10
+
+      ant_azimuth = 0
+      ant_mech_downtilt = 0
+      peak_ant_gain = 18.8
+
+      dirs = {'hor':50,'ver':20}
 
       gain  = antenna.MethodB1basedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ver_pattern, ant_mech_downtilt) 
+
+      alpha = dirs['hor']
+      #azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
+      theta_r = alpha - ant_azimuth
+
+      beta = dirs['ver']
+      #vertical angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
+      phi_r = beta + ant_mech_downtilt*np.cos(theta_r*180/np.pi)    
+
+      angles_list = list(range(-180,180,1))
+
+      theta_r_idx = [i for i,j in enumerate(angles_list) if j == theta_r]
+      phi_r_idx = [i for i,j in enumerate(angles_list) if j ==phi_r]
+      if any(theta_r_idx):
+        if any(phi_r_idx):
+          gain_at_given_dir = float(gain_two_dimensional[phi_r_idx[0]][theta_r_idx[0]])
+          diff = gain - gain_at_given_dir
+          print_str = "calculated gain is within " + str(abs(float(diff))) + " dB of actual gain"
+          print(print_str)
+
 
   def test_MethodCbasedAntennaGainCalculation(self):
       

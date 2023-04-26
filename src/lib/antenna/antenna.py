@@ -85,7 +85,7 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
                                                                              ant_az, downtilt)
    #REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
    g_cbsd = GetTwoDimensionalAntennaGain(dirs,g_h_theta_r,g_v_phi_r,g_v_phi_rsup,
-                                        hor_pattern['gain'][0],hor_pattern['gain'][179],peak_ant_gain)
+                                        hor_pattern['gain'][180],hor_pattern['gain'][0],peak_ant_gain)
 
    gain_two_dimensional = g_cbsd
 
@@ -434,7 +434,7 @@ def GetAntennaGainsFromGivenPattern(dirs,hor_pattern = None, ver_pattern = None,
 
 
     if any(phi_r_idx):
-      g_v_phi_r = g_v_list[phi_r_idx]
+      g_v_phi_r = g_v_list[phi_r_idx[0]]
     else:
       phi_diff = [phi_r - i for i in phi_list]
       phi_diff_pos = [i for i in phi_diff if i>0]
@@ -454,7 +454,7 @@ def GetAntennaGainsFromGivenPattern(dirs,hor_pattern = None, ver_pattern = None,
       g_v_phi_r = g_v_phi_r_interp
 
     if any(phi_rs_idx):
-      g_v_phi_rsup = g_v_list[phi_rs_idx]
+      g_v_phi_rsup = g_v_list[phi_rs_idx[0]]
     else:
       phi_rsup_diff = [phi_r_supplementary_angle - i for i in phi_list]
       phi_rs_diff_pos = [i for i in phi_rsup_diff if i>0]
@@ -513,8 +513,8 @@ def GetTwoDimensionalAntennaGain(dirs,hor_gain,ver_gain,ver_gain_sup_angle,hor_g
   g_v_phi_r = ver_gain
   g_v_phi_rsup = ver_gain_sup_angle
   
-  g_cbsd_abs = g_h_theta_r + ( (1-abs(hor_dir)/180)*(g_v_phi_r - g_h_theta_0) + (abs(hor_gain)/180)*(g_v_phi_rsup - g_h_theta_180))
-  g_cbsd = g_cbsd_abs + g_0
+  g_cbsd_relative = g_h_theta_r + np.ceil( (1-abs(hor_dir)/180)*(g_v_phi_r - g_h_theta_0) + (abs(hor_gain)/180)*(g_v_phi_rsup - g_h_theta_180))
+  g_cbsd = g_cbsd_relative + g_0
   gain_two_dimensional = g_cbsd
 
   return gain_two_dimensional
