@@ -56,6 +56,8 @@ Removing /home/glennb/.local/miniconda3 /home/glennb/.conda /home/glennb/.condar
 ```
 
 ## Important Miniconda Commands
+These are useful commands for maintaining a Miniconda environment once it's installed.
+
 ### Remove a Miniconda environment
 
 ```bash
@@ -78,4 +80,14 @@ cd Spectrum-Access_System-Release-2
 git pull
 cd src/conda-config
 conda env update --file environment.yml  --prune
+```
+
+### Build an updated environment.yml file
+**Note:** *This is useful to bring the environment.yml file back up to date after package maintenance.*
+
+```bash
+cd Spectrum-Access_System-Release-2
+conda env export | grep -v "^prefix" >environment.yml
+git commit environment.yml
+git push origin <branch>
 ```
