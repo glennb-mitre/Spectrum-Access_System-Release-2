@@ -73,7 +73,7 @@ def MethodB1basedAntennaGainCalculation(dirs, ant_az, peak_ant_gain, hor_pattern
    beta = dirs['ver']
    #vertical angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
    phi_r = beta + downtilt*np.cos(theta_r*180/np.pi)
-
+   
    dirs_relative_boresight = {}
    dirs_relative_boresight['hor'] = theta_r
    dirs_relative_boresight['ver'] = phi_r
@@ -402,7 +402,7 @@ def GetAntennaGainsFromGivenPattern(dirs,hor_pattern = None, ver_pattern = None,
     theta_list = hor_pattern['angle']
     g_h_list = hor_pattern['gain']
     theta_r_idx = [i for i,j in enumerate(theta_list) if j == theta_r]
-    if any(theta_r_idx):
+    if theta_r_idx:
       g_h_theta_r = g_h_list[theta_r_idx[0]]
     else:
       theta_diff = [theta_r - i for i in theta_list]
@@ -430,10 +430,18 @@ def GetAntennaGainsFromGivenPattern(dirs,hor_pattern = None, ver_pattern = None,
     phi_r_idx = [i for i,j in enumerate(phi_list) if j == phi_r]  
 
     phi_r_supplementary_angle = 180 - phi_r
+    phi_r_supplementary_angle = np.atleast_1d(phi_r_supplementary_angle)   
+
+    #if(phi_r_supplementary_angle>180 or phi_r_supplementary_angle<-180):
+    #print("stop")
+    
+    phi_r_supplementary_angle[phi_r_supplementary_angle >=180] -= 360
+    
+
     phi_rs_idx = [i for i,j in enumerate(phi_list) if j == phi_r_supplementary_angle]  
 
 
-    if any(phi_r_idx):
+    if phi_r_idx:
       g_v_phi_r = g_v_list[phi_r_idx[0]]
     else:
       phi_diff = [phi_r - i for i in phi_list]
@@ -453,7 +461,7 @@ def GetAntennaGainsFromGivenPattern(dirs,hor_pattern = None, ver_pattern = None,
       g_v_phi_r_interp = ((phi_n_1-phi_r)*g_v_phi_n + (phi_r - phi_n)*g_v_phi_n_1)/(phi_n_1 - phi_n)
       g_v_phi_r = g_v_phi_r_interp
 
-    if any(phi_rs_idx):
+    if phi_rs_idx:
       g_v_phi_rsup = g_v_list[phi_rs_idx[0]]
     else:
       phi_rsup_diff = [phi_r_supplementary_angle - i for i in phi_list]
@@ -513,7 +521,7 @@ def GetTwoDimensionalAntennaGain(dirs,hor_gain,ver_gain,ver_gain_sup_angle,hor_g
   g_v_phi_r = ver_gain
   g_v_phi_rsup = ver_gain_sup_angle
   
-  g_cbsd_relative = g_h_theta_r + np.ceil( (1-abs(hor_dir)/180)*(g_v_phi_r - g_h_theta_0) + (abs(hor_gain)/180)*(g_v_phi_rsup - g_h_theta_180))
+  g_cbsd_relative = g_h_theta_r + ( (1-abs(hor_dir)/180)*(g_v_phi_r - g_h_theta_0) + (abs(hor_dir)/180)*(g_v_phi_rsup - g_h_theta_180))
   g_cbsd = g_cbsd_relative + g_0
   gain_two_dimensional = g_cbsd
 

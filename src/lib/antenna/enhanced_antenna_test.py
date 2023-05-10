@@ -1,12 +1,12 @@
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import numpy as np
 import unittest
 import csv
+import os
 
 import antenna
+
+test_data_dir = os.getcwd() + '/test data/'
 
 class TestEnhancedAntenna(unittest.TestCase):
 
@@ -189,7 +189,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       
       hor_pattern = {}
       #hor_antenna_patt_filename = '3GHz_450bHG_SM_BH_INT_AZ.csv'
-      hor_antenna_patt_filename = 'simulated_data_az.csv'
+      hor_antenna_patt_filename = test_data_dir + 'simulated_data_az.csv'
       angles = []
       gains = []
       with open(hor_antenna_patt_filename,'r') as csvfile:
@@ -203,7 +203,7 @@ class TestEnhancedAntenna(unittest.TestCase):
      
 
       ver_pattern = {}
-      ver_antenna_patt_filename = 'simulated_data_el.csv'
+      ver_antenna_patt_filename = test_data_dir + 'simulated_data_el.csv'
       angles = []
       gains = []      
       with open(ver_antenna_patt_filename) as csvfile:
@@ -215,7 +215,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       ver_pattern['angle'] = list(angles)
       ver_pattern['gain'] = list(gains)
 
-      two_dimensional_gain_filename = 'simulated_data_two_dimensional_gain.csv'
+      two_dimensional_gain_filename = test_data_dir + 'simulated_data_two_dimensional_gain.csv'
       gain_two_dimensional =[]
       with open(two_dimensional_gain_filename) as csvfile:
          csv_reader = csv.reader(csvfile,delimiter='\t')
@@ -224,7 +224,7 @@ class TestEnhancedAntenna(unittest.TestCase):
                        
               gain_two_dimensional.append(row)              
          
-      
+ 
       #hor_pattern['angle'] = list(range(-180,180,1))
       #hor_pattern['gain'] = list(range(0,360,1))
       
@@ -240,9 +240,24 @@ class TestEnhancedAntenna(unittest.TestCase):
       ant_mech_downtilt = 0
       peak_ant_gain = 18.8
 
-      dirs = {'hor':50,'ver':20}
+      #test_angles_hor = list(range(-180,180,1))
+      #test_angles_ver = list(range(-180,180,1))
+      test_angles_hor = list([-6])
+      test_angles_ver = list([-8])      
+      gain_hor_ver = [[0 for i in range(0,len(test_angles_hor))] for j in range(0,len(test_angles_ver))]
+      for idx1,angle_ver in enumerate(test_angles_ver):
+        for idx2,angle_hor in enumerate(test_angles_hor):
+          dirs = {'hor':angle_hor,'ver':angle_ver}
+          gain  = antenna.MethodB1basedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ver_pattern, ant_mech_downtilt) 
+          gain_hor_ver[idx1][idx2] = gain
+      
+      
+      results_file = test_data_dir + 'results_updated.csv'
+      with open(results_file,'w') as csvfile:
+         csvwriter = csv.writer(csvfile)
+         csvwriter.writerows(gain_hor_ver)
 
-      gain  = antenna.MethodB1basedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ver_pattern, ant_mech_downtilt) 
+      #gain  = antenna.MethodB1basedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ver_pattern, ant_mech_downtilt) 
 
       alpha = dirs['hor']
       #azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight 
