@@ -36,8 +36,8 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r    
 
-      [hor_gain,ver_gain] = antenna.GetStandardAntennaGainsHorAndVer(dirs_relative_boresight,ant_azimuth = ant_az,ant_mech_downtilt = downtilt,
-                                                                     ant_hor_beamwidth = beamwidth_hor,ant_ver_beamwidth = beamwidth_ver,peak_ant_gain = peak_gain)
+      [hor_gain,ver_gain] = antenna.get_standard_2d_gains(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
+                                                          ant_hor_beamwidth = beamwidth_hor, ant_ver_beamwidth = beamwidth_ver, peak_ant_gain = peak_gain)
       if not isinstance(dirs,list):
         if isinstance(hor_gain,np.ndarray):
           hor_gain = hor_gain[0]
@@ -61,8 +61,8 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r 
 
-      [hor_gain,ver_gain] = antenna.GetStandardAntennaGainsHorAndVer(dirs_relative_boresight,ant_azimuth = ant_az,ant_mech_downtilt = downtilt,
-                                                                     ant_hor_beamwidth = beamwidth_hor,ant_ver_beamwidth = beamwidth_ver,peak_ant_gain = peak_gain)
+      [hor_gain,ver_gain] = antenna.get_standard_2d_gains(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
+                                                          ant_hor_beamwidth = beamwidth_hor, ant_ver_beamwidth = beamwidth_ver, peak_ant_gain = peak_gain)
       if not isinstance(dirs,list):
         if isinstance(hor_gain,np.ndarray):
           hor_gain = hor_gain[0]
@@ -91,8 +91,8 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r 
 
-      [hor_gain,ver_gain] = antenna.GetStandardAntennaGainsHorAndVer(dirs_relative_boresight,ant_azimuth = ant_az,ant_mech_downtilt = downtilt,
-                                                                     ant_hor_beamwidth = beamwidth_hor,ant_ver_beamwidth = beamwidth_ver,peak_ant_gain = peak_gain)     
+      [hor_gain,ver_gain] = antenna.get_standard_2d_gains(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
+                                                          ant_hor_beamwidth = beamwidth_hor, ant_ver_beamwidth = beamwidth_ver, peak_ant_gain = peak_gain)
 
       if not isinstance(dirs,list):
           if isinstance(hor_gain,np.ndarray):
@@ -130,7 +130,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r   
 
-      [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = antenna.GetAntennaGainsFromGivenPattern(dirs_relative_boresight,hor_pattern,ver_pattern,ant_azimuth,ant_mech_downtilt)  
+      [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = antenna.get_given_2d_pattern_gains(dirs_relative_boresight, hor_pattern, ver_pattern, ant_azimuth, ant_mech_downtilt)
 
       
       if not isinstance(dirs,list):
@@ -172,7 +172,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r      
       
-      [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = antenna.GetAntennaGainsFromGivenPattern(dirs_relative_boresight,hor_pattern,ver_pattern,ant_azimuth,ant_mech_downtilt) 
+      [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = antenna.get_given_2d_pattern_gains(dirs_relative_boresight, hor_pattern, ver_pattern, ant_azimuth, ant_mech_downtilt)
 
       if not isinstance(dirs,list):
         if isinstance(g_h_theta_r,np.ndarray):
@@ -181,8 +181,8 @@ class TestEnhancedAntenna(unittest.TestCase):
           g_v_phi_r = g_v_phi_r[0]   
           g_v_phi_rsup = g_v_phi_rsup[0]    
 
-      gain_two_dimensional = antenna.GetTwoDimensionalAntennaGain(dirs,g_h_theta_r,g_v_phi_r,g_v_phi_rsup,
-                                                                  hor_pattern['gain'][0],hor_pattern['gain'][179],peak_ant_gain)
+      gain_two_dimensional = antenna.get_2d_antenna_gain(dirs, g_h_theta_r, g_v_phi_r, g_v_phi_rsup,
+                                                         hor_pattern['gain'][0], hor_pattern['gain'][179], peak_ant_gain)
                                                                   
 
   def test_MethodB1basedAntennaGainCalculation(self):
@@ -248,7 +248,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       for idx1,angle_ver in enumerate(test_angles_ver):
         for idx2,angle_hor in enumerate(test_angles_hor):
           dirs = {'hor':angle_hor,'ver':angle_ver}
-          gain  = antenna.MethodB1basedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ver_pattern, ant_mech_downtilt) 
+          gain  = antenna.b1_antenna_gain(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ver_pattern, ant_mech_downtilt)
           gain_hor_ver[idx1][idx2] = gain
       
       
@@ -292,8 +292,8 @@ class TestEnhancedAntenna(unittest.TestCase):
       
       ant_fbr = 10
 
-      gain  = antenna.MethodCbasedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, ant_mech_downtilt, ant_hor_beamwidth, 
-                                                         ant_ver_beamwidth,ant_fbr)
+      gain  = antenna.c_antenna_gain(dirs, ant_azimuth, peak_ant_gain, ant_mech_downtilt, ant_hor_beamwidth,
+                                     ant_ver_beamwidth, ant_fbr)
       
   def test_MethodDbasedAntennaGainCalculation(self):
       
@@ -311,8 +311,8 @@ class TestEnhancedAntenna(unittest.TestCase):
       
       ant_fbr = 10
 
-      gain  = antenna.MethodDbasedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ant_mech_downtilt, 
-                                                         ant_ver_beamwidth,ant_fbr)
+      gain  = antenna.d_antenna_gain(dirs, ant_azimuth, peak_ant_gain, hor_pattern, ant_mech_downtilt,
+                                     ant_ver_beamwidth, ant_fbr)
       
   def test_MethodEbasedAntennaGainCalculation(self):
       
@@ -324,7 +324,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       hor_pattern['angle'] = list(range(-180,180,1))
       hor_pattern['gain'] = list(range(0,360,1))
 
-      gain  = antenna.MethodEbasedAntennaGainCalculation(dirs, ant_azimuth, peak_ant_gain, hor_pattern)
+      gain  = antenna.e_antenna_gain(dirs, ant_azimuth, peak_ant_gain, hor_pattern)
 
           
 
