@@ -240,10 +240,10 @@ class TestEnhancedAntenna(unittest.TestCase):
       ant_mech_downtilt = 0
       peak_ant_gain = 18.8
 
-      #test_angles_hor = list(range(-180,180,1))
-      #test_angles_ver = list(range(-180,180,1))
-      test_angles_hor = list([-6])
-      test_angles_ver = list([-8])      
+      test_angles_hor = list(range(-180,180,1))
+      test_angles_ver = list(range(-180,180,1))
+      """ test_angles_hor = list([-6])
+      test_angles_ver = list([-8])  """     
       gain_hor_ver = [[0 for i in range(0,len(test_angles_hor))] for j in range(0,len(test_angles_ver))]
       for idx1,angle_ver in enumerate(test_angles_ver):
         for idx2,angle_hor in enumerate(test_angles_hor):
