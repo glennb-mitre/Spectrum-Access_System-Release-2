@@ -250,9 +250,9 @@ def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidt
                                                      hor_pattern=hor_patt,
                                                      ant_azimuth=ant_az)
     # G_H(0)
-    g_h_theta_0 = hor_patt['gain'][0]
+    g_h_theta_0 = hor_patt['gain'][180]
     # G_H(180)
-    g_h_theta_180 = hor_patt['gain'][179]
+    g_h_theta_180 = hor_patt['gain'][0]
 
     # G_V(phiR)
     [_, g_v_phi_r] = get_standard_2d_gains(dirs_relative_boresight, ant_az,
@@ -321,9 +321,9 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
                                                      hor_pattern=hor_patt,
                                                      ant_azimuth=ant_az)
     # G_H(0)
-    g_h_theta_0 = hor_patt['gain'][0]
+    g_h_theta_0 = hor_patt['gain'][180]
     # G_H(180)
-    g_h_theta_180 = hor_patt['gain'][179]
+    g_h_theta_180 = hor_patt['gain'][0]
 
     g_v_phi_r = 0
     g_v_phi_r_sup = 0

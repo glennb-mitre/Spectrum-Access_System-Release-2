@@ -316,7 +316,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       
   def test_MethodEbasedAntennaGainCalculation(self):
       
-      dirs = {'hor':20,'ver':0}
+      dirs = {'hor':20}
       ant_azimuth = 20
       peak_ant_gain = 10
       
