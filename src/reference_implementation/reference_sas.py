@@ -103,11 +103,10 @@ INVALID_PARAM = 103
 
 
 class FakeSas(sas_interface.SasInterface):
-    """A fake implementation of SasInterface.
+    """ A fake implementation of SasInterface.
 
     Returns success for all requests with plausible fake values for all required
     response fields.
-
     """
 
     def __init__(self):
@@ -120,23 +119,24 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> ListDictMsg:
-        """SAS-CBSD Registration implementation.
-            Registers CBSDs.
+        """
+        SAS-CBSD Registration implementation.
+        Registers CBSDs.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Request and response are both lists of dictionaries, which is type aliased to:
+            ListDictMsg = Dict[str, List[Dict]].
+        Each dictionary contains all fields of a single request/response.
 
-            Request and response are both lists of dictionaries, which is type aliased to:
-                ListDictMsg = Dict[str, List[Dict]].
-            Each dictionary contains all fields of a single request/response.
-
-            Args:
-                request: A dictionary with a single key-value pair where the key is
-                    "registrationRequest" and the value is a list of individual CBSD
-                    registration requests (each of which is itself a dictionary).
-                ssl_cert: Path to SSL cert file, if None, will use default cert file.
-                ssl_key: Path to SSL key file, if None, will use default key file.
-            Returns:
-                A dictionary with a single key-value pair where the key is
-                "registrationResponse" and the value is a list of individual CBSD
-                registration responses (each of which is itself a dictionary).
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "registrationRequest" and the value is a list of individual CBSD
+                registration requests (each of which is itself a dictionary).
+            ssl_cert: Path to SSL cert file, if None, will use default cert file.
+            ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+            A dictionary with a single key-value pair where the key is
+            "registrationResponse" and the value is a list of individual CBSD
+            registration responses (each of which is itself a dictionary).
         """
         response = {'registrationResponse': []}
         for req in request['registrationRequest']:
@@ -161,6 +161,26 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> ListDictMsg:
+        """
+        SAS-CBSD SpectrumInquiry reference implementation.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+
+        Performs spectrum inquiry for CBSDs.
+
+        Request and response are both lists of dictionaries. Each dictionary
+        contains all fields of a single request/response.
+
+        Args:
+          request: A dictionary with a single key-value pair where the key is
+            "spectrumInquiryRequest" and the value is a list of individual CBSD
+            spectrum inquiry requests (each of which is itself a dictionary).
+          ssl_cert: Path to SSL cert file, if None, will use default cert file.
+          ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+          A dictionary with a single key-value pair where the key is
+          "spectrumInquiryResponse" and the value is a list of individual CBSD
+          spectrum inquiry responses (each of which is itself a dictionary).
+        """
         response = {'spectrumInquiryResponse': []}
         for req in request['spectrumInquiryRequest']:
             response['spectrumInquiryResponse'].append(
@@ -185,6 +205,24 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> ListDictMsg:
+        """
+        SAS-CBSD Grant reference implementation.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+
+        Request and response are both lists of dictionaries. Each dictionary
+        contains all fields of a single request/response.
+
+        Args:
+          request: A dictionary with a single key-value pair where the key is
+            "grantRequest" and the value is a list of individual CBSD
+            grant requests (each of which is itself a dictionary).
+          ssl_cert: Path to SSL cert file, if None, will use default cert file.
+          ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+          A dictionary with a single key-value pair where the key is
+          "grantResponse" and the value is a list of individual CBSD
+          grant responses (each of which is itself a dictionary).
+        """
         response = {'grantResponse': []}
         for req in request['grantRequest']:
             if 'cbsdId' not in req:
@@ -219,6 +257,26 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> ListDictMsg:
+        """
+        SAS-CBSD Heartbeat reference implementation (RI).
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+
+        Requests heartbeat for a grant for CBSDs.
+
+        Request and response are both lists of dictionaries. Each dictionary
+        contains all fields of a single request/response.
+
+        Args:
+          request: A dictionary with a single key-value pair where the key is
+            "heartbeatRequest" and the value is a list of individual CBSD
+            heartbeat requests (each of which is itself a dictionary).
+          ssl_cert: Path to SSL cert file, if None, will use default cert file.
+          ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+          A dictionary with a single key-value pair where the key is
+          "heartbeatResponse" and the value is a list of individual CBSD
+          heartbeat responses (each of which is itself a dictionary).
+        """
         response = {'heartbeatResponse': []}
         for req in request['heartbeatRequest']:
             transmit_expire_time = datetime.utcnow().replace(
@@ -240,6 +298,25 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: Optional[str] = None,
         ssl_key: Optional[str] = None
     ) -> ListDictMsg:
+        """
+        SAS-CBSD Relinquishment RI.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Relinquishes grant for CBSDs.
+
+        Request and response are both lists of dictionaries. Each dictionary
+        contains all fields of a single request/response.
+
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "relinquishmentRequest" and the value is a list of individual CBSD
+                relinquishment requests (each of which is itself a dictionary).
+            ssl_cert: Path to SSL cert file, if None, will use default cert file.
+            ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+            A dictionary with a single key-value pair where the key is
+            "relinquishmentResponse" and the value is a list of individual CBSD
+            relinquishment responses (each of which is itself a dictionary).
+        """
         response = {'relinquishmentResponse': []}
         for req in request['relinquishmentRequest']:
             response['relinquishmentResponse'].append(
@@ -257,9 +334,28 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> ListDictMsg:
+        """
+        SAS-CBSD Deregistration interface.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Deregisters CBSDs.
+
+        Request and response are both lists of dictionaries. Each dictionary
+        contains all fields of a single request/response.
+
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "deregistrationRequest" and the value is a list of individual CBSD
+                deregistration requests (each of which is itself a dictionary).
+            ssl_cert: Path to SSL cert file, if None, will use default cert file.
+            ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+            A dictionary with a single key-value pair where the key is
+            "deregistrationResponse" and the value is a list of individual CBSD
+            deregistration responses (each of which is itself a dictionary).
+        """
         response = {'deregistrationResponse': []}
         for req in request['deregistrationRequest']:
-            if ('cbsdId' not in req):
+            if 'cbsdId' not in req:
                 response['deregistrationResponse'].append(
                     {
                         'response': self._GetMissingParamResponse()
@@ -280,6 +376,19 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> Dict:
+        """
+        SAS-SAS ESC Sensor Record Exchange interface
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Requests a Pull Command to get the ESC Sensor Data Message
+
+        Args:
+            request: A string containing Esc Sensor Record Id
+            ssl_cert: Path to SSL cert file, if None, will use default cert file.
+            ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+            A dictionary of Esc Sensor Data Message object specified in
+            WINNF-16-S-0096
+        """
         # Get the Esc Sensor record
         with open(os.path.join('../harness/testcases', 'testdata', 'esc_sensor_record_0.json')) as fd:
             esc_sensor_record = json.load(fd)
@@ -296,12 +405,23 @@ class FakeSas(sas_interface.SasInterface):
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
     ) -> Dict:
+        """
+        SAS-SAS Full Activity Dump interface.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Requests a Pull Command to get Full Activity Dump Message.
+
+        Args:
+            ssl_cert: Path to SSL cert file, if None, will use default cert file.
+            ssl_key: Path to SSL key file, if None, will use default key file.
+        Returns:
+            A dictionary containing the FullActivityDump object specified in WINNF-16-S-0096
+        """
         response = json.loads(
             json.dumps(
                 {'files': [
                     {
                         'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/' +
-                            'Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
+                               'Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
                         'checksum': 'da39a3ee5e6b4b0d3255bfef95601890afd80709', 'size': 19,
                         'version': version, 'recordType': "cbsd"
                     },
@@ -340,11 +460,12 @@ class FakeSas(sas_interface.SasInterface):
         url: str,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ):
-        """SAS-SAS Get data from json files after generate the
-         Full Activity Dump Message
+    ) -> Dict:
+        """
+        SAS-SAS Get data from json files after generate the Full Activity Dump Message
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Returns:
-         the message as an "json data" object specified in WINNF-16-S-0096
+            the message as a "json data" object specified in WINNF-16-S-0096
         """
         pass
 
@@ -353,37 +474,109 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
     """Implementation of SAS Admin for this Reference SAS Implementation."""
 
     def Reset(self):
+        """
+        SAS admin interface to reset the SAS between test cases.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        """
         pass
 
-    def InjectFccId(self, request):
+    def InjectFccId(
+        self,
+        request: Dict[str, Union[str, float]]
+    ):
+        """
+        SAS admin interface to inject fcc id information into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "fccId": (string) valid fccId to be injected into SAS under test
+                "fccMaxEirp": (double) optional; default value of 47 dBm/10 MHz
+        """
         pass
 
     def InjectUserId(self, request):
+        """
+        SAS admin interface to whitelist a user ID in the SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "userId" and the value is a string of valid userId to be whitelisted by
+                the SAS under test.
+        """
         pass
 
-    def InjectCpiUser(self, request):
+    def InjectCpiUser(self, request: Dict[str, str]) -> None:
+        """
+        SAS admin interface to add a CPI User as if it came directly from the CPI database.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "cpiId": (string) valid cpiId to be injected into SAS under test
+                "cpiName": (string) valid name for cpi user to be injected into SAS under test
+                "cpiPublicKey": (string) public key value for cpi user to be injected into SAS under test
+        """
         pass
 
     def BlacklistByFccId(self, request):
+        """
+        Inject an FCC ID which will be blacklisted by the SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "fccId" and the value is the FCC ID (string) to be blacklisted.
+        """
         pass
 
     def BlacklistByFccIdAndSerialNumber(self, request):
+        """
+        Inject an (FCC ID, serial number) pair which will be blacklisted by the SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "fccId": (string) blacklisted FCC ID
+                "serialNumber": (string) blacklisted serial number
+        """
         pass
 
     def PreloadRegistrationData(self, request):
+        """
+        SAS admin interface to preload registration data into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "registrationData" and the value is a list of individual CBSD
+                registration data which need to be preloaded into SAS (each of which is
+                itself a dictionary). The dictionary is a RegistrationRequest object,
+                the fccId and cbsdSerialNumber fields are required, other fields are
+                optional.
+        """
         pass
 
-    def InjectExclusionZone(self, request, ssl_cert=None, ssl_key=None):
+    def InjectExclusionZone(
+        self,
+        request,
+        # ssl_cert=None,
+        # ssl_key=None
+    ):
+        """
+        Inject exclusion zone information into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "zone": A GeoJSON object defining the exclusion zone to be injected to SAS UUT.
+                "frequencyRanges": A list of frequency ranges for the exclusion zone.
+        """
         pass
 
     def InjectZoneData(
         self,
         request: Dict[str, Dict],
-        ssl_cert: OptStr = None,
-        ssl_key: OptStr = None
+        # ssl_cert: OptStr = None,
+        # ssl_key: OptStr = None
     ):
-        """Inject PPA or NTIA zone information into SAS under test.
-
+        """
+        Inject PPA or NTIA zone information into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Args:
             request: A dictionary with a single key-value pair where the key is
                 "record" and the value is ZoneData object to be injected into
@@ -393,27 +586,91 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         return request['record']['id']
 
     def InjectPalDatabaseRecord(self, request):
+        """
+        Inject a PAL Database record into the SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request:
+            For the contents of this request, please refer to the PAL Database TS
+            (WINNF-16-S-0245) - Section 6.x.
+        """
         pass
 
     def InjectFss(self, request):
+        """
+        SAS admin interface to inject FSS information into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+            "record" and the value is a fixed satellite service object
+            (which is itself a dictionary). The dictionary is an
+            IncumbentProtectionData object (specified in SAS-SAS TS) -- WINNF-16-S-0096: Section 8.5.
+        """
         pass
 
     def InjectWisp(self, request):
+        """
+        SAS admin interface to inject WISP information into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with two key-value pairs where the keys are "record" and "zone" with the values
+                    IncumbentProtectionData object (specified in SAS-SAS TS) and a GeoJSON Object respectively
+        Note: Required Field in IncumbentProtectionData are id, type,
+                deploymentParam->operationParam->operationFrequencyRange->lowFrequency, highFrequency
+        """
         pass
 
     def InjectSasAdministratorRecord(self, request):
+        """
+        SAS admin interface to inject SAS Administrator Record into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "record" and the value is a SAS Administrator information (which is
+                itself a dictionary). The dictionary is an SASAdministrator object
+                (Specified in SAS-SAS TS WINNF-16-S-0096) - Section 8.1.
+        """
         pass
 
     def InjectEscSensorDataRecord(self, request):
+        """
+        SAS admin interface to inject ESC Sensor Data Record into SAS under test.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with a single key-value pair where the key is
+                "record" and the value is a EscSensorData object (which is
+                itself a dictionary specified in SAS-SAS TS WINNF-16-S-0096) - Section 8.6.
+        Behavior: SAS should act as if it is connected to an ESC sensor with the provided parameters.
+        """
         pass
 
     def InjectPeerSas(self, request):
+        """
+        SAS admin interface to inject a peer SAS into the SAS UUT.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "certificateHash": the sha1 fingerprint of the certificate
+                "url": base URL of the peer SAS.
+        """
         pass
 
     def TriggerMeasurementReportRegistration(self):
+        """
+        SAS admin interface to trigger measurement report request for all subsequent registration request
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Note: The SAS should request a measurement report in the RegistrationResponse
+        (if status == 0)
+        """
         pass
 
     def TriggerMeasurementReportHeartbeat(self):
+        """
+        SAS admin interface to trigger measurement report request for all subsequent heartbeat requests
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Note: The SAS should request a measurement report in the HeartbeatResponse
+        (if status == 0)
+        """
         pass
 
     def TriggerPpaCreation(
@@ -422,32 +679,50 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         ssl_cert: Optional[str] = None,
         ssl_key: Optional[str] = None
     ):
-        """SAS admin interface implementation to trigger PPA creation based on the CBSD Ids, Pal Ids and Provided Contour
-
+        """
+        SAS admin interface implementation to trigger PPA creation based on the CBSD Ids, Pal Ids and Provided Contour
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
                 cbsdIds: array of string containing CBSD Id
                 palIds: array of string containing PAL Id
-                providedCosntour(optional): GeoJSON Object
+                providedContour(optional): GeoJSON Object
 
         Returns:
-            PPA Id in string format
+            PPA Id in string format (contained within a dictionary returned by the request_handler.RequestPost() function).
         """
         return 'zone/ppa/fake_sas/%s/%s' % (request['palIds'][0],
                                             uuid.uuid4().hex)
 
     def TriggerDailyActivitiesImmediately(self):
+        """
+        SAS admin interface to trigger daily activities immediately which will execute the following activities:
+            1. Pull from all External Database and other SASes (URLs will be injected to
+            SAS UUT using another RPC Call)
+            2. Run IAP and DPA Calculations
+            3. Apply EIRP updates to devices
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        """
         pass
 
     def TriggerEnableNtiaExclusionZones(self):
+        """
+        SAS admin interface to trigger enforcement of the NTIA exclusion zones
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        """
         pass
 
     def TriggerEnableScheduledDailyActivities(self):
+        """
+        SAS admin interface to trigger the daily activities according to the schedule agreed upon by SAS admins.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        """
         pass
 
     def QueryPropagationAndAntennaModel(self, request) -> Dict:
-        """SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS    or Provided PPA Contour
-
+        """
+        SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS    or Provided PPA Contour
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
                 reliabilityLevel: (permitted values: -1, 0.05, 0.95)
@@ -467,6 +742,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
     def GetDailyActivitiesStatus(self) -> Dict[str, bool]:
         """
         Fake SAS admin implementation to get the daily activities' status (always successful).
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Returns:
             A dictionary with a single, fixed key-value pair: {"completed":True},
             indicating that the daily activities have completed successfully.
@@ -474,8 +750,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         return {'completed': True}
 
     def GetPpaCreationStatus(self) -> Dict[str, bool]:
-        """Fake SAS admin interface implementation to indicated that the most recent PPA creation task
+        """
+        Fake SAS admin interface implementation to indicated that the most recent PPA creation task
         completed successfully.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Returns:
             A dictionary with a two key-value pairs where the keys are "completed" and
             "withError". The values for these keys are True and False, respectively.
@@ -483,24 +761,68 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         return {'completed': True, 'withError': False}
 
     def TriggerLoadDpas(self):
+        """
+        SAS admin interface to load all ESC-monitored DPAs and immediately activate all of them.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        """
         pass
 
     def TriggerBulkDpaActivation(self, request):
+        """
+        SAS admin interface to bulk DPA activation/deactivation
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "activate": (boolean) if True, activate all ESC-monitored DPAs on all channels
+                        else deactivate all ESC-monitored DPAs on all channels
+        """
         pass
 
     def TriggerDpaActivation(self, request):
+        """
+        SAS admin interface to activate specific DPA on specific channel
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "dpaId": (string) it represents the field "name" in the kml file of DPAs
+                "frequencyRange": frequencyRange of DPA Channel with lowFrequency, highFrequency
+        """
         pass
 
     def TriggerFullActivityDump(self):
+        """
+        SAS admin interface to trigger generation of a Full Activity Dump.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Note: SAS does not need to complete generation before returning HTTP 200.
+        See the testing API specification for more details.
+        """
         pass
 
     def TriggerDpaDeactivation(self, request):
+        """
+        SAS admin interface to deactivate specific DPA on specific channel
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: A dictionary with the following key-value pairs:
+                "dpaId": (string) it represents the field "name" in the kml file of DPAs
+                "frequencyRange": frequencyRange of DPA Channel with lowFrequency, highFrequency
+        """
         pass
 
     def TriggerEscDisconnect(self):
+        """
+        Simulates the ESC (ESC-DE) being disconnected from the SAS UUT.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        """
         pass
 
     def InjectDatabaseUrl(self, request):
+        """
+        Inject the Database URL into SAS.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        Args:
+            request: Contains database url to be injected.
+        """
         pass
 
 
