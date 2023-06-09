@@ -241,7 +241,7 @@ class SecurityTestCase(sas_testcase.SasTestCase):
 
 		# Does a regular CBSD registration
 		self.SasReset()
-		device_a = util.json_load(os.path.join('testcases', 'testdata', 'device_a.json'))
+		device_a = util.json_load(os.path.join('../harness/testcases', 'testdata', 'device_a.json'))
 
 		with CiphersOverload(self._sas, [cipher], client_cert, client_key):
 			self.assertRegistered([device_a])
@@ -341,7 +341,7 @@ class SecurityTestCase(sas_testcase.SasTestCase):
 				if is_sas:
 					self._sas.GetFullActivityDump(client_cert, client_key)
 				else:
-					device_a = util.json_load(os.path.join('testcases', 'testdata', 'device_a.json'))
+					device_a = util.json_load(os.path.join('../harness/testcases', 'testdata', 'device_a.json'))
 					request = {'registrationRequest': [device_a]}
 					self._sas.Registration(request, ssl_cert=client_cert, ssl_key=client_key)
 			except request_handler.HTTPError as e:

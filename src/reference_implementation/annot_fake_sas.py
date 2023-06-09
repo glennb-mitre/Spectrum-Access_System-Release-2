@@ -256,7 +256,7 @@ class FakeSas(sas_interface.SasInterface):
 		ssl_key: Optional[str] = None
 	) -> Dict:
 		# Get the Esc Sensor record
-		record_path = os.path.join('testcases', 'testdata', 'esc_sensor_record_0.json')
+		record_path = os.path.join('../harness/testcases', 'testdata', 'esc_sensor_record_0.json')
 		with open(record_path) as fd:
 			esc_sensor_record = json.load(fd)
 

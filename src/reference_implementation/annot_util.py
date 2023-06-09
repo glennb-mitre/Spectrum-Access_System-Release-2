@@ -124,8 +124,8 @@ def configurable_testcase(default_config_function: FunctionType):
 		harness_dir = os.path.dirname(
 			os.path.abspath(inspect.getfile(inspect.currentframe()))
 		)
-		config_dir = os.path.join(harness_dir, 'testcases', 'configs',
-				testcase.__name__)
+		config_dir = os.path.join(harness_dir, '../harness/testcases', 'configs',
+								  testcase.__name__)
 		config_names = os.listdir(config_dir) if os.path.exists(config_dir) else []
 
 		# No existing configs => generate default config.
