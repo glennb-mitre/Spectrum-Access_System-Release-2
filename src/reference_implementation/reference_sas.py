@@ -83,9 +83,9 @@ OptStr = Optional[str]
 
 # Reference SAS server configurations.
 PORT = 9000
-CERT_FILE = 'certs/server.cert'
-KEY_FILE = 'certs/server.key'
-CA_CERT = 'certs/ca.cert'
+CERT_FILE = '../harness/certs/server.cert'
+KEY_FILE = '../harness/certs/server.key'
+CA_CERT = '../harness/certs/ca.cert'
 CIPHERS = [
     'AES128-GCM-SHA256',  # TLS_RSA_WITH_AES_128_GCM_SHA256
     'AES256-GCM-SHA384',  # TLS_RSA_WITH_AES_256_GCM_SHA384
@@ -676,8 +676,8 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
     def TriggerPpaCreation(
         self,
         request: Dict,
-        ssl_cert: Optional[str] = None,
-        ssl_key: Optional[str] = None
+        # ssl_cert: Optional[str] = None,
+        # ssl_key: Optional[str] = None
     ):
         """
         SAS admin interface implementation to trigger PPA creation based on the CBSD Ids, Pal Ids and Provided Contour
@@ -833,7 +833,15 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         cls.sas_sas_version = sas_sas_version
 
     def _parseUrl(self, url: str) -> Tuple[str, str]:
-        """Parse the Url into the path and value."""
+        """
+        Parse the URL into the path and value.
+
+        Examples: If _parseUrl were called with the following argument:
+        'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
+        the function would return:
+        ('/raw.githubusercontent.com',
+ 'Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json')
+        """
         splitted_url = url.split('/')[1:]
         # Returns path and value
         return '/'.join(splitted_url[0:2]), '/'.join(splitted_url[2:])
