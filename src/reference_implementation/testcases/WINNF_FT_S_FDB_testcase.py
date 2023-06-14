@@ -15,7 +15,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import common_strings
+from src.reference_implementation import common_strings, sas, sas_testcase
 import json
 import logging
 import os
@@ -25,10 +25,10 @@ from time import sleep, strftime, gmtime
 
 from six.moves import zip
 
-import sas
-import sas_testcase
-from database import DatabaseServer
-from util import configurable_testcase, writeConfig, loadConfig, \
+# import sas
+# import sas_testcase
+from src.reference_implementation.database import DatabaseServer
+from src.reference_implementation.util import configurable_testcase, writeConfig, loadConfig, \
   addCbsdIdsToRequests, getFqdnLocalhost, getUnusedPort,getCertFilename, json_load
 
 # Time zone in which CPAS is scheduled
