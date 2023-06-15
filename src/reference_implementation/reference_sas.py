@@ -83,9 +83,9 @@ OptStr = Optional[str]
 
 # Reference SAS server configurations.
 PORT = 9000
-CERT_FILE = '../harness/certs/server.cert'
-KEY_FILE = '../harness/certs/server.key'
-CA_CERT = '../harness/certs/ca.cert'
+CERT_FILE = 'certs/server.cert'
+KEY_FILE = 'certs/server.key'
+CA_CERT = 'certs/ca.cert'
 CIPHERS = [
     'AES128-GCM-SHA256',  # TLS_RSA_WITH_AES_128_GCM_SHA256
     'AES256-GCM-SHA384',  # TLS_RSA_WITH_AES_256_GCM_SHA384
@@ -990,6 +990,7 @@ def RunFakeServer(
         keyfile=ECC_KEY_FILE if is_ecc else KEY_FILE
     )
     ssl_context.set_ciphers(':'.join(ECC_CIPHERS if is_ecc else CIPHERS))
+    # before the following line, the verify_mode is <VerifyMode.CERT_NONE: 0>
     ssl_context.verify_mode = ssl.CERT_REQUIRED
     server.socket = ssl_context.wrap_socket(server.socket, server_side=True)
     print('Will start server at localhost:%d, use <Ctrl-C> to stop.' % PORT)
