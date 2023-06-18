@@ -1,9 +1,23 @@
 """
-This module contains class definitions for objects used by SAS-CBSD interactions according to the following documents:
+This module contains class definitions for objects used in SAS-CBSD interactions according to the following documents:
 <1> WINNF-TS-0016-V1.2.7 SAS to CBSD Technical Specification
+<2> WINNF-SSC-0002 v6.0.0.0 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS):
+    WInnForum Recognized CBRS Air Interfaces and Measurements
+*2  <1> cites <2> for several object field definitions
+
+Note 1: <1> Marks each parameter's requirement level with (R)equired, (O)ptional, or (C)onditional.
+In the case of Registration Request Message objects, some parameters are marked as "REG-Conditional," indicating that
+"the parameter is required by the SAS to complete the CBSD registration process, but may be omitted from the
+[Registration_Request] object. If not included in the RegistrationRequest object, the parameter, to the extent that it
+is needed by the SAS to satisfy the Part 96 Rules, shall be provided to the SAS by other means outside the protocol
+specified in this document, e.g., it may be provided by a CPI as required by Part 96 Rules for category B CBSDs or CBSDs
+without automatic location determination, or for operational reasons. Other means based on CBSD device characteristics
+that are beyond the scope of this specification, are not precluded from use.
+
 
 This module uses pydantic to validate objects, inputs, and outputs
 """
+
 from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from decimal import Decimal
@@ -34,8 +48,8 @@ OptFloat = Optional[float]
 OptInt = Optional[int]
 OptDec = Optional[Decimal]
 
-# @dataclass
-class Cbsd_Info:
+
+class Cbsd_Info(BaseModel):
     """
     Optional argument for Registration_Request
     Defined in 10.1.5 of <1>
@@ -46,27 +60,40 @@ class Cbsd_Info:
     All fields are optional
     """
     # Name of CBSD Vendor
-    vendor: OptStr = None
+    vendor: Optional[constr(max_length=64)] = None
     # Name of the CBSD model
-    model: OptStr = None
+    model: Optional[constr(max_length=64)] = None
     # Software version of the CBSD
-    software_version: OptStr = None
+    software_version: Optional[constr(max_length=64)] = None
     # Hardware version of the CBSD
-    hardware_version: OptStr = None
+    hardware_version: Optional[constr(max_length=64)] = None
     # Firmware version of the CBSD
-    firmware_version: OptStr = None
+    firmware_version: Optional[constr(max_length=64)] = None
     # Optional additional vendor information
-    extended_vendor_info: Dict = field(default_factory=dict)
+    extended_vendor_info: Optional[Dict] = field(default_factory=dict)
 
-# @dataclass
-class Air_Interface:
+
+class Radio_Technology_Enum(str, Enum):
+    """
+    Used to specify the possible choices for the 'radio_technology' parameter of an Air_Interface object
+    The peritted values are specified in section 6 of <2>
+    """
+    E_UTRA = "E_UTRA"
+    CAMBRIUM_NETWORKS = "CAMBRIUM_NETWORKS"
+    FOURG_BBW_SAA_1 = "4G_BBW_SAA_1"
+    NR = "NR"
+    DOODLE_CBRS = "DOODLE_CBRS"
+
+
+class Air_Interface(BaseModel):
     """
     A data object that includes information on the air interface technology of the CBSD.
     REG-Conditional for Registration_Request
     Defined in 10.1.2 of <1>
     """
     # REG-Conditional
-    radio_technology: OptStr
+    radio_technology: Radio_Technology_Enum
+
 
 class Height_Type_Enum(str, Enum):
     """
@@ -75,7 +102,7 @@ class Height_Type_Enum(str, Enum):
     agl = "AGL" # measured relative to ground level
     amsl = "AMSL" # measured relative to mean sea level
 
-# @dataclass
+
 class Installation_Param(BaseModel):
     """
     A data object that includes information on CBSD installation.
@@ -118,20 +145,52 @@ class Installation_Param(BaseModel):
     # Optional
     antenna_model: Optional[constr(max_length=128)] = None
 
-# @dataclass
-class Group_Param:
+
+class Meas_Capability_Enum(str, Enum):
+    """
+    Used to specify the possible choices for the 'meas_capability' parameter of a Registration_Request object
+    The permitted values are specified in section 7 of <2>
+    """
+    RECEIVED_POWER_WITHOUT_GRANT = "RECEIVED_POWER_WITHOUT_GRANT"
+    RECEIVED_POWER_WITH_GRANT = "RECEIVED_POWER_WITH_GRANT"
+    INDOOR_LOSS_USING_GNSS = "INDOOR_LOSS_USING_GNSS"
+
+
+class Group_Type_Enum(str, Enum):
+    """
+    Used to specify the possible choices for the 'group_type' parameter of a Group_Param object
+    Note that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that "additional group
+    types are expected to be defined in future revisions."
+    """
+    interference_coordination = "INTERFERENCE_COORDINATION"
+
+
+class Group_Param(BaseModel):
     """
     Object that includes information on CBSD grouping.
     A list of these objects are included as the optional group_param parameter in Registration_Request
     Defined in 10.1.4 of <1>
 
+    <1> 8.3.1: Successful Operation of the CBSD Registration Procedure:
+        "If the RegistrationRequest object contains a groupingParam parameter containing a GroupParam object having the
+        groupType parameter set to "INTERFERENCE_COORDINATION", the CBSD is requesting the SAS to not provide any
+        intra-group, inter-CBSD interference coordination between CBSDs sharing the value of the groupId parameter
+        provided in the request (Ref [n.8] 96.35(e), 96.41(d)(1)).
+
+        Notes:
+            The procedure by which CBSDs determine a common value of groupId, and therefore Interference Coordination
+                Group membership, is outside the scope of this specification.
+            The CBSD's use of an Interference Coordination Group declares to the SAS that all members of the particular
+                Group are using methods defined outside the scope of this specification to manage radio interference
+                among themselves.
+
     All fields are required.
     """
-    group_type: str
+    group_type: Group_Type_Enum
     group_id: str
 
-# @dataclass
-class Professional_Installer_Data:
+
+class Professional_Installer_Data(BaseModel):
     """
     "The value of this parameter is the data identifying the CPI vouching for the installation parameters included in
     the installationParam value contained in this object"
@@ -142,15 +201,17 @@ class Professional_Installer_Data:
     All fields are required.
     The maximum length of cpi_id and cpi_name is 256 octets.
     installation_certification_time is the UTC datetime at which the CPI identified in this object cerified the CBSD's
-    installed parameters. It is expressed using the format, YYYY-MM-DDThh:mm:ssZ, as defined by [n.7]/
+    installed parameters. It is expressed using the format, YYYY-MM-DDThh:mm:ssZ, as defined by [n.7]
     """
-    cpi_id: str
-    cpi_name: str
-    # (See documentation)
-    install_certification_time: str
+    cpi_id: constr(max_length=256)
+    cpi_name: constr(max_length=256)
+    # YYYY-MM-DDThh:mm:ssZ
+    # install_certification_time: str
+    # The ellipsis indicates that the field is required
+    install_certification_time: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
 
-# @dataclass
-class Cpi_Signed_Data:
+
+class Cpi_Signed_Data(BaseModel):
     """
     The un-encoded "encoded_cpi_signed_data" parameter of a Cpi_Signature Data object
     Defined in 10.1.7 in <1>
@@ -161,8 +222,9 @@ class Cpi_Signed_Data:
     installation_param: Installation_Param
     professional_installer_data: Professional_Installer_Data
 
+    def base64_encode(self):
+        pass
 
-# @dataclass
 class Cpi_Signature_Data:
     """
     The CPI is vouching for the parameters in this object. In addition, the digital signature for these parameters is
@@ -194,10 +256,19 @@ class Cpi_Signature_Data:
     encoded_cpi_signed_data: str
     digital_signature: str
 
-# @dataclass
+
 class Registration_Request:
     """
     RegistrationRequest object per section 10.1.1 of <1>
+
+    <1> 8.3.1: CBSD Registration Procedure: "The CBSD then initiates the Registration procedure by sending a
+        RegistrationRequestobject(userId, fccId, cbsdSerialNumber, callSign, cbsdCategory, cbsdInfo, airInterface,
+        installationParam, measCapability, groupingParam) to the SAS. The fccId, callSign, cbsdSerialNumber, and userId
+        parameters identify the CBSD to the SAS. The cbsdCategory, cbsdInfo, airInterface, and installationParam
+        parameters provide specific information on the CBSD equipment capabilities. The measCapability parameter
+        identifies the measurement reporting capabilities of the CBSD. The optional GroupingParam object requests the
+        SAS to enroll the CBSD as a member of one or more Groups."
+
     """
     # Required
     user_id: str
@@ -210,14 +281,14 @@ class Registration_Request:
     # REG-Conditional
     cbsd_category: Optional[str] = None
     # Optional
-    cbsd_info: Optional[Cbsd_Info] = field(default_factory=Cbsd_Info)
+    cbsd_info: Optional[Cbsd_Info] = None
     # REG-Conditional
-    air_interface: Optional[Air_Interface] = field(default_factory=Air_Interface)
+    air_interface: Optional[Air_Interface] = None
     # REG-Conditional
-    installation_param: Optional[Installation_Param] = field(default_factory=Installation_Param)
+    installation_param: Optional[Installation_Param] = None
     # REG-Conditional
-    meas_capability: Optional[List[str]] = field(default_factory=list)
+    meas_capability: Optional[List[Meas_Capability_Enum]] = None
     # Optional
-    grouping_param: Optional[List[Group_Param]] = field(default_factory=Group_Param)
+    grouping_param: Optional[List[Group_Param]] = None
     # Optional
-    cpi_signature_data: Optional[Cpi_Signature_Data] = field(default_factory=Cpi_Signature_Data)
+    cpi_signature_data: Optional[Cpi_Signature_Data] = None
