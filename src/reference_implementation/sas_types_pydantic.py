@@ -146,7 +146,7 @@ class Installation_Param(BaseModel):
     antenna_model: Optional[constr(max_length=128)] = None
 
 
-class Meas_Capability_Enum(str, Enum):
+class Meas_Report_Type(str, Enum):
     """
     Used to specify the possible choices for the 'meas_capability' parameter of a Registration_Request object
     The permitted values are specified in section 7 of <2>
@@ -225,7 +225,7 @@ class Cpi_Signed_Data(BaseModel):
     def base64_encode(self):
         pass
 
-class Cpi_Signature_Data:
+class Cpi_Signature_Data(BaseModel):
     """
     The CPI is vouching for the parameters in this object. In addition, the digital signature for these parameters is
     included.
@@ -257,9 +257,9 @@ class Cpi_Signature_Data:
     digital_signature: str
 
 
-class Registration_Request:
+class Registration_Request(BaseModel):
     """
-    RegistrationRequest object per section 10.1.1 of <1>
+    RegistrationRequest object as defined in section 10.1.1 of <1>
 
     <1> 8.3.1: CBSD Registration Procedure: "The CBSD then initiates the Registration procedure by sending a
         RegistrationRequestobject(userId, fccId, cbsdSerialNumber, callSign, cbsdCategory, cbsdInfo, airInterface,
@@ -287,8 +287,111 @@ class Registration_Request:
     # REG-Conditional
     installation_param: Optional[Installation_Param] = None
     # REG-Conditional
-    meas_capability: Optional[List[Meas_Capability_Enum]] = None
+    meas_capability: Optional[List[Meas_Report_Type]] = None
     # Optional
     grouping_param: Optional[List[Group_Param]] = None
     # Optional
     cpi_signature_data: Optional[Cpi_Signature_Data] = None
+
+
+class Response_Code_Enum(IntEnum):
+    """
+    Contains the valid response codes for the response_code parameter of a Response object.
+    Defined in 10.1.3 of <1>
+
+    The response codes are grouped into the following categories and defined in the following table. The name associated
+    with each responseCode parameter is not included in the Response object, but can be attached to a responseCode
+    parameter by the CBSD or other network entity for logging or human-involved troubleshooting.
+        0: success
+        100 – 199: general errors related to the SAS-CBSD protocol
+        200 – 299: error events related to the CBSD Registration procedure
+        300 – 399: error events related to the Spectrum Inquiry procedure
+        400 – 499: error events related to the Grant procedure
+        500 – 599: error events related to the Heartbeat procedure
+    """
+    # "CBSD request is approved by SAS"
+    SUCCESS = 0
+    # "SAS protocol version used by CBSD is not supported by SAS"
+    VERSION = 100
+    # "CBSD is blacklisted. This responseCode is returned if the CBSD is under a SAS or FCC enforcement action and is
+    # barred from CBRS operation. In general, the CBSD should not try to re-register until actions external to this
+    # specification are taken. Note: Blacklisting behavior by the SAS and CBSD is FFS."
+    BLACKLISTED = 101
+    # "Required parameters missing"
+    MISSING_PARAM = 102
+    # "One or more parameters have invalid value"
+    INVALID_VALUE = 103
+    # "There is an error in the certificate used to make the request (e.g. the credential is of the wrong role). Note:
+    # Most certificate errors, such as expired or syntactically invalid certificates, will cause errors at the TLS
+    # connection."
+    CERT_ERROR = 104
+    # "A CBSD receiving this responseCode is automatically deregistered by the SAS. The CBSD shall cease all
+    # transmissions, terminate all Grants, and consider itself Unregistered. The SAS may include this responseCode
+    # parameter in any message. The responseMessage parameter may contain a string describing the reason for
+    # deregistration."
+    DEREGISTER = 105
+    # "Incomplete registration information. The registration process is pending. One or more REG-Conditional parameters
+    # have not yet been supplied to the SAS. The CBSD is likely to accomplish a successful registration when the missing
+    # registration information is made available to the SAS."
+    REG_PENDING = 200
+    # "An error has been identified in the grouping parameters of the CBSD."
+    GROUP_ERROR = 201
+    # "The frequency range indicated in the spectrum inquiry request or grant request is at least partially outside of
+    # the CBRS band."
+    UNSUPPORTED_SPECTRUM = 300
+    # "Requested operation parameters cause too much interference. This responseCode value indicates that the Grant
+    # request is unlikely to be successful if retried by the CBSD."
+    INTERFERENCE = 400
+    # "Conflict with an existing Grant of the same CBSD. The CBSD should be able to remediate this using the data
+    # returned in the responseData structure, by synchronizing its Grant state with the SAS and relinquishing any
+    # out-of-sync Grants."
+    GRANT_CONFLICT = 401
+    # "The Grant is terminated. This condition occurs if, for example, incumbent status has changed permanently causing
+    # the current Grant to terminate. The CBSD shall terminate radio operation by turning off its radio transmission
+    # associated with this Grant within 60 seconds after the value of the transmitExpireTime parameter expires, in
+    # accordance with part 96.39(c)(2) (ref. [n.8]). The Grant is considered terminated by the SAS, but the CBSD may
+    # relinquish the Grant. If the operationParam parameter is included in the HeartbeatResponse object, the CBSD should
+    # consider it as a recommendation by the SAS to obtain a new Grant using the included operational parameter values,
+    # and may request a new Grant using those operational parameters."
+    TERMINATED_GRANT = 500
+    # "The Grant is suspended. This condition occurs if incumbent status has changed temporarily. The CBSD shall
+    # terminate radio operation by turning off its radio transmission associated with this Grant within 60 seconds
+    # after the value of the transmitExpireTime parameter expires, in accordance with part 96.39(c)(2) (ref. [n.8]).
+    # In such a case the CBSD may continue to send HeartbeatRequest objects and waiting until the Grant is re-enabled,
+    # or may relinquish the Grant and request another. If the operationParam parameter is included in the
+    # HeartbeatResponse object, the CBSD should consider it as a recommendation by the SAS to obtain a new Grant using
+    # the included operational parameter values, and may request a new Grant using those parameters."
+    SUSPENDED_GRANT = 501
+    # "The Grant state is out of sync between the CBSD and the SAS. The CBSD shall turn off the radio transmission
+    # associated with this Grant within 60 seconds from receiving this responseCode value, in accordance with Part
+    # 96.39(c)(2) (ref. [n.8]), and shall relinquish this Grant."
+    UNSYNC_OF_PARAM = 502
+
+
+class Response(BaseModel):
+    """
+    A data object that "includes information on whether the corresponding CBSD request is approved or disapproved for a
+    response," defined in 10.2.2 of <1>.
+    Required parameter of Registration_Response.
+    """
+    # Required
+    response_code: Response_Code_Enum
+    # Optional
+    response_message: Optional[str] = None
+    # Optional
+    # TODO: Annotate/create the data objects for response_data according to Table 40 in <1>
+    response_data: Optional[str] = None
+
+
+class Registration_Response(BaseModel):
+    """
+    RegistrationResponse object as defined in 10.2.1 of <1>
+    """
+    # Required
+    response: Response
+    # Conditional; included IFF response_code indicates SUCCESS
+    cbsd_id: Optional[constr(max_length=256)] = None
+    # Optional
+    meas_report_config: Optional[List[Meas_Report_Type]] = None
+
+
