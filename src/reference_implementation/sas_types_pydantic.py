@@ -379,8 +379,13 @@ class Response(BaseModel):
     # Optional
     response_message: Optional[str] = None
     # Optional
-    # TODO: Annotate/create the data objects for response_data according to Table 40 in <1>
-    response_data: Optional[str] = None
+    # If response_code is 100, the error data is a list of Protocol versions supported by the SAS administrator;
+    # if 102, a list of missing parameters
+    # if 103, a list of parameter names with invalid values
+    # if 200, a list of missing registration parameters
+    # if 401, the Grant ID of an existing Grant that causes the conflict (also in List[str] format)
+    # the response_data is not present for any other response_code value
+    response_data: Optional[List[str]] = None
 
 
 class Registration_Response(BaseModel):
