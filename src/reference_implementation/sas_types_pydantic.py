@@ -457,3 +457,57 @@ class Spectrum_Inquiry_Response(BaseModel):
     cbsd_id: Optional[str] = None
     # Conditional; included IFF the Spectrum Inquiry is successful
     available_channel: Optional[List[Available_Channel]] = None
+
+
+class Operation_Param(BaseModel):
+    """
+    "This data object includes operation parameters of the requested Grant."
+    Required param for Grant_Request.
+    All fields are required.
+    """
+    max_eirp: Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]
+    operation_frequency_range = Frequency_Range
+
+class Grant_Request(BaseModel):
+    """
+    GrantRequest object as defined in 10.5.1 of <1>
+
+    "A GrantRequest object contains operating parameters that the CBSD plans to operate with. Operation parameters
+    include a continuous segment of spectrum and the maximum EIRP."
+    """
+    # Req
+    cbsd_id: str
+    # Req
+    operation_param: Operation_Param
+    # Cond; the document does not specify when this parameter should be included
+    meas_report: Optional[Meas_Report_Type] = None
+
+
+class Grant_Response(BaseModel):
+    """
+    GrantResponse object as defined in 10.6.1 of <1>
+
+    grant_expire_time: "The grantExpireTime indicates the time when the Grant associated with the grantId expires. This
+    parameter is UTC time expressed in the format, YYYY-MM-DDThh:mm:ssZ as defined by [n.7]. This parameter shall be
+    included if and only if the responseCode parameter indicates SUCCESS. If the channelType parameter is included in
+    this object and the value is set to 'PAL', the grantExpireTime parameter shall be set to the value that does not
+    extend beyond the licenseExpiration of the corresponding PAL recorded in the PAL Database [n.23]."
+    """
+    # Req
+    response: Response
+    # Conditional; included IFF cbsd_id param in Grant_Request is a valid CBSD identity
+    cbsd_id: Optional[str] = None
+    # Cond; ID provided by the SAS for this grant, included IFF the Grant request is approved
+    grant_id: Optional[str] = None
+    # Cond; see docstring
+    grant_expire_time: Optional[str] = None
+    # Cond; included IFF response_code indicates SUCCESS
+    heartbeat_interval: Optional[conint(gt=0)] = None
+    # Optional
+    meas_report_config: Optional[List[Meas_Report_Type]] = None
+    # Optional
+    operation_param: Optional[Operation_Param] = None
+    # Cond; included IFF response_code indicates SUCCESS
+    channel_type: Optional[Channel_Type_Enum] = None
+
+
