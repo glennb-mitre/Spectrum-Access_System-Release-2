@@ -400,3 +400,60 @@ class Registration_Response(BaseModel):
     meas_report_config: Optional[List[Meas_Report_Type]] = None
 
 
+class Frequency_Range(BaseModel):
+    """
+    A data object that "describes the spectrum for which the CBSD seeks information on spectrum availability."
+    Defined in section 10.3.2 of <1>.
+    Required parameter of Spectrum_Inquiry_Request.
+    All fields are required
+    """
+    low_frequency: condecimal(gt=Decimal(0))
+    high_frequency: condecimal(gt=Decimal(0))
+
+
+class Spectrum_Inquiry_Request(BaseModel):
+    """
+    SpectrumInquiryRequest object as defined in 10.3.1 of <1>
+    """
+    # Required
+    cbsd_id: str
+    # Required
+    inquired_spectrum: Frequency_Range
+    # Conditional; the document does not specify when this parameter should be included
+    meas_report: Meas_Report_Type
+
+class Channel_Type_Enum(str, Enum):
+    """
+    Contains the valid choices for the channel_type parameter of an Available_Channel object.
+    Defined in 10.4.2 of <1>
+    """
+    PAL = "PAL"
+    GAA = "GAA"
+
+class Available_Channel(BaseModel):
+    """
+    "A data object that describes a channel that is available for the CBSD"
+    Defined in 10.4.2 of <1>
+    Required as available_channel parameter of Spectrum_Inquiry_Response IFF the inquiry is successful
+    """
+    # Required
+    frequency_range: Frequency_Range
+    # Req
+    channel_type: Channel_Type_Enum
+    # Req; "the regulatory rule used to generate this response, e.g., 'FCC_PART_96'."
+    rule_applied: str
+    # Optional; Maximum EIRP likely to be permitted for a Grant on this frequencyRange, given the CBSD registration
+    # parameters, including location, antenna orientation and antenna pattern. The maximum EIRP is in the units of
+    # dBm/MHz and is an integer or a floating point value between -137 and +37 (dBm/MHz) inclusive.
+    max_eirp: Optional[Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]] = None
+
+class Spectrum_Inquiry_Response(BaseModel):
+    """
+    SpectrumInquiryResponse object as defined in 10.4.1 of <1>
+    """
+    # Required
+    response: Response
+    # Conditional; included IFF the request contains a valid CBSD Identity
+    cbsd_id: Optional[str] = None
+    # Conditional; included IFF the Spectrum Inquiry is successful
+    available_channel: Optional[List[Available_Channel]] = None
