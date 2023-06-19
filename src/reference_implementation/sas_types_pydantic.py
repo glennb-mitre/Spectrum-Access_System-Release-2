@@ -511,3 +511,31 @@ class Grant_Response(BaseModel):
     channel_type: Optional[Channel_Type_Enum] = None
 
 
+class Operation_State_Enum(str, Enum):
+    """
+    Defines the possible values of the required operation_state parameter of a Heartbeat_Request object
+    """
+    AUTHORIZED = "AUTHORIZED"
+    GRANTED = "GRANTED"
+
+
+class Meas_Report(BaseModel):
+    """
+    TODO: measurement objects specified in <2>
+    """
+    pass
+
+class Heartbeat_Request(BaseModel):
+    """
+    HeartbeatRequest object as defined in 10.7.1 of <1>
+    """
+    # Required
+    cbsd_id: str
+    # Req
+    grant_id: str
+    # Req
+    operation_state: Operation_State_Enum
+    # Opt
+    grant_renew: Optional[bool] = None
+    # Conditional; see 8.6 for inclusion rules
+    meas_report: Optional[Meas_Report] = None
