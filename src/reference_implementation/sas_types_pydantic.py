@@ -18,7 +18,6 @@ that are beyond the scope of this specification, are not precluded from use.
 This module uses pydantic to validate objects, inputs, and outputs
 """
 
-from dataclasses import dataclass, field
 from enum import Enum, IntEnum
 from decimal import Decimal
 from typing import Optional, Any, Union, List, Dict, Tuple
@@ -70,7 +69,7 @@ class Cbsd_Info(BaseModel):
     # Firmware version of the CBSD
     firmware_version: Optional[constr(max_length=64)] = None
     # Optional additional vendor information
-    extended_vendor_info: Optional[Dict] = field(default_factory=dict)
+    extended_vendor_info: Optional[Dict] = Field(default_factory=dict)
 
 
 class Radio_Technology_Enum(str, Enum):
@@ -257,6 +256,14 @@ class Cpi_Signature_Data(BaseModel):
     digital_signature: str
 
 
+class Cbsd_Category_Enum(str, Enum):
+    """
+    Allowed values for the cbsd_category parameter of a RegistrationRequest object, as defined in table 4 of <1>.
+    """
+    A = "A"
+    B = "B"
+
+
 class Registration_Request(BaseModel):
     """
     RegistrationRequest object as defined in section 10.1.1 of <1>
@@ -279,7 +286,7 @@ class Registration_Request(BaseModel):
     # Optional
     call_sign: Optional[str] = None
     # REG-Conditional
-    cbsd_category: Optional[str] = None
+    cbsd_category: Optional[Cbsd_Category_Enum] = None
     # Optional
     cbsd_info: Optional[Cbsd_Info] = None
     # REG-Conditional
