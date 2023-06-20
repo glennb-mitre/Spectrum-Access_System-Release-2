@@ -519,11 +519,96 @@ class Operation_State_Enum(str, Enum):
     GRANTED = "GRANTED"
 
 
-class Meas_Report(BaseModel):
+class Rcvd_Power_Meas_Report(BaseModel):
     """
-    TODO: measurement objects specified in <2>
+    A data object containing information about the "Recived Power" measurement, a "Measurement of the radio frequency
+    energy received over a set of frequency ranges during a measurement interval with results reported to a SAS for each
+    of the frequency ranges in terms of effective received power for each frequency range."
+
+    Defined in table 7.1-2 of section 7.1.1 and table 7.1-4 of section 7.1.2 of <2> as RcvdPowerMeasReport
+
+    7.1.1: RECEIVED_POWER_WITHOUT_GRANT:
+        "Semantics: Received Power can be measured and reported when the CBSD does
+        not have a spectrum grant from the SAS. If this measurement report capability is indicated by the SAS to the
+        CBSD, the CBSD performs and reports Received Power measurements over the entire CBRS band in segments that do not
+        exceed 10 MHz per measurement report. Those measurement reports are sent to the SAS in the first Spectrum Inquiry
+        Request message and first Grant Request message.
+
+        A given CBSD can include unsolicited (i.e., even if SAS did not send measReportConfig to CBSD) measReport object
+        in spectrumInquiryRequest object or grantRequest object, if the CBSD included measCapability parameter in
+        registrationRequest object to SAS with a value of RECEIVED_POWER_WITHOUT_GRANT.
+
+        A given CBSD must include measReport parameter in spectrumInquiryRequest object, if SAS included measReportConfig
+        parameter in registrationResponse object to CBSD."
+
+    7.1.2: RECEIVED_POWER_WITH_GRANT:
+        "Semantics: Received Power can be measured and reported when the CBSD has a
+        spectrum grant from the SAS. If this measurement report capability is indicated by the SAS to the CBSD,
+        the CBSD performs and reports Received Power measurements over one or more frequency ranges that do not exceed 10
+        MHz per measurement report. The measurement report(s) are sent to the SAS in the subsequent Heartbeat Request
+        message.
+
+        A given CBSD can include unsolicited (i.e., even if SAS did not send measReportConfig to CBSD) measReport object
+        in spectrumInquiryRequest or heartbeatRequest object, if the CBSD included measCapability parameter in
+        registrationRequest object to SAS with a value of RECEIVED_POWER_WITH_GRANT.
+
+        A given CBSD must include measReport parameter in the first heartbeatRequest object, if SAS included
+        measReportConfig parameter in either grantResponse or heartbeatResponse objects to CBSD."
+
+    All fields are required
     """
-    pass
+    meas_frequency: conint(gt=0)
+    meas_bandwidth: conint(gt=0)
+    # TODO: Verify that this param given in units of dBm is (possibly) a FP quantity; Also, that the range is inclusive.
+    meas_rcvd_power: confloat(ge=-100, le=-25)
+
+
+class Indoor_Loss_Technology_Type_Enum(str, Enum):
+    """
+    Contains the permitted values for the "technology_type" parameter of an Indoor_Loss_GNSS_Meas_Report object.
+    Defined in table 7.2-2 of section 7.2.1 of <2>
+    """
+    GPS_L1 = "GPS_L1"
+    GPS_L2 = "GPS_L2"
+    GPS_L5 = "GPS_L5"
+    GLONASS_G1 = "GLONASS_G1"
+    GLONASS_G2 = "GLONASS_G2"
+    GLONASS_G3 = "GLONASS_G3"
+    GALILEO_E1 = "GALILEO_E1"
+    GALILEO_E5A = "GALILEO_E5A"
+    GALILEO_E5B = "GALILEO_E5B"
+    GALILEO_E6 = "GALILEO_E6"
+    BEIDOU_B1 = "BEIDOU_B1"
+    BEIDOU_B2 = "BEIDOU_B2"
+    BEIDOU_B3 = "BEIDOU_B3"
+
+
+class Indoor_Loss_GNSS_Meas_Report(BaseModel):
+    """
+    A data object containing information about the "Indoor Loss" measurement, a "Measurement of indoor loss at physical
+    location of CBSD. This indoor attenuation data will be sent to a SAS to provide power and frequency management of the CBSD"
+
+    Defined in table 7.2-2 of section 7.2.1 of <2>
+
+    7.2.1: INDOOR_LOSS_USING_GNSS:
+        "Semantics: A GNSS receiver along with its antenna, embedded inside a CBSD
+        measures received power levels at 1575.42 MHz. GNSS power levels outdoors are well regulated and are maintained
+        uniformly at -128.5 dBm into a 0 dBic antenna at ground level to 5 degrees elevation angle. By using an extremely
+        sensitive GPS L1 C/A code receiver, this method can measure indoor losses up to 46.5 dB.
+
+        This does not fulfill the requirement of Part 96.39(d) but can provide supplemental information to the SAS.
+
+        The indoor loss measurements are sent to the SAS upon request."
+
+    All fields are required.
+    """
+    indoor_loss: confloat(ge=0, le=70)
+    azimuth_angle_with_gnss: conint(ge=0, le=359)
+    elevation_angle_with_gnss: conint(ge=0, le=90)
+    technology_type: Indoor_Loss_Technology_Type_Enum
+
+
+Meas_Report = Union[List[Rcvd_Power_Meas_Report], List[Indoor_Loss_GNSS_Meas_Report]]
 
 class Heartbeat_Request(BaseModel):
     """
@@ -538,4 +623,5 @@ class Heartbeat_Request(BaseModel):
     # Opt
     grant_renew: Optional[bool] = None
     # Conditional; see 8.6 for inclusion rules
+    # TODO: Check if this is a List of Meas_Report objects
     meas_report: Optional[Meas_Report] = None
