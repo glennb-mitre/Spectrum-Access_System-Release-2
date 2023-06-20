@@ -422,6 +422,7 @@ class Spectrum_Inquiry_Request(BaseModel):
     # Conditional; the document does not specify when this parameter should be included
     meas_report: Meas_Report_Type
 
+
 class Channel_Type_Enum(str, Enum):
     """
     Contains the valid choices for the channel_type parameter of an Available_Channel object.
@@ -429,6 +430,7 @@ class Channel_Type_Enum(str, Enum):
     """
     PAL = "PAL"
     GAA = "GAA"
+
 
 class Available_Channel(BaseModel):
     """
@@ -446,6 +448,7 @@ class Available_Channel(BaseModel):
     # parameters, including location, antenna orientation and antenna pattern. The maximum EIRP is in the units of
     # dBm/MHz and is an integer or a floating point value between -137 and +37 (dBm/MHz) inclusive.
     max_eirp: Optional[Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]] = None
+
 
 class Spectrum_Inquiry_Response(BaseModel):
     """
@@ -467,6 +470,7 @@ class Operation_Param(BaseModel):
     """
     max_eirp: Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]
     operation_frequency_range = Frequency_Range
+
 
 class Grant_Request(BaseModel):
     """
@@ -610,6 +614,7 @@ class Indoor_Loss_GNSS_Meas_Report(BaseModel):
 
 Meas_Report = Union[List[Rcvd_Power_Meas_Report], List[Indoor_Loss_GNSS_Meas_Report]]
 
+
 class Heartbeat_Request(BaseModel):
     """
     HeartbeatRequest object as defined in 10.7.1 of <1>
@@ -657,4 +662,44 @@ class Heartbeat_Response(BaseModel):
     meas_report_config: Optional[List[Meas_Report_Type]]
 
 
+class Relinquishment_Request(BaseModel):
+    """
+    RelinquishmentRequest object as defined in 10.9.1 of <1>
+    All fields are required.
+    """
+    cbsd_id: str
+    grant_id: str
 
+
+class Relinquishment_Response(BaseModel):
+    """
+    RelinquishmentResponse object as defined in 10.10.1 of <1>
+    """
+    response: Response
+    # Conditional; "Included IFF the cbsdId parameter in the RelinquishmentRequest object
+    # contains a valid CBSD identity. If included, the SAS shall set this parameter to the value of the cbsdId
+    # parameter in the corresponding RelinquishmentRequest object"
+    cbsd_id: str
+    # Conditional; "Included IFF the grantId parameter in the RelinquishmentRequest object contains a valid Grant
+    # identity. If included, the SAS shall set this parameter to the value of the grantId parameter in the
+    # corresponding RelinquishmentRequest object"
+    grant_id: str
+
+
+class Deregistration_Request(BaseModel):
+    """
+    DeregistrationRequest object as defined in 10.11.1 of <1>
+    All fields are required.
+    """
+    cbsd_id: str
+
+
+class Deregistration_Response(BaseModel):
+    """
+    DeregistrationResponse object as defined in 10.12.1 of <1>
+    """
+    response: Response
+    # Conditional; "Included IFF the cbsdId parameter in the DeregistrationRequest object
+    # contains a valid CBSD identity. If included, the SAS shall set this parameter to the value of the cbsdId
+    # parameter in the corresponding DeregistrationRequest object"
+    cbsd_id: str
