@@ -625,3 +625,36 @@ class Heartbeat_Request(BaseModel):
     # Conditional; see 8.6 for inclusion rules
     # TODO: Check if this is a List of Meas_Report objects
     meas_report: Optional[Meas_Report] = None
+
+
+class Heartbeat_Response(BaseModel):
+    """
+    HeartbeatResponse object as defined in 10.8.1. of <1>
+    """
+    # Req
+    response: Response
+    # Req
+    transmit_expire_time: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    # Cond; This parameter is included if and only if  the cbsdId parameter in the HeartbeatRequest object contains a
+    # valid CBSD identity. If included, the SAS shall set this parameter to the value of thein the corresponding
+    # HeartbeatRequest object.
+    cbsd_id: Optional[str] = None
+    # Cond; included iff "the grantId parameter in the HeartbeatRequest object contains a valid Grant identity. If
+    # included, the SAS shall set this parameter to the value of the grantId parameter in the corresponding
+    # HeartbeatRequest object"
+    grant_id: Optional[str] = None
+    # Cond; "Required if the responseCode parameter indicates SUCCESS or SUSPENDED_GRANT and the grantRenew parameter
+    # was included and set to True in the corresponding HeartbeatRequest object. This parameter may be included at
+    # other times by SAS choice. When included, if the channelType of this Grant is “PAL”, this parameter shall be
+    # set to the value that does not extend beyond the licenseExpiration of the corresponding PAL recorded in the PAL
+    # Database [n.23]."
+    grant_expire_time: Optional[str] = None
+    # Optional
+    heartbeat_interval: Optional[conint(gt=0)] = None
+    # Optional
+    operation_param: Optional[Operation_Param] = None
+    # Optional
+    meas_report_config: Optional[List[Meas_Report_Type]]
+
+
+
