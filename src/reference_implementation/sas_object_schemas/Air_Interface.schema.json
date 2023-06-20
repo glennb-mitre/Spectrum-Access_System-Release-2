@@ -1,0 +1,31 @@
+{
+  "title": "Air_Interface JSON Schema",
+  "$ref": "#/definitions/Air_Interface",
+  "definitions": {
+    "Radio_Technology_Enum": {
+      "title": "Radio_Technology_Enum",
+      "description": "Used to specify the possible choices for the 'radio_technology' parameter of an Air_Interface object\nThe peritted values are specified in section 6 of <2>",
+      "enum": [
+        "E_UTRA",
+        "CAMBRIUM_NETWORKS",
+        "4G_BBW_SAA_1",
+        "NR",
+        "DOODLE_CBRS"
+      ],
+      "type": "string"
+    },
+    "Air_Interface": {
+      "title": "Air_Interface",
+      "description": "A data object that includes information on the air interface technology of the CBSD.\nREG-Conditional for Registration_Request\nDefined in 10.1.2 of <1>",
+      "type": "object",
+      "properties": {
+        "radio_technology": {
+          "$ref": "#/definitions/Radio_Technology_Enum"
+        }
+      },
+      "required": [
+        "radio_technology"
+      ]
+    }
+  }
+}

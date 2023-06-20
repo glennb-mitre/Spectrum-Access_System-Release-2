@@ -1,0 +1,20 @@
+{
+  "title": "Deregistration_Request JSON Schema",
+  "$ref": "#/definitions/Deregistration_Request",
+  "definitions": {
+    "Deregistration_Request": {
+      "title": "Deregistration_Request",
+      "description": "DeregistrationRequest object as defined in 10.11.1 of <1>\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "cbsd_id": {
+          "title": "Cbsd Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cbsd_id"
+      ]
+    }
+  }
+}

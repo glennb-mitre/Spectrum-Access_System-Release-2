@@ -1,0 +1,60 @@
+{
+  "title": "Indoor_Loss_GNSS_Meas_Report JSON Schema",
+  "$ref": "#/definitions/Indoor_Loss_GNSS_Meas_Report",
+  "definitions": {
+    "Indoor_Loss_Technology_Type_Enum": {
+      "title": "Indoor_Loss_Technology_Type_Enum",
+      "description": "Contains the permitted values for the \"technology_type\" parameter of an Indoor_Loss_GNSS_Meas_Report object.\nDefined in table 7.2-2 of section 7.2.1 of <2>",
+      "enum": [
+        "GPS_L1",
+        "GPS_L2",
+        "GPS_L5",
+        "GLONASS_G1",
+        "GLONASS_G2",
+        "GLONASS_G3",
+        "GALILEO_E1",
+        "GALILEO_E5A",
+        "GALILEO_E5B",
+        "GALILEO_E6",
+        "BEIDOU_B1",
+        "BEIDOU_B2",
+        "BEIDOU_B3"
+      ],
+      "type": "string"
+    },
+    "Indoor_Loss_GNSS_Meas_Report": {
+      "title": "Indoor_Loss_GNSS_Meas_Report",
+      "description": "A data object containing information about the \"Indoor Loss\" measurement, a \"Measurement of indoor loss at physical\nlocation of CBSD. This indoor attenuation data will be sent to a SAS to provide power and frequency management of the CBSD\"\n\nDefined in table 7.2-2 of section 7.2.1 of <2>\n\n7.2.1: INDOOR_LOSS_USING_GNSS:\n    \"Semantics: A GNSS receiver along with its antenna, embedded inside a CBSD\n    measures received power levels at 1575.42 MHz. GNSS power levels outdoors are well regulated and are maintained\n    uniformly at -128.5 dBm into a 0 dBic antenna at ground level to 5 degrees elevation angle. By using an extremely\n    sensitive GPS L1 C/A code receiver, this method can measure indoor losses up to 46.5 dB.\n\n    This does not fulfill the requirement of Part 96.39(d) but can provide supplemental information to the SAS.\n\n    The indoor loss measurements are sent to the SAS upon request.\"\n\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "indoor_loss": {
+          "title": "Indoor Loss",
+          "minimum": 0,
+          "maximum": 70,
+          "type": "number"
+        },
+        "azimuth_angle_with_gnss": {
+          "title": "Azimuth Angle With Gnss",
+          "minimum": 0,
+          "maximum": 359,
+          "type": "integer"
+        },
+        "elevation_angle_with_gnss": {
+          "title": "Elevation Angle With Gnss",
+          "minimum": 0,
+          "maximum": 90,
+          "type": "integer"
+        },
+        "technology_type": {
+          "$ref": "#/definitions/Indoor_Loss_Technology_Type_Enum"
+        }
+      },
+      "required": [
+        "indoor_loss",
+        "azimuth_angle_with_gnss",
+        "elevation_angle_with_gnss",
+        "technology_type"
+      ]
+    }
+  }
+}

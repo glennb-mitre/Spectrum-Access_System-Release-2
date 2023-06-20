@@ -1,0 +1,73 @@
+{
+  "title": "Available_Channel JSON Schema",
+  "$ref": "#/definitions/Available_Channel",
+  "definitions": {
+    "Frequency_Range": {
+      "title": "Frequency_Range",
+      "description": "A data object that \"describes the spectrum for which the CBSD seeks information on spectrum availability.\"\nDefined in section 10.3.2 of <1>.\nRequired parameter of Spectrum_Inquiry_Request.\nAll fields are required",
+      "type": "object",
+      "properties": {
+        "low_frequency": {
+          "title": "Low Frequency",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "high_frequency": {
+          "title": "High Frequency",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "low_frequency",
+        "high_frequency"
+      ]
+    },
+    "Channel_Type_Enum": {
+      "title": "Channel_Type_Enum",
+      "description": "Contains the valid choices for the channel_type parameter of an Available_Channel object.\nDefined in 10.4.2 of <1>",
+      "enum": [
+        "PAL",
+        "GAA"
+      ],
+      "type": "string"
+    },
+    "Available_Channel": {
+      "title": "Available_Channel",
+      "description": "\"A data object that describes a channel that is available for the CBSD\"\nDefined in 10.4.2 of <1>\nRequired as available_channel parameter of Spectrum_Inquiry_Response IFF the inquiry is successful",
+      "type": "object",
+      "properties": {
+        "frequency_range": {
+          "$ref": "#/definitions/Frequency_Range"
+        },
+        "channel_type": {
+          "$ref": "#/definitions/Channel_Type_Enum"
+        },
+        "rule_applied": {
+          "title": "Rule Applied",
+          "type": "string"
+        },
+        "max_eirp": {
+          "title": "Max Eirp",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -137,
+              "maximum": 37
+            },
+            {
+              "type": "number",
+              "minimum": -137.0,
+              "maximum": 37.0
+            }
+          ]
+        }
+      },
+      "required": [
+        "frequency_range",
+        "channel_type",
+        "rule_applied"
+      ]
+    }
+  }
+}

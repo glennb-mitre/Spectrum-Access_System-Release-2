@@ -1,0 +1,143 @@
+{
+  "title": "Spectrum_Inquiry_Response JSON Schema",
+  "$ref": "#/definitions/Spectrum_Inquiry_Response",
+  "definitions": {
+    "Response_Code_Enum": {
+      "title": "Response_Code_Enum",
+      "description": "Contains the valid response codes for the response_code parameter of a Response object.\nDefined in 10.1.3 of <1>\n\nThe response codes are grouped into the following categories and defined in the following table. The name associated\nwith each responseCode parameter is not included in the Response object, but can be attached to a responseCode\nparameter by the CBSD or other network entity for logging or human-involved troubleshooting.\n    0: success\n    100 \u2013 199: general errors related to the SAS-CBSD protocol\n    200 \u2013 299: error events related to the CBSD Registration procedure\n    300 \u2013 399: error events related to the Spectrum Inquiry procedure\n    400 \u2013 499: error events related to the Grant procedure\n    500 \u2013 599: error events related to the Heartbeat procedure",
+      "enum": [
+        0,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        200,
+        201,
+        300,
+        400,
+        401,
+        500,
+        501,
+        502
+      ],
+      "type": "integer"
+    },
+    "Response": {
+      "title": "Response",
+      "description": "A data object that \"includes information on whether the corresponding CBSD request is approved or disapproved for a\nresponse,\" defined in 10.2.2 of <1>.\nRequired parameter of Registration_Response.",
+      "type": "object",
+      "properties": {
+        "response_code": {
+          "$ref": "#/definitions/Response_Code_Enum"
+        },
+        "response_message": {
+          "title": "Response Message",
+          "type": "string"
+        },
+        "response_data": {
+          "title": "Response Data",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "response_code"
+      ]
+    },
+    "Frequency_Range": {
+      "title": "Frequency_Range",
+      "description": "A data object that \"describes the spectrum for which the CBSD seeks information on spectrum availability.\"\nDefined in section 10.3.2 of <1>.\nRequired parameter of Spectrum_Inquiry_Request.\nAll fields are required",
+      "type": "object",
+      "properties": {
+        "low_frequency": {
+          "title": "Low Frequency",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "high_frequency": {
+          "title": "High Frequency",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "low_frequency",
+        "high_frequency"
+      ]
+    },
+    "Channel_Type_Enum": {
+      "title": "Channel_Type_Enum",
+      "description": "Contains the valid choices for the channel_type parameter of an Available_Channel object.\nDefined in 10.4.2 of <1>",
+      "enum": [
+        "PAL",
+        "GAA"
+      ],
+      "type": "string"
+    },
+    "Available_Channel": {
+      "title": "Available_Channel",
+      "description": "\"A data object that describes a channel that is available for the CBSD\"\nDefined in 10.4.2 of <1>\nRequired as available_channel parameter of Spectrum_Inquiry_Response IFF the inquiry is successful",
+      "type": "object",
+      "properties": {
+        "frequency_range": {
+          "$ref": "#/definitions/Frequency_Range"
+        },
+        "channel_type": {
+          "$ref": "#/definitions/Channel_Type_Enum"
+        },
+        "rule_applied": {
+          "title": "Rule Applied",
+          "type": "string"
+        },
+        "max_eirp": {
+          "title": "Max Eirp",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -137,
+              "maximum": 37
+            },
+            {
+              "type": "number",
+              "minimum": -137.0,
+              "maximum": 37.0
+            }
+          ]
+        }
+      },
+      "required": [
+        "frequency_range",
+        "channel_type",
+        "rule_applied"
+      ]
+    },
+    "Spectrum_Inquiry_Response": {
+      "title": "Spectrum_Inquiry_Response",
+      "description": "SpectrumInquiryResponse object as defined in 10.4.1 of <1>",
+      "type": "object",
+      "properties": {
+        "response": {
+          "$ref": "#/definitions/Response"
+        },
+        "cbsd_id": {
+          "title": "Cbsd Id",
+          "type": "string"
+        },
+        "available_channel": {
+          "title": "Available Channel",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Available_Channel"
+          }
+        }
+      },
+      "required": [
+        "response"
+      ]
+    }
+  }
+}

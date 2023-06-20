@@ -1,0 +1,59 @@
+{
+  "title": "Spectrum_Inquiry_Request JSON Schema",
+  "$ref": "#/definitions/Spectrum_Inquiry_Request",
+  "definitions": {
+    "Frequency_Range": {
+      "title": "Frequency_Range",
+      "description": "A data object that \"describes the spectrum for which the CBSD seeks information on spectrum availability.\"\nDefined in section 10.3.2 of <1>.\nRequired parameter of Spectrum_Inquiry_Request.\nAll fields are required",
+      "type": "object",
+      "properties": {
+        "low_frequency": {
+          "title": "Low Frequency",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        "high_frequency": {
+          "title": "High Frequency",
+          "exclusiveMinimum": 0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "low_frequency",
+        "high_frequency"
+      ]
+    },
+    "Meas_Report_Type": {
+      "title": "Meas_Report_Type",
+      "description": "Used to specify the possible choices for the 'meas_capability' parameter of a Registration_Request object\nThe permitted values are specified in section 7 of <2>",
+      "enum": [
+        "RECEIVED_POWER_WITHOUT_GRANT",
+        "RECEIVED_POWER_WITH_GRANT",
+        "INDOOR_LOSS_USING_GNSS"
+      ],
+      "type": "string"
+    },
+    "Spectrum_Inquiry_Request": {
+      "title": "Spectrum_Inquiry_Request",
+      "description": "SpectrumInquiryRequest object as defined in 10.3.1 of <1>",
+      "type": "object",
+      "properties": {
+        "cbsd_id": {
+          "title": "Cbsd Id",
+          "type": "string"
+        },
+        "inquired_spectrum": {
+          "$ref": "#/definitions/Frequency_Range"
+        },
+        "meas_report": {
+          "$ref": "#/definitions/Meas_Report_Type"
+        }
+      },
+      "required": [
+        "cbsd_id",
+        "inquired_spectrum",
+        "meas_report"
+      ]
+    }
+  }
+}

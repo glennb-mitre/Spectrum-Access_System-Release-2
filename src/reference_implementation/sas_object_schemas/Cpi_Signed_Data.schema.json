@@ -1,0 +1,144 @@
+{
+  "title": "Cpi_Signed_Data JSON Schema",
+  "$ref": "#/definitions/Cpi_Signed_Data",
+  "definitions": {
+    "Height_Type_Enum": {
+      "title": "Height_Type_Enum",
+      "description": "Used to specify the possible choices for the 'height_type' parameter of an Installation_Param object",
+      "enum": [
+        "AGL",
+        "AMSL"
+      ],
+      "type": "string"
+    },
+    "Installation_Param": {
+      "title": "Installation_Param",
+      "description": "A data object that includes information on CBSD installation.\nREG-Conditional for Registration_Request\nDefined in 10.1.3 of <1>\n\nAll fields are either Conditionally Required (REG_Conditional) or Optional.",
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "title": "Latitude",
+          "minimum": -90,
+          "maximum": 90,
+          "type": "number"
+        },
+        "longitude": {
+          "title": "Longitude",
+          "minimum": -180,
+          "maximum": 180,
+          "type": "number"
+        },
+        "height": {
+          "title": "Height",
+          "type": "number"
+        },
+        "height_type": {
+          "$ref": "#/definitions/Height_Type_Enum"
+        },
+        "horizontal_accuracy": {
+          "title": "Horizontal Accuracy",
+          "exclusiveMaximum": 50,
+          "type": "number"
+        },
+        "vertical_accuracy": {
+          "title": "Vertical Accuracy",
+          "exclusiveMaximum": 3,
+          "type": "number"
+        },
+        "indoor_deployment": {
+          "title": "Indoor Deployment",
+          "type": "boolean"
+        },
+        "antenna_azimuth": {
+          "title": "Antenna Azimuth",
+          "minimum": 0,
+          "maximum": 359,
+          "type": "integer"
+        },
+        "antenna_downtilt": {
+          "title": "Antenna Downtilt",
+          "minimum": -90,
+          "maximum": 90,
+          "type": "integer"
+        },
+        "antenna_gain": {
+          "title": "Antenna Gain",
+          "minimum": -127,
+          "maximum": 128,
+          "type": "integer"
+        },
+        "eirp_capability": {
+          "title": "Eirp Capability",
+          "minimum": -127,
+          "maximum": 4,
+          "type": "integer"
+        },
+        "antenna_beamwitdth": {
+          "title": "Antenna Beamwitdth",
+          "minimum": 0,
+          "maximum": 360,
+          "type": "integer"
+        },
+        "antenna_model": {
+          "title": "Antenna Model",
+          "maxLength": 128,
+          "type": "string"
+        }
+      }
+    },
+    "Professional_Installer_Data": {
+      "title": "Professional_Installer_Data",
+      "description": "\"The value of this parameter is the data identifying the CPI vouching for the installation parameters included in\nthe installationParam value contained in this object\"\nA required parameter of the Cpi_Signed_Data constructor, which is itself, the unencoded parameter of a\nCpi_Signature_Data object, which finally, is an optional parameter for Registration_Request.\nDefined in 10.1.8 of <1>\n\nAll fields are required.\nThe maximum length of cpi_id and cpi_name is 256 octets.\ninstallation_certification_time is the UTC datetime at which the CPI identified in this object cerified the CBSD's\ninstalled parameters. It is expressed using the format, YYYY-MM-DDThh:mm:ssZ, as defined by [n.7]",
+      "type": "object",
+      "properties": {
+        "cpi_id": {
+          "title": "Cpi Id",
+          "maxLength": 256,
+          "type": "string"
+        },
+        "cpi_name": {
+          "title": "Cpi Name",
+          "maxLength": 256,
+          "type": "string"
+        },
+        "install_certification_time": {
+          "title": "Install Certification Time",
+          "pattern": "\\d{4}-[01]\\d-[0123]\\dT[012]\\d:[012345]\\d:[012345]\\dZ",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cpi_id",
+        "cpi_name",
+        "install_certification_time"
+      ]
+    },
+    "Cpi_Signed_Data": {
+      "title": "Cpi_Signed_Data",
+      "description": "The un-encoded \"encoded_cpi_signed_data\" parameter of a Cpi_Signature Data object\nDefined in 10.1.7 in <1>\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "fcc_id": {
+          "title": "Fcc Id",
+          "type": "string"
+        },
+        "cbsd_serial_number": {
+          "title": "Cbsd Serial Number",
+          "type": "string"
+        },
+        "installation_param": {
+          "$ref": "#/definitions/Installation_Param"
+        },
+        "professional_installer_data": {
+          "$ref": "#/definitions/Professional_Installer_Data"
+        }
+      },
+      "required": [
+        "fcc_id",
+        "cbsd_serial_number",
+        "installation_param",
+        "professional_installer_data"
+      ]
+    }
+  }
+}

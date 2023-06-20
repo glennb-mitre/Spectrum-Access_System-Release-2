@@ -1,0 +1,31 @@
+{
+  "title": "Operation_Param JSON Schema",
+  "$ref": "#/definitions/Operation_Param",
+  "definitions": {
+    "Operation_Param": {
+      "title": "Operation_Param",
+      "description": "\"This data object includes operation parameters of the requested Grant.\"\nRequired param for Grant_Request.\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "max_eirp": {
+          "title": "Max Eirp",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -137,
+              "maximum": 37
+            },
+            {
+              "type": "number",
+              "minimum": -137.0,
+              "maximum": 37.0
+            }
+          ]
+        }
+      },
+      "required": [
+        "max_eirp"
+      ]
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "title": "Grant_Request JSON Schema",
+  "$ref": "#/definitions/Grant_Request",
+  "definitions": {
+    "Operation_Param": {
+      "title": "Operation_Param",
+      "description": "\"This data object includes operation parameters of the requested Grant.\"\nRequired param for Grant_Request.\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "max_eirp": {
+          "title": "Max Eirp",
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -137,
+              "maximum": 37
+            },
+            {
+              "type": "number",
+              "minimum": -137.0,
+              "maximum": 37.0
+            }
+          ]
+        }
+      },
+      "required": [
+        "max_eirp"
+      ]
+    },
+    "Meas_Report_Type": {
+      "title": "Meas_Report_Type",
+      "description": "Used to specify the possible choices for the 'meas_capability' parameter of a Registration_Request object\nThe permitted values are specified in section 7 of <2>",
+      "enum": [
+        "RECEIVED_POWER_WITHOUT_GRANT",
+        "RECEIVED_POWER_WITH_GRANT",
+        "INDOOR_LOSS_USING_GNSS"
+      ],
+      "type": "string"
+    },
+    "Grant_Request": {
+      "title": "Grant_Request",
+      "description": "GrantRequest object as defined in 10.5.1 of <1>\n\n\"A GrantRequest object contains operating parameters that the CBSD plans to operate with. Operation parameters\ninclude a continuous segment of spectrum and the maximum EIRP.\"",
+      "type": "object",
+      "properties": {
+        "cbsd_id": {
+          "title": "Cbsd Id",
+          "type": "string"
+        },
+        "operation_param": {
+          "$ref": "#/definitions/Operation_Param"
+        },
+        "meas_report": {
+          "$ref": "#/definitions/Meas_Report_Type"
+        }
+      },
+      "required": [
+        "cbsd_id",
+        "operation_param"
+      ]
+    }
+  }
+}

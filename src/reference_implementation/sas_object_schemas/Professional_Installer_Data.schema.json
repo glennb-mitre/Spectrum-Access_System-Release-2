@@ -1,0 +1,33 @@
+{
+  "title": "Professional_Installer_Data JSON Schema",
+  "$ref": "#/definitions/Professional_Installer_Data",
+  "definitions": {
+    "Professional_Installer_Data": {
+      "title": "Professional_Installer_Data",
+      "description": "\"The value of this parameter is the data identifying the CPI vouching for the installation parameters included in\nthe installationParam value contained in this object\"\nA required parameter of the Cpi_Signed_Data constructor, which is itself, the unencoded parameter of a\nCpi_Signature_Data object, which finally, is an optional parameter for Registration_Request.\nDefined in 10.1.8 of <1>\n\nAll fields are required.\nThe maximum length of cpi_id and cpi_name is 256 octets.\ninstallation_certification_time is the UTC datetime at which the CPI identified in this object cerified the CBSD's\ninstalled parameters. It is expressed using the format, YYYY-MM-DDThh:mm:ssZ, as defined by [n.7]",
+      "type": "object",
+      "properties": {
+        "cpi_id": {
+          "title": "Cpi Id",
+          "maxLength": 256,
+          "type": "string"
+        },
+        "cpi_name": {
+          "title": "Cpi Name",
+          "maxLength": 256,
+          "type": "string"
+        },
+        "install_certification_time": {
+          "title": "Install Certification Time",
+          "pattern": "\\d{4}-[01]\\d-[0123]\\dT[012]\\d:[012345]\\d:[012345]\\dZ",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cpi_id",
+        "cpi_name",
+        "install_certification_time"
+      ]
+    }
+  }
+}

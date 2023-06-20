@@ -1,0 +1,32 @@
+{
+  "title": "Group_Param JSON Schema",
+  "$ref": "#/definitions/Group_Param",
+  "definitions": {
+    "Group_Type_Enum": {
+      "title": "Group_Type_Enum",
+      "description": "Used to specify the possible choices for the 'group_type' parameter of a Group_Param object\nNote that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that \"additional group\ntypes are expected to be defined in future revisions.\"",
+      "enum": [
+        "INTERFERENCE_COORDINATION"
+      ],
+      "type": "string"
+    },
+    "Group_Param": {
+      "title": "Group_Param",
+      "description": "Object that includes information on CBSD grouping.\nA list of these objects are included as the optional group_param parameter in Registration_Request\nDefined in 10.1.4 of <1>\n\n<1> 8.3.1: Successful Operation of the CBSD Registration Procedure:\n    \"If the RegistrationRequest object contains a groupingParam parameter containing a GroupParam object having the\n    groupType parameter set to \"INTERFERENCE_COORDINATION\", the CBSD is requesting the SAS to not provide any\n    intra-group, inter-CBSD interference coordination between CBSDs sharing the value of the groupId parameter\n    provided in the request (Ref [n.8] 96.35(e), 96.41(d)(1)).\n\n    Notes:\n        The procedure by which CBSDs determine a common value of groupId, and therefore Interference Coordination\n            Group membership, is outside the scope of this specification.\n        The CBSD's use of an Interference Coordination Group declares to the SAS that all members of the particular\n            Group are using methods defined outside the scope of this specification to manage radio interference\n            among themselves.\n\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "group_type": {
+          "$ref": "#/definitions/Group_Type_Enum"
+        },
+        "group_id": {
+          "title": "Group Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "group_type",
+        "group_id"
+      ]
+    }
+  }
+}

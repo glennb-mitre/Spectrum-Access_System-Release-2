@@ -1,0 +1,30 @@
+{
+  "title": "Cpi_Signature_Data JSON Schema",
+  "$ref": "#/definitions/Cpi_Signature_Data",
+  "definitions": {
+    "Cpi_Signature_Data": {
+      "title": "Cpi_Signature_Data",
+      "description": "The CPI is vouching for the parameters in this object. In addition, the digital signature for these parameters is\nincluded.\nOptional parameter for Registration_Request.\nDefined in 10.1.6 of <1>\n\nprotected_header: \"The value of this parameter is the BASE64-encoded JOSE [(Javascript Object Signing and\n    Encryption)] protected header. This is a JSON object equivalent to the JWT RS256 method or the ES256 method\n    described in RFC 7515 [n.19] Section 3. BASE64 encoding is per RFC 4648 (see [n.20]). Valid values are\n    equivalent to the JSON: { \"typ\": \"JWT\", \"alg\": \"RS256\" } or { \"typ\": \"JWT\", \"alg\": \"ES256\" }\"\n    Note: The definition specified in 10.1.6 of <1> uses 'smart quotes' (i.e., \u201ctyp\u201d), which is invalid JSON.\n    Objects of this class use 'straight quotation marks.'\nencoded_cpi_signed_Data: \"The value of this parameter is the encoded JOSE payload data\n    to be signed by the CPI\u2019s private key.This parameter is calculated by taking the BASE64 encoding of a\n    CpiSignedDataobject (see Table 10) according to the procedures in RFC 7515 [n.19], Section 3.\"\ndigital_signature: \"The value of this parameter is the CPI digital signature applied to the encodedCpiSignedData\n    field.This signature is the BASE64URLencoding of the digital signature, prepared according to the procedures in\n    RFC 7515 [n.19] Section 3, using the algorithm as declared in the protectedHeader field.\"\n\n\"Note: The JOSE JSON Web Signature per RFC-7515 (see [n.19]) is used to ensure data integrity and CPI\nnon-repudiation of the signed parameters. The JOSE compact serialization is formed by concatenating the\nprotectedHeader, encodedCpiSignedData, and digitalSignature fields with \".\" Characters, as described in section 3\nof RFC 7515 [n.19].\"\n\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "protected_header": {
+          "title": "Protected Header",
+          "type": "string"
+        },
+        "encoded_cpi_signed_data": {
+          "title": "Encoded Cpi Signed Data",
+          "type": "string"
+        },
+        "digital_signature": {
+          "title": "Digital Signature",
+          "type": "string"
+        }
+      },
+      "required": [
+        "protected_header",
+        "encoded_cpi_signed_data",
+        "digital_signature"
+      ]
+    }
+  }
+}

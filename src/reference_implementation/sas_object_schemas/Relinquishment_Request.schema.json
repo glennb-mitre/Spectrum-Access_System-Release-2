@@ -1,0 +1,25 @@
+{
+  "title": "Relinquishment_Request JSON Schema",
+  "$ref": "#/definitions/Relinquishment_Request",
+  "definitions": {
+    "Relinquishment_Request": {
+      "title": "Relinquishment_Request",
+      "description": "RelinquishmentRequest object as defined in 10.9.1 of <1>\nAll fields are required.",
+      "type": "object",
+      "properties": {
+        "cbsd_id": {
+          "title": "Cbsd Id",
+          "type": "string"
+        },
+        "grant_id": {
+          "title": "Grant Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "cbsd_id",
+        "grant_id"
+      ]
+    }
+  }
+}
