@@ -712,3 +712,26 @@ class Deregistration_Response(BaseModel):
     # contains a valid CBSD identity. If included, the SAS shall set this parameter to the value of the cbsdId
     # parameter in the corresponding DeregistrationRequest object"
     cbsdId: str
+
+
+# Type aliases for the JSON Arrays that are used as inputs and outputs to each of the SAS functions.
+# The JSON Array names and format is specified in section 9 and table 1 of <1>.
+# Each of the following SAS-CBSD message types are sent as JSON (or a Python dictionary), with a single key-value pair.
+# The single key for a given message type is named f"{sas_method_name}Request" or f"{sas_method_name}Response", where
+# sas_method_name is one of the following: registration, spectrumInquiry, grant, heartbeat, relinquishment, or
+# deregistration. The single value for a given message type is a JSON Array (or Python list) of the following types:
+# Registration_Request, Registration_Request, Spectrum_Inquiry_Request, Spectrum_Inquiry_Response, Grant_Request,
+# Grant_Response, Heartbeat_Request, Heartbeat_Response, Relinquishment_Request, Relinquishment_Response,
+# Deregistration_Request, Deregistration_Response
+registrationRequest = Dict[str, List[Registration_Request]]
+registrationResponse = Dict[str, List[Registration_Request]]
+spectrumInquiryRequest = Dict[str, List[Spectrum_Inquiry_Request]]
+spectrumInquiryResponse = Dict[str, List[Spectrum_Inquiry_Response]]
+grantRequest = Dict[str, List[Grant_Request]]
+grantResponse = Dict[str, List[Grant_Response]]
+heartbeatRequest = Dict[str, List[Heartbeat_Request]]
+heartbeatResponse = Dict[str, List[Heartbeat_Response]]
+relinquishmentRequest = Dict[str, List[Relinquishment_Request]]
+relinquishmentResponse = Dict[str, List[Relinquishment_Response]]
+deregistrationRequest = Dict[str, List[Deregistration_Request]]
+deregistrationResponse = Dict[str, List[Deregistration_Response]]
