@@ -40,6 +40,7 @@ from pydantic import (
     conset,
     constr,
     Field,
+    Extra,
 )
 
 OptStr = Optional[str]
@@ -48,13 +49,14 @@ OptInt = Optional[int]
 OptDec = Optional[Decimal]
 
 
-class Cbsd_Info(BaseModel):
+class Cbsd_Info(BaseModel, extra=Extra.allow):
     """
     Optional argument for Registration_Request
     Defined in 10.1.5 of <1>
 
     Note: The maximum length of each parameter is 64 octets
     Note 2: The CbsdInfo object can be extended with other vendor information in additional key-value pairs.
+    This is captured in the pydantic model by using 'extra=Extra.allow'.
 
     All fields are optional
     """
@@ -68,8 +70,6 @@ class Cbsd_Info(BaseModel):
     hardware_version: Optional[constr(max_length=64)] = None
     # Firmware version of the CBSD
     firmware_version: Optional[constr(max_length=64)] = None
-    # Optional additional vendor information
-    extended_vendor_info: Optional[Dict] = Field(default_factory=dict)
 
 
 class Radio_Technology_Enum(str, Enum):
