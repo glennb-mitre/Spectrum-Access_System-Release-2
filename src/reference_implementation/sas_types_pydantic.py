@@ -4,11 +4,13 @@ This module contains class definitions for objects used in SAS-CBSD interactions
 <2> WINNF-SSC-0002 v6.0.0.0 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS):
     WInnForum Recognized CBRS Air Interfaces and Measurements
 *2  <1> cites <2> for several object field definitions
+<3> WINNF-TS-0096-V1.3.2 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS): Spectrum Access
+    System (SAS) - SAS Interface Technical Specification
 
 Note 1: <1> Marks each parameter's requirement level with (R)equired, (O)ptional, or (C)onditional.
 In the case of Registration Request Message objects, some parameters are marked as "REG-Conditional," indicating that
 "the parameter is required by the SAS to complete the CBSD registration process, but may be omitted from the
-[Registration_Request] object. If not included in the RegistrationRequest object, the parameter, to the extent that it
+[RegistrationRequest] object. If not included in the RegistrationRequest object, the parameter, to the extent that it
 is needed by the SAS to satisfy the Part 96 Rules, shall be provided to the SAS by other means outside the protocol
 specified in this document, e.g., it may be provided by a CPI as required by Part 96 Rules for category B CBSDs or CBSDs
 without automatic location determination, or for operational reasons. Other means based on CBSD device characteristics
@@ -48,10 +50,11 @@ OptFloat = Optional[float]
 OptInt = Optional[int]
 OptDec = Optional[Decimal]
 
+# The following classes are for SAS-CBSD interactions and are derived from the definitions given in <1> and <2>
 
-class Cbsd_Info(BaseModel, extra=Extra.allow):
+class CbsdInfo(BaseModel, extra=Extra.allow):
     """
-    Optional argument for Registration_Request
+    Optional argument for RegistrationRequest
     Defined in 10.1.5 of <1>
 
     Note: The maximum length of each parameter is 64 octets
@@ -74,7 +77,7 @@ class Cbsd_Info(BaseModel, extra=Extra.allow):
 
 class Radio_Technology_Enum(str, Enum):
     """
-    Used to specify the possible choices for the 'radio_technology' parameter of an Air_Interface object
+    Used to specify the possible choices for the 'radio_technology' parameter of an AirInterface object
     The peritted values are specified in section 6 of <2>
     """
     E_UTRA = "E_UTRA"
@@ -84,10 +87,10 @@ class Radio_Technology_Enum(str, Enum):
     DOODLE_CBRS = "DOODLE_CBRS"
 
 
-class Air_Interface(BaseModel):
+class AirInterface(BaseModel):
     """
     A data object that includes information on the air interface technology of the CBSD.
-    REG-Conditional for Registration_Request
+    REG-Conditional for RegistrationRequest
     Defined in 10.1.2 of <1>
     """
     # REG-Conditional
@@ -96,16 +99,16 @@ class Air_Interface(BaseModel):
 
 class Height_Type_Enum(str, Enum):
     """
-    Used to specify the possible choices for the 'height_type' parameter of an Installation_Param object
+    Used to specify the possible choices for the 'height_type' parameter of an InstallationParam object
     """
     agl = "AGL" # measured relative to ground level
     amsl = "AMSL" # measured relative to mean sea level
 
 
-class Installation_Param(BaseModel):
+class InstallationParam(BaseModel):
     """
     A data object that includes information on CBSD installation.
-    REG-Conditional for Registration_Request
+    REG-Conditional for RegistrationRequest
     Defined in 10.1.3 of <1>
 
     All fields are either Conditionally Required (REG_Conditional) or Optional.
@@ -147,7 +150,7 @@ class Installation_Param(BaseModel):
 
 class Meas_Report_Type(str, Enum):
     """
-    Used to specify the possible choices for the 'meas_capability' parameter of a Registration_Request object
+    Used to specify the possible choices for the 'meas_capability' parameter of a RegistrationRequest object
     The permitted values are specified in section 7 of <2>
     """
     RECEIVED_POWER_WITHOUT_GRANT = "RECEIVED_POWER_WITHOUT_GRANT"
@@ -157,17 +160,17 @@ class Meas_Report_Type(str, Enum):
 
 class Group_Type_Enum(str, Enum):
     """
-    Used to specify the possible choices for the 'group_type' parameter of a Group_Param object
+    Used to specify the possible choices for the 'group_type' parameter of a GroupParam object
     Note that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that "additional group
     types are expected to be defined in future revisions."
     """
     interferenceCoordination = "INTERFERENCE_COORDINATION"
 
 
-class Group_Param(BaseModel):
+class GroupParam(BaseModel):
     """
     Object that includes information on CBSD grouping.
-    A list of these objects are included as the optional group_param parameter in Registration_Request
+    A list of these objects are included as the optional group_param parameter in RegistrationRequest
     Defined in 10.1.4 of <1>
 
     <1> 8.3.1: Successful Operation of the CBSD Registration Procedure:
@@ -189,12 +192,12 @@ class Group_Param(BaseModel):
     groupId: str
 
 
-class Professional_Installer_Data(BaseModel):
+class ProfessionalInstallerData(BaseModel):
     """
     "The value of this parameter is the data identifying the CPI vouching for the installation parameters included in
     the installationParam value contained in this object"
-    A required parameter of the Cpi_Signed_Data constructor, which is itself, the unencoded parameter of a
-    Cpi_Signature_Data object, which finally, is an optional parameter for Registration_Request.
+    A required parameter of the CpiSignedData constructor, which is itself, the unencoded parameter of a
+    CpiSignatureData object, which finally, is an optional parameter for RegistrationRequest.
     Defined in 10.1.8 of <1>
 
     All fields are required.
@@ -210,7 +213,7 @@ class Professional_Installer_Data(BaseModel):
     installCertificationTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
 
 
-class Cpi_Signed_Data(BaseModel):
+class CpiSignedData(BaseModel):
     """
     The un-encoded "encoded_cpi_signed_data" parameter of a Cpi_Signature Data object
     Defined in 10.1.7 in <1>
@@ -220,17 +223,17 @@ class Cpi_Signed_Data(BaseModel):
     """
     fccId: str
     cbsdSerialNumber: str
-    installationParam: Installation_Param
-    professionalInstallerData: Professional_Installer_Data
+    installationParam: InstallationParam
+    professionalInstallerData: ProfessionalInstallerData
 
     def base64_encode(self):
         pass
 
-class Cpi_Signature_Data(BaseModel):
+class CpiSignatureData(BaseModel):
     """
     The CPI is vouching for the parameters in this object. In addition, the digital signature for these parameters is
     included.
-    Optional parameter for Registration_Request.
+    Optional parameter for RegistrationRequest.
     Defined in 10.1.6 of <1>
 
     protected_header: "The value of this parameter is the BASE64-encoded JOSE [(Javascript Object Signing and
@@ -266,7 +269,7 @@ class Cbsd_Category_Enum(str, Enum):
     B = "B"
 
 
-class Registration_Request(BaseModel):
+class RegistrationRequest(BaseModel):
     """
     RegistrationRequest object as defined in section 10.1.1 of <1>
 
@@ -290,17 +293,17 @@ class Registration_Request(BaseModel):
     # REG-Conditional
     cbsdCategory: Optional[Cbsd_Category_Enum] = None
     # Optional
-    cbsdInfo: Optional[Cbsd_Info] = None
+    cbsdInfo: Optional[CbsdInfo] = None
     # REG-Conditional
-    airInterface: Optional[Air_Interface] = None
+    airInterface: Optional[AirInterface] = None
     # REG-Conditional
-    installationParam: Optional[Installation_Param] = None
+    installationParam: Optional[InstallationParam] = None
     # REG-Conditional
     measCapability: Optional[List[Meas_Report_Type]] = None
     # Optional
-    groupingParam: Optional[List[Group_Param]] = None
+    groupingParam: Optional[List[GroupParam]] = None
     # Optional
-    cpiSignatureData: Optional[Cpi_Signature_Data] = None
+    cpiSignatureData: Optional[CpiSignatureData] = None
 
 
 class Response_Code_Enum(IntEnum):
@@ -381,7 +384,7 @@ class Response(BaseModel):
     """
     A data object that "includes information on whether the corresponding CBSD request is approved or disapproved for a
     response," defined in 10.2.2 of <1>.
-    Required parameter of Registration_Response.
+    Required parameter of RegistrationResponse.
     """
     # Required
     responseCode: Response_Code_Enum
@@ -397,7 +400,7 @@ class Response(BaseModel):
     responseData: Optional[List[str]] = None
 
 
-class Registration_Response(BaseModel):
+class RegistrationResponse(BaseModel):
     """
     RegistrationResponse object as defined in 10.2.1 of <1>
     """
@@ -409,46 +412,46 @@ class Registration_Response(BaseModel):
     measReportConfig: Optional[List[Meas_Report_Type]] = None
 
 
-class Frequency_Range(BaseModel):
+class FrequencyRange(BaseModel):
     """
     A data object that "describes the spectrum for which the CBSD seeks information on spectrum availability."
     Defined in section 10.3.2 of <1>.
-    Required parameter of Spectrum_Inquiry_Request.
+    Required parameter of SpectrumInquiryRequest.
     All fields are required
     """
     lowFrequency: condecimal(gt=Decimal(0))
     highFrequency: condecimal(gt=Decimal(0))
 
 
-class Spectrum_Inquiry_Request(BaseModel):
+class SpectrumInquiryRequest(BaseModel):
     """
     SpectrumInquiryRequest object as defined in 10.3.1 of <1>
     """
     # Required
     cbsdId: str
     # Required
-    inquiredSpectrum: Frequency_Range
+    inquiredSpectrum: FrequencyRange
     # Conditional; the document does not specify when this parameter should be included
     measReport: Meas_Report_Type
 
 
 class Channel_Type_Enum(str, Enum):
     """
-    Contains the valid choices for the channelType parameter of an Available_Channel object.
+    Contains the valid choices for the channelType parameter of an AvailableChannel object.
     Defined in 10.4.2 of <1>
     """
     PAL = "PAL"
     GAA = "GAA"
 
 
-class Available_Channel(BaseModel):
+class AvailableChannel(BaseModel):
     """
     "A data object that describes a channel that is available for the CBSD"
     Defined in 10.4.2 of <1>
-    Required as available_channel parameter of Spectrum_Inquiry_Response IFF the inquiry is successful
+    Required as available_channel parameter of SpectrumInquiryResponse IFF the inquiry is successful
     """
     # Required
-    frequencyRange: Frequency_Range
+    frequencyRange: FrequencyRange
     # Req
     channelType: Channel_Type_Enum
     # Req; "the regulatory rule used to generate this response, e.g., 'FCC_PART_96'."
@@ -459,7 +462,7 @@ class Available_Channel(BaseModel):
     maxEirp: Optional[Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]] = None
 
 
-class Spectrum_Inquiry_Response(BaseModel):
+class SpectrumInquiryResponse(BaseModel):
     """
     SpectrumInquiryResponse object as defined in 10.4.1 of <1>
     """
@@ -468,20 +471,20 @@ class Spectrum_Inquiry_Response(BaseModel):
     # Conditional; included IFF the request contains a valid CBSD Identity
     cbsdId: Optional[str] = None
     # Conditional; included IFF the Spectrum Inquiry is successful
-    availableChannel: Optional[List[Available_Channel]] = None
+    availableChannel: Optional[List[AvailableChannel]] = None
 
 
-class Operation_Param(BaseModel):
+class OperationParam(BaseModel):
     """
     "This data object includes operation parameters of the requested Grant."
-    Required param for Grant_Request.
+    Required param for GrantRequest.
     All fields are required.
     """
     maxEirp: Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]
-    operationFrequencyRange = Frequency_Range
+    operationFrequencyRange = FrequencyRange
 
 
-class Grant_Request(BaseModel):
+class GrantRequest(BaseModel):
     """
     GrantRequest object as defined in 10.5.1 of <1>
 
@@ -491,12 +494,12 @@ class Grant_Request(BaseModel):
     # Req
     cbsdId: str
     # Req
-    operationParam: Operation_Param
+    operationParam: OperationParam
     # Cond; the document does not specify when this parameter should be included
     measReport: Optional[Meas_Report_Type] = None
 
 
-class Grant_Response(BaseModel):
+class GrantResponse(BaseModel):
     """
     GrantResponse object as defined in 10.6.1 of <1>
 
@@ -508,7 +511,7 @@ class Grant_Response(BaseModel):
     """
     # Req
     response: Response
-    # Conditional; included IFF cbsdId param in Grant_Request is a valid CBSD identity
+    # Conditional; included IFF cbsdId param in GrantRequest is a valid CBSD identity
     cbsdId: Optional[str] = None
     # Cond; ID provided by the SAS for this grant, included IFF the Grant request is approved
     grantId: Optional[str] = None
@@ -519,14 +522,14 @@ class Grant_Response(BaseModel):
     # Optional
     measReportConfig: Optional[List[Meas_Report_Type]] = None
     # Optional
-    operationParam: Optional[Operation_Param] = None
+    operationParam: Optional[OperationParam] = None
     # Cond; included IFF response_code indicates SUCCESS
     channelType: Optional[Channel_Type_Enum] = None
 
 
 class Operation_State_Enum(str, Enum):
     """
-    Defines the possible values of the required operationState parameter of a Heartbeat_Request object
+    Defines the possible values of the required operationState parameter of a HeartbeatRequest object
     """
     AUTHORIZED = "AUTHORIZED"
     GRANTED = "GRANTED"
@@ -624,7 +627,7 @@ class Indoor_Loss_GNSS_Meas_Report(BaseModel):
 Meas_Report = Union[List[Rcvd_Power_Meas_Report], List[Indoor_Loss_GNSS_Meas_Report]]
 
 
-class Heartbeat_Request(BaseModel):
+class HeartbeatRequest(BaseModel):
     """
     HeartbeatRequest object as defined in 10.7.1 of <1>
     """
@@ -641,7 +644,7 @@ class Heartbeat_Request(BaseModel):
     measReport: Optional[Meas_Report] = None
 
 
-class Heartbeat_Response(BaseModel):
+class HeartbeatResponse(BaseModel):
     """
     HeartbeatResponse object as defined in 10.8.1. of <1>
     """
@@ -666,12 +669,12 @@ class Heartbeat_Response(BaseModel):
     # Optional
     heartbeatInterval: Optional[conint(gt=0)] = None
     # Optional
-    operationParam: Optional[Operation_Param] = None
+    operationParam: Optional[OperationParam] = None
     # Optional
     measReportConfig: Optional[List[Meas_Report_Type]]
 
 
-class Relinquishment_Request(BaseModel):
+class RelinquishmentRequest(BaseModel):
     """
     RelinquishmentRequest object as defined in 10.9.1 of <1>
     All fields are required.
@@ -680,7 +683,7 @@ class Relinquishment_Request(BaseModel):
     grantId: str
 
 
-class Relinquishment_Response(BaseModel):
+class RelinquishmentResponse(BaseModel):
     """
     RelinquishmentResponse object as defined in 10.10.1 of <1>
     """
@@ -695,7 +698,7 @@ class Relinquishment_Response(BaseModel):
     grantId: str
 
 
-class Deregistration_Request(BaseModel):
+class DeregistrationRequest(BaseModel):
     """
     DeregistrationRequest object as defined in 10.11.1 of <1>
     All fields are required.
@@ -703,7 +706,7 @@ class Deregistration_Request(BaseModel):
     cbsdId: str
 
 
-class Deregistration_Response(BaseModel):
+class DeregistrationResponse(BaseModel):
     """
     DeregistrationResponse object as defined in 10.12.1 of <1>
     """
@@ -720,18 +723,33 @@ class Deregistration_Response(BaseModel):
 # The single key for a given message type is named f"{sas_method_name}Request" or f"{sas_method_name}Response", where
 # sas_method_name is one of the following: registration, spectrumInquiry, grant, heartbeat, relinquishment, or
 # deregistration. The single value for a given message type is a JSON Array (or Python list) of the following types:
-# Registration_Request, Registration_Request, Spectrum_Inquiry_Request, Spectrum_Inquiry_Response, Grant_Request,
-# Grant_Response, Heartbeat_Request, Heartbeat_Response, Relinquishment_Request, Relinquishment_Response,
-# Deregistration_Request, Deregistration_Response
-registrationRequest = Dict[str, List[Registration_Request]]
-registrationResponse = Dict[str, List[Registration_Request]]
-spectrumInquiryRequest = Dict[str, List[Spectrum_Inquiry_Request]]
-spectrumInquiryResponse = Dict[str, List[Spectrum_Inquiry_Response]]
-grantRequest = Dict[str, List[Grant_Request]]
-grantResponse = Dict[str, List[Grant_Response]]
-heartbeatRequest = Dict[str, List[Heartbeat_Request]]
-heartbeatResponse = Dict[str, List[Heartbeat_Response]]
-relinquishmentRequest = Dict[str, List[Relinquishment_Request]]
-relinquishmentResponse = Dict[str, List[Relinquishment_Response]]
-deregistrationRequest = Dict[str, List[Deregistration_Request]]
-deregistrationResponse = Dict[str, List[Deregistration_Response]]
+# RegistrationRequest, RegistrationResponse, SpectrumInquiryRequest, SpectrumInquiryResponse, GrantRequest,
+# GrantResponse, HeartbeatRequest, HeartbeatResponse, RelinquishmentRequest, RelinquishmentResponse,
+# DeregistrationRequest, DeregistrationResponse
+registrationRequest = Dict[str, List[RegistrationRequest]]
+registrationResponse = Dict[str, List[RegistrationResponse]]
+spectrumInquiryRequest = Dict[str, List[SpectrumInquiryRequest]]
+spectrumInquiryResponse = Dict[str, List[SpectrumInquiryResponse]]
+grantRequest = Dict[str, List[GrantRequest]]
+grantResponse = Dict[str, List[GrantResponse]]
+heartbeatRequest = Dict[str, List[HeartbeatRequest]]
+heartbeatResponse = Dict[str, List[HeartbeatResponse]]
+relinquishmentRequest = Dict[str, List[RelinquishmentRequest]]
+relinquishmentResponse = Dict[str, List[RelinquishmentResponse]]
+deregistrationRequest = Dict[str, List[DeregistrationRequest]]
+deregistrationResponse = Dict[str, List[DeregistrationResponse]]
+
+
+# The following classes are used in SAS-SAS interactions and are derived from the definitions given in <3>
+# See section 5.2 of <3> for a description of SAS-SAS Record Exchanges, and in particular, see section 5.2.1: SAS-SAS
+# exchange entities and IDs for a description of each Protocol Exchange Entity.
+# The following CBRS Entities are defined in Table 1 of <3>:
+# [Name of CBRS Entity] with ID of the form: "
+# "SAS Administrators" : "sas_admin/$ADMINISTRATOR_ID"
+# "SAS Implementations" : "sas_impl/$ADMINISTRATOR_ID/$SAS_IMPLEMENTATION"
+# "CBSDs" : "cbsd/$CBSD_REFERENCE_ID"
+# "ESC Sensors" : "esc_sensor/$ADMINISTRATOR_ID/$SENSOR_ID"
+# "Zones" : "zone/$CREATOR/$ZONE_ID"
+# "Coordination events" : "coordination/$ADMINISTRATOR_ID/$EVENT_ID"
+# Note: "the symbol “$” before any token refers to a token chosen by the entity issuing the token."
+

@@ -128,13 +128,13 @@ class FakeSas(sas_interface.SasInterface):
         Args:
             request: A dictionary with a single key-value pair where the key is
                 "registrationRequest" and the value is a list of individual CBSD
-                registration requests (each of which is a Registration_Request object).
+                registration requests (each of which is a RegistrationRequest object).
             ssl_cert: Path to SSL cert file, if None, will use default cert file.
             ssl_key: Path to SSL key file, if None, will use default key file.
         Returns:
             A dictionary with a single key-value pair where the key is
             "registrationResponse" and the value is a list of individual CBSD
-            registration responses (each of which is a Registration_Response object).
+            registration responses (each of which is a RegistrationResponse object).
         """
         response = {'registrationResponse': []}
         for req in request['registrationRequest']:

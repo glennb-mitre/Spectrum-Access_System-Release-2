@@ -13,7 +13,7 @@ OptInt = Optional[int]
 @dataclass
 class Cbsd_Info:
     """
-    Optional argument for Registration_Request
+    Optional argument for RegistrationRequest
     Defined in 10.1.5 of <1>
 
     Note: The maximum length of each parameter is 64 octets
@@ -38,7 +38,7 @@ class Cbsd_Info:
 class Air_Interface:
     """
     A data object that includes information on the air interface technology of the CBSD.
-    REG-Conditional for Registration_Request
+    REG-Conditional for RegistrationRequest
     Defined in 10.1.2 of <1>
     """
     # REG-Conditional
@@ -48,7 +48,7 @@ class Air_Interface:
 class Installation_Param:
     """
     A data object that includes information on CBSD installation.
-    REG-Conditional for Registration_Request
+    REG-Conditional for RegistrationRequest
     Defined in 10.1.3 of <1>
 
     All fields are either Conditionally Required (REG_Conditional) or Optional.
@@ -84,7 +84,7 @@ class Installation_Param:
 class Group_Param:
     """
     Object that includes information on CBSD grouping.
-    A list of these objects are included as the optional group_param parameter in Registration_Request
+    A list of these objects are included as the optional group_param parameter in RegistrationRequest
     Defined in 10.1.4 of <1>
 
     All fields are required.
@@ -97,8 +97,8 @@ class Professional_Installer_Data:
     """
     "The value of this parameter is the data identifying the CPI vouching for the installation parameters included in
     the installationParam value contained in this object"
-    A required parameter of the Cpi_Signed_Data constructor, which is itself, the unencoded parameter of a
-    Cpi_Signature_Data object, which finally, is an optional parameter for Registration_Request.
+    A required parameter of the CpiSignedData constructor, which is itself, the unencoded parameter of a
+    CpiSignatureData object, which finally, is an optional parameter for RegistrationRequest.
     Defined in 10.1.8 of <1>
 
     All fields are required.
@@ -129,7 +129,7 @@ class Cpi_Signature_Data:
     """
     The CPI is vouching for the parameters in this object. In addition, the digital signature for these parameters is
     included.
-    Optional parameter for Registration_Request.
+    Optional parameter for RegistrationRequest.
     Defined in 10.1.6 of <1>
 
     protected_header: "The value of this parameter is the BASE64-encoded JOSE [(Javascript Object Signing and
