@@ -71,6 +71,7 @@ from six.moves.BaseHTTPServer import HTTPServer
 import sas_interface
 
 from typing import Dict, List, Tuple, Any, Optional, Union, NoReturn
+from sas_types_pydantic import *
 
 # Type alias for convenience of type hinting request/response objects:
 # a dictionary with a single key-value pair, with the key being a string
@@ -115,28 +116,25 @@ class FakeSas(sas_interface.SasInterface):
 
     def Registration(
         self,
-        request: ListDictMsg,
+        request: registrationRequest,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> ListDictMsg:
+    ) -> registrationResponse:
         """
         SAS-CBSD Registration implementation.
         Registers CBSDs.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
-        Request and response are both lists of dictionaries, which is type aliased to:
-            ListDictMsg = Dict[str, List[Dict]].
-        Each dictionary contains all fields of a single request/response.
 
         Args:
             request: A dictionary with a single key-value pair where the key is
                 "registrationRequest" and the value is a list of individual CBSD
-                registration requests (each of which is itself a dictionary).
+                registration requests (each of which is a Registration_Request object).
             ssl_cert: Path to SSL cert file, if None, will use default cert file.
             ssl_key: Path to SSL key file, if None, will use default key file.
         Returns:
             A dictionary with a single key-value pair where the key is
             "registrationResponse" and the value is a list of individual CBSD
-            registration responses (each of which is itself a dictionary).
+            registration responses (each of which is a Registration_Response object).
         """
         response = {'registrationResponse': []}
         for req in request['registrationRequest']:
@@ -157,10 +155,10 @@ class FakeSas(sas_interface.SasInterface):
 
     def SpectrumInquiry(
         self,
-        request: ListDictMsg,
+        request: spectrumInquiryRequest,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> ListDictMsg:
+    ) -> spectrumInquiryResponse:
         """
         SAS-CBSD SpectrumInquiry reference implementation.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -201,10 +199,10 @@ class FakeSas(sas_interface.SasInterface):
 
     def Grant(
         self,
-        request: ListDictMsg,
+        request: grantRequest,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> ListDictMsg:
+    ) -> grantResponse:
         """
         SAS-CBSD Grant reference implementation.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -253,10 +251,10 @@ class FakeSas(sas_interface.SasInterface):
 
     def Heartbeat(
         self,
-        request: ListDictMsg,
+        request: heartbeatRequest,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> ListDictMsg:
+    ) -> heartbeatResponse:
         """
         SAS-CBSD Heartbeat reference implementation (RI).
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -294,10 +292,10 @@ class FakeSas(sas_interface.SasInterface):
 
     def Relinquishment(
         self,
-        request: ListDictMsg,
+        request: relinquishmentRequest,
         ssl_cert: Optional[str] = None,
         ssl_key: Optional[str] = None
-    ) -> ListDictMsg:
+    ) -> relinquishmentResponse:
         """
         SAS-CBSD Relinquishment RI.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -330,10 +328,10 @@ class FakeSas(sas_interface.SasInterface):
 
     def Deregistration(
         self,
-        request: ListDictMsg,
+        request: deregistrationRequest,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> ListDictMsg:
+    ) -> deregistrationResponse:
         """
         SAS-CBSD Deregistration interface.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
