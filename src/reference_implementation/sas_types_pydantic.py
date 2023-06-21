@@ -65,11 +65,11 @@ class Cbsd_Info(BaseModel, extra=Extra.allow):
     # Name of the CBSD model
     model: Optional[constr(max_length=64)] = None
     # Software version of the CBSD
-    software_version: Optional[constr(max_length=64)] = None
+    softwareVersion: Optional[constr(max_length=64)] = None
     # Hardware version of the CBSD
-    hardware_version: Optional[constr(max_length=64)] = None
+    hardwareVersion: Optional[constr(max_length=64)] = None
     # Firmware version of the CBSD
-    firmware_version: Optional[constr(max_length=64)] = None
+    firmwareVersion: Optional[constr(max_length=64)] = None
 
 
 class Radio_Technology_Enum(str, Enum):
@@ -91,7 +91,7 @@ class Air_Interface(BaseModel):
     Defined in 10.1.2 of <1>
     """
     # REG-Conditional
-    radio_technology: Radio_Technology_Enum
+    radioTechnology: Radio_Technology_Enum
 
 
 class Height_Type_Enum(str, Enum):
@@ -121,28 +121,28 @@ class Installation_Param(BaseModel):
     # coordinates from the WGS84 datum to the NAD83 datum.See “REG-Conditional Registration Request Parameters” above.
     height: Optional[Decimal] = None
     # REG-Conditional
-    height_type: Optional[Height_Type_Enum] = None
+    heightType: Optional[Height_Type_Enum] = None
     # Optional
-    horizontal_accuracy: Optional[condecimal(lt=Decimal(50))] = None
+    horizontalAccuracy: Optional[condecimal(lt=Decimal(50))] = None
     # Optional
-    vertical_accuracy: Optional[condecimal(lt=Decimal(3))] = None
+    verticalAccuracy: Optional[condecimal(lt=Decimal(3))] = None
     # REG-Conditional
-    indoor_deployment: Optional[bool] = None
+    indoorDeployment: Optional[bool] = None
     # REG-Conditional - Optional for Category A CBSD; REG-Conditional for Cat B
-    antenna_azimuth: Optional[conint(ge=0, le=359)] = None
+    antennaAzimuth: Optional[conint(ge=0, le=359)] = None
     # REG-Conditional - Opt for Cat A; REG-Conditional for Cat B
-    antenna_downtilt: Optional[conint(ge=-90, le=90)] = None
+    antennaDowntilt: Optional[conint(ge=-90, le=90)] = None
     # REG-Conditional
-    antenna_gain: Optional[conint(ge=-127, le=128)] = None
+    antennaGain: Optional[conint(ge=-127, le=128)] = None
     # Optional - This parameter is the maximum EIRP in units of dBm/10MHz to be used by this CBSD and shall be no
     # more than the rounded-up FCC certified maximum EIRP. The Value of this parameter is an integer with a value
     # between -127 and +47 (dBm/10MHz) inclusive. If not included, SAS shall set eirpCapability as the rounded up FCC
     # certified maximum EIRP of the CBSD.
-    eirp_capability: Optional[conint(ge=-127, le=4)] = None
+    eirpCapability: Optional[conint(ge=-127, le=4)] = None
     # REG-Conditional - Opt for Cat A; REG-Conditional for Cat B
-    antenna_beamwitdth: Optional[conint(ge=0, le=360)] = None
+    antennaBeamwitdth: Optional[conint(ge=0, le=360)] = None
     # Optional
-    antenna_model: Optional[constr(max_length=128)] = None
+    antennaModel: Optional[constr(max_length=128)] = None
 
 
 class Meas_Report_Type(str, Enum):
@@ -161,7 +161,7 @@ class Group_Type_Enum(str, Enum):
     Note that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that "additional group
     types are expected to be defined in future revisions."
     """
-    interference_coordination = "INTERFERENCE_COORDINATION"
+    interferenceCoordination = "INTERFERENCE_COORDINATION"
 
 
 class Group_Param(BaseModel):
@@ -185,8 +185,8 @@ class Group_Param(BaseModel):
 
     All fields are required.
     """
-    group_type: Group_Type_Enum
-    group_id: str
+    groupType: Group_Type_Enum
+    groupId: str
 
 
 class Professional_Installer_Data(BaseModel):
@@ -202,12 +202,12 @@ class Professional_Installer_Data(BaseModel):
     installation_certification_time is the UTC datetime at which the CPI identified in this object cerified the CBSD's
     installed parameters. It is expressed using the format, YYYY-MM-DDThh:mm:ssZ, as defined by [n.7]
     """
-    cpi_id: constr(max_length=256)
-    cpi_name: constr(max_length=256)
+    cpiId: constr(max_length=256)
+    cpiName: constr(max_length=256)
     # YYYY-MM-DDThh:mm:ssZ
     # install_certification_time: str
     # The ellipsis indicates that the field is required
-    install_certification_time: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    installCertificationTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
 
 
 class Cpi_Signed_Data(BaseModel):
@@ -215,11 +215,13 @@ class Cpi_Signed_Data(BaseModel):
     The un-encoded "encoded_cpi_signed_data" parameter of a Cpi_Signature Data object
     Defined in 10.1.7 in <1>
     All fields are required.
+
+    TODO: Ensure that this object is included in the Cpi_Signature object definition...
     """
-    fcc_id: str
-    cbsd_serial_number: str
-    installation_param: Installation_Param
-    professional_installer_data: Professional_Installer_Data
+    fccId: str
+    cbsdSerialNumber: str
+    installationParam: Installation_Param
+    professionalInstallerData: Professional_Installer_Data
 
     def base64_encode(self):
         pass
@@ -251,9 +253,9 @@ class Cpi_Signature_Data(BaseModel):
 
     All fields are required.
     """
-    protected_header: str
-    encoded_cpi_signed_data: str
-    digital_signature: str
+    protectedHeader: str
+    encodedCpiSignedData: str
+    digitalSignature: str
 
 
 class Cbsd_Category_Enum(str, Enum):
@@ -278,27 +280,27 @@ class Registration_Request(BaseModel):
 
     """
     # Required
-    user_id: str
+    userId: str
     # Required
-    fcc_id: str
+    fccId: str
     # Required
-    cbsd_serial_number: str
+    cbsdSerialNumber: str
     # Optional
-    call_sign: Optional[str] = None
+    callSign: Optional[str] = None
     # REG-Conditional
-    cbsd_category: Optional[Cbsd_Category_Enum] = None
+    cbsdCategory: Optional[Cbsd_Category_Enum] = None
     # Optional
-    cbsd_info: Optional[Cbsd_Info] = None
+    cbsdInfo: Optional[Cbsd_Info] = None
     # REG-Conditional
-    air_interface: Optional[Air_Interface] = None
+    airInterface: Optional[Air_Interface] = None
     # REG-Conditional
-    installation_param: Optional[Installation_Param] = None
+    installationParam: Optional[Installation_Param] = None
     # REG-Conditional
-    meas_capability: Optional[List[Meas_Report_Type]] = None
+    measCapability: Optional[List[Meas_Report_Type]] = None
     # Optional
-    grouping_param: Optional[List[Group_Param]] = None
+    groupingParam: Optional[List[Group_Param]] = None
     # Optional
-    cpi_signature_data: Optional[Cpi_Signature_Data] = None
+    cpiSignatureData: Optional[Cpi_Signature_Data] = None
 
 
 class Response_Code_Enum(IntEnum):
@@ -382,9 +384,9 @@ class Response(BaseModel):
     Required parameter of Registration_Response.
     """
     # Required
-    response_code: Response_Code_Enum
+    responseCode: Response_Code_Enum
     # Optional
-    response_message: Optional[str] = None
+    responseMessage: Optional[str] = None
     # Optional
     # If response_code is 100, the error data is a list of Protocol versions supported by the SAS administrator;
     # if 102, a list of missing parameters
@@ -392,7 +394,7 @@ class Response(BaseModel):
     # if 200, a list of missing registration parameters
     # if 401, the Grant ID of an existing Grant that causes the conflict (also in List[str] format)
     # the response_data is not present for any other response_code value
-    response_data: Optional[List[str]] = None
+    responseData: Optional[List[str]] = None
 
 
 class Registration_Response(BaseModel):
@@ -402,9 +404,9 @@ class Registration_Response(BaseModel):
     # Required
     response: Response
     # Conditional; included IFF response_code indicates SUCCESS
-    cbsd_id: Optional[constr(max_length=256)] = None
+    cbsdId: Optional[constr(max_length=256)] = None
     # Optional
-    meas_report_config: Optional[List[Meas_Report_Type]] = None
+    measReportConfig: Optional[List[Meas_Report_Type]] = None
 
 
 class Frequency_Range(BaseModel):
@@ -414,8 +416,8 @@ class Frequency_Range(BaseModel):
     Required parameter of Spectrum_Inquiry_Request.
     All fields are required
     """
-    low_frequency: condecimal(gt=Decimal(0))
-    high_frequency: condecimal(gt=Decimal(0))
+    lowFrequency: condecimal(gt=Decimal(0))
+    highFrequency: condecimal(gt=Decimal(0))
 
 
 class Spectrum_Inquiry_Request(BaseModel):
@@ -423,16 +425,16 @@ class Spectrum_Inquiry_Request(BaseModel):
     SpectrumInquiryRequest object as defined in 10.3.1 of <1>
     """
     # Required
-    cbsd_id: str
+    cbsdId: str
     # Required
-    inquired_spectrum: Frequency_Range
+    inquiredSpectrum: Frequency_Range
     # Conditional; the document does not specify when this parameter should be included
-    meas_report: Meas_Report_Type
+    measReport: Meas_Report_Type
 
 
 class Channel_Type_Enum(str, Enum):
     """
-    Contains the valid choices for the channel_type parameter of an Available_Channel object.
+    Contains the valid choices for the channelType parameter of an Available_Channel object.
     Defined in 10.4.2 of <1>
     """
     PAL = "PAL"
@@ -446,15 +448,15 @@ class Available_Channel(BaseModel):
     Required as available_channel parameter of Spectrum_Inquiry_Response IFF the inquiry is successful
     """
     # Required
-    frequency_range: Frequency_Range
+    frequencyRange: Frequency_Range
     # Req
-    channel_type: Channel_Type_Enum
+    channelType: Channel_Type_Enum
     # Req; "the regulatory rule used to generate this response, e.g., 'FCC_PART_96'."
-    rule_applied: str
+    ruleApplied: str
     # Optional; Maximum EIRP likely to be permitted for a Grant on this frequencyRange, given the CBSD registration
     # parameters, including location, antenna orientation and antenna pattern. The maximum EIRP is in the units of
     # dBm/MHz and is an integer or a floating point value between -137 and +37 (dBm/MHz) inclusive.
-    max_eirp: Optional[Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]] = None
+    maxEirp: Optional[Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]] = None
 
 
 class Spectrum_Inquiry_Response(BaseModel):
@@ -464,9 +466,9 @@ class Spectrum_Inquiry_Response(BaseModel):
     # Required
     response: Response
     # Conditional; included IFF the request contains a valid CBSD Identity
-    cbsd_id: Optional[str] = None
+    cbsdId: Optional[str] = None
     # Conditional; included IFF the Spectrum Inquiry is successful
-    available_channel: Optional[List[Available_Channel]] = None
+    availableChannel: Optional[List[Available_Channel]] = None
 
 
 class Operation_Param(BaseModel):
@@ -475,8 +477,8 @@ class Operation_Param(BaseModel):
     Required param for Grant_Request.
     All fields are required.
     """
-    max_eirp: Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]
-    operation_frequency_range = Frequency_Range
+    maxEirp: Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]
+    operationFrequencyRange = Frequency_Range
 
 
 class Grant_Request(BaseModel):
@@ -487,18 +489,18 @@ class Grant_Request(BaseModel):
     include a continuous segment of spectrum and the maximum EIRP."
     """
     # Req
-    cbsd_id: str
+    cbsdId: str
     # Req
-    operation_param: Operation_Param
+    operationParam: Operation_Param
     # Cond; the document does not specify when this parameter should be included
-    meas_report: Optional[Meas_Report_Type] = None
+    measReport: Optional[Meas_Report_Type] = None
 
 
 class Grant_Response(BaseModel):
     """
     GrantResponse object as defined in 10.6.1 of <1>
 
-    grant_expire_time: "The grantExpireTime indicates the time when the Grant associated with the grantId expires. This
+    grantExpireTime: "The grantExpireTime indicates the time when the Grant associated with the grantId expires. This
     parameter is UTC time expressed in the format, YYYY-MM-DDThh:mm:ssZ as defined by [n.7]. This parameter shall be
     included if and only if the responseCode parameter indicates SUCCESS. If the channelType parameter is included in
     this object and the value is set to 'PAL', the grantExpireTime parameter shall be set to the value that does not
@@ -506,25 +508,25 @@ class Grant_Response(BaseModel):
     """
     # Req
     response: Response
-    # Conditional; included IFF cbsd_id param in Grant_Request is a valid CBSD identity
-    cbsd_id: Optional[str] = None
+    # Conditional; included IFF cbsdId param in Grant_Request is a valid CBSD identity
+    cbsdId: Optional[str] = None
     # Cond; ID provided by the SAS for this grant, included IFF the Grant request is approved
-    grant_id: Optional[str] = None
+    grantId: Optional[str] = None
     # Cond; see docstring
-    grant_expire_time: Optional[str] = None
+    grantExpireTime: Optional[str] = None
     # Cond; included IFF response_code indicates SUCCESS
-    heartbeat_interval: Optional[conint(gt=0)] = None
+    heartbeatInterval: Optional[conint(gt=0)] = None
     # Optional
-    meas_report_config: Optional[List[Meas_Report_Type]] = None
+    measReportConfig: Optional[List[Meas_Report_Type]] = None
     # Optional
-    operation_param: Optional[Operation_Param] = None
+    operationParam: Optional[Operation_Param] = None
     # Cond; included IFF response_code indicates SUCCESS
-    channel_type: Optional[Channel_Type_Enum] = None
+    channelType: Optional[Channel_Type_Enum] = None
 
 
 class Operation_State_Enum(str, Enum):
     """
-    Defines the possible values of the required operation_state parameter of a Heartbeat_Request object
+    Defines the possible values of the required operationState parameter of a Heartbeat_Request object
     """
     AUTHORIZED = "AUTHORIZED"
     GRANTED = "GRANTED"
@@ -568,15 +570,15 @@ class Rcvd_Power_Meas_Report(BaseModel):
 
     All fields are required
     """
-    meas_frequency: conint(gt=0)
-    meas_bandwidth: conint(gt=0)
+    measFrequency: conint(gt=0)
+    measBandwidth: conint(gt=0)
     # TODO: Verify that this param given in units of dBm is (possibly) a FP quantity; Also, that the range is inclusive.
-    meas_rcvd_power: confloat(ge=-100, le=-25)
+    measRcvdPower: confloat(ge=-100, le=-25)
 
 
 class Indoor_Loss_Technology_Type_Enum(str, Enum):
     """
-    Contains the permitted values for the "technology_type" parameter of an Indoor_Loss_GNSS_Meas_Report object.
+    Contains the permitted values for the "technologyType" parameter of an Indoor_Loss_GNSS_Meas_Report object.
     Defined in table 7.2-2 of section 7.2.1 of <2>
     """
     GPS_L1 = "GPS_L1"
@@ -613,10 +615,10 @@ class Indoor_Loss_GNSS_Meas_Report(BaseModel):
 
     All fields are required.
     """
-    indoor_loss: confloat(ge=0, le=70)
-    azimuth_angle_with_gnss: conint(ge=0, le=359)
-    elevation_angle_with_gnss: conint(ge=0, le=90)
-    technology_type: Indoor_Loss_Technology_Type_Enum
+    indoorLoss: confloat(ge=0, le=70)
+    azimuthAngleWithGnss: conint(ge=0, le=359)
+    elevationAngleWithGnss: conint(ge=0, le=90)
+    technologyType: Indoor_Loss_Technology_Type_Enum
 
 
 Meas_Report = Union[List[Rcvd_Power_Meas_Report], List[Indoor_Loss_GNSS_Meas_Report]]
@@ -627,16 +629,16 @@ class Heartbeat_Request(BaseModel):
     HeartbeatRequest object as defined in 10.7.1 of <1>
     """
     # Required
-    cbsd_id: str
+    cbsdId: str
     # Req
-    grant_id: str
+    grantId: str
     # Req
-    operation_state: Operation_State_Enum
+    operationState: Operation_State_Enum
     # Opt
-    grant_renew: Optional[bool] = None
+    grantRenew: Optional[bool] = None
     # Conditional; see 8.6 for inclusion rules
     # TODO: Check if this is a List of Meas_Report objects
-    meas_report: Optional[Meas_Report] = None
+    measReport: Optional[Meas_Report] = None
 
 
 class Heartbeat_Response(BaseModel):
@@ -646,27 +648,27 @@ class Heartbeat_Response(BaseModel):
     # Req
     response: Response
     # Req
-    transmit_expire_time: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    transmitExpireTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
     # Cond; This parameter is included if and only if  the cbsdId parameter in the HeartbeatRequest object contains a
     # valid CBSD identity. If included, the SAS shall set this parameter to the value of thein the corresponding
     # HeartbeatRequest object.
-    cbsd_id: Optional[str] = None
+    cbsdId: Optional[str] = None
     # Cond; included iff "the grantId parameter in the HeartbeatRequest object contains a valid Grant identity. If
     # included, the SAS shall set this parameter to the value of the grantId parameter in the corresponding
     # HeartbeatRequest object"
-    grant_id: Optional[str] = None
+    grantId: Optional[str] = None
     # Cond; "Required if the responseCode parameter indicates SUCCESS or SUSPENDED_GRANT and the grantRenew parameter
     # was included and set to True in the corresponding HeartbeatRequest object. This parameter may be included at
     # other times by SAS choice. When included, if the channelType of this Grant is “PAL”, this parameter shall be
     # set to the value that does not extend beyond the licenseExpiration of the corresponding PAL recorded in the PAL
     # Database [n.23]."
-    grant_expire_time: Optional[str] = None
+    grantExpireTime: Optional[str] = None
     # Optional
-    heartbeat_interval: Optional[conint(gt=0)] = None
+    heartbeatInterval: Optional[conint(gt=0)] = None
     # Optional
-    operation_param: Optional[Operation_Param] = None
+    operationParam: Optional[Operation_Param] = None
     # Optional
-    meas_report_config: Optional[List[Meas_Report_Type]]
+    measReportConfig: Optional[List[Meas_Report_Type]]
 
 
 class Relinquishment_Request(BaseModel):
@@ -674,8 +676,8 @@ class Relinquishment_Request(BaseModel):
     RelinquishmentRequest object as defined in 10.9.1 of <1>
     All fields are required.
     """
-    cbsd_id: str
-    grant_id: str
+    cbsdId: str
+    grantId: str
 
 
 class Relinquishment_Response(BaseModel):
@@ -686,11 +688,11 @@ class Relinquishment_Response(BaseModel):
     # Conditional; "Included IFF the cbsdId parameter in the RelinquishmentRequest object
     # contains a valid CBSD identity. If included, the SAS shall set this parameter to the value of the cbsdId
     # parameter in the corresponding RelinquishmentRequest object"
-    cbsd_id: str
+    cbsdId: str
     # Conditional; "Included IFF the grantId parameter in the RelinquishmentRequest object contains a valid Grant
     # identity. If included, the SAS shall set this parameter to the value of the grantId parameter in the
     # corresponding RelinquishmentRequest object"
-    grant_id: str
+    grantId: str
 
 
 class Deregistration_Request(BaseModel):
@@ -698,7 +700,7 @@ class Deregistration_Request(BaseModel):
     DeregistrationRequest object as defined in 10.11.1 of <1>
     All fields are required.
     """
-    cbsd_id: str
+    cbsdId: str
 
 
 class Deregistration_Response(BaseModel):
@@ -709,4 +711,4 @@ class Deregistration_Response(BaseModel):
     # Conditional; "Included IFF the cbsdId parameter in the DeregistrationRequest object
     # contains a valid CBSD identity. If included, the SAS shall set this parameter to the value of the cbsdId
     # parameter in the corresponding DeregistrationRequest object"
-    cbsd_id: str
+    cbsdId: str
