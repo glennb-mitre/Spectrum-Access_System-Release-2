@@ -1,0 +1,15 @@
+{
+  "title": "Height_Type_Enum JSON Schema",
+  "$ref": "#/definitions/Height_Type_Enum",
+  "definitions": {
+    "Height_Type_Enum": {
+      "title": "Height_Type_Enum",
+      "description": "Used to specify the possible choices for the 'height_type' parameter of an Installation_Param object",
+      "enum": [
+        "AGL",
+        "AMSL"
+      ],
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Radio_Technology_Enum JSON Schema",
+  "$ref": "#/definitions/Radio_Technology_Enum",
+  "definitions": {
+    "Radio_Technology_Enum": {
+      "title": "Radio_Technology_Enum",
+      "description": "Used to specify the possible choices for the 'radio_technology' parameter of an Air_Interface object\nThe peritted values are specified in section 6 of <2>",
+      "enum": [
+        "E_UTRA",
+        "CAMBRIUM_NETWORKS",
+        "4G_BBW_SAA_1",
+        "NR",
+        "DOODLE_CBRS"
+      ],
+      "type": "string"
+    }
+  }
+}

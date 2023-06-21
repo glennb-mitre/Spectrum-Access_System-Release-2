@@ -1,0 +1,15 @@
+{
+  "title": "Operation_State_Enum JSON Schema",
+  "$ref": "#/definitions/Operation_State_Enum",
+  "definitions": {
+    "Operation_State_Enum": {
+      "title": "Operation_State_Enum",
+      "description": "Defines the possible values of the required operationState parameter of a Heartbeat_Request object",
+      "enum": [
+        "AUTHORIZED",
+        "GRANTED"
+      ],
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "Channel_Type_Enum JSON Schema",
+  "$ref": "#/definitions/Channel_Type_Enum",
+  "definitions": {
+    "Channel_Type_Enum": {
+      "title": "Channel_Type_Enum",
+      "description": "Contains the valid choices for the channelType parameter of an Available_Channel object.\nDefined in 10.4.2 of <1>",
+      "enum": [
+        "PAL",
+        "GAA"
+      ],
+      "type": "string"
+    }
+  }
+}

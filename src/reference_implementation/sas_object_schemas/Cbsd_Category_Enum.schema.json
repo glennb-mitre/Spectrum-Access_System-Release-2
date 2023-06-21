@@ -1,0 +1,15 @@
+{
+  "title": "Cbsd_Category_Enum JSON Schema",
+  "$ref": "#/definitions/Cbsd_Category_Enum",
+  "definitions": {
+    "Cbsd_Category_Enum": {
+      "title": "Cbsd_Category_Enum",
+      "description": "Allowed values for the cbsd_category parameter of a RegistrationRequest object, as defined in table 4 of <1>.",
+      "enum": [
+        "A",
+        "B"
+      ],
+      "type": "string"
+    }
+  }
+}

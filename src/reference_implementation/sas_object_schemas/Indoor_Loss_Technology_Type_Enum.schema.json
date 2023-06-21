@@ -1,0 +1,26 @@
+{
+  "title": "Indoor_Loss_Technology_Type_Enum JSON Schema",
+  "$ref": "#/definitions/Indoor_Loss_Technology_Type_Enum",
+  "definitions": {
+    "Indoor_Loss_Technology_Type_Enum": {
+      "title": "Indoor_Loss_Technology_Type_Enum",
+      "description": "Contains the permitted values for the \"technologyType\" parameter of an Indoor_Loss_GNSS_Meas_Report object.\nDefined in table 7.2-2 of section 7.2.1 of <2>",
+      "enum": [
+        "GPS_L1",
+        "GPS_L2",
+        "GPS_L5",
+        "GLONASS_G1",
+        "GLONASS_G2",
+        "GLONASS_G3",
+        "GALILEO_E1",
+        "GALILEO_E5A",
+        "GALILEO_E5B",
+        "GALILEO_E6",
+        "BEIDOU_B1",
+        "BEIDOU_B2",
+        "BEIDOU_B3"
+      ],
+      "type": "string"
+    }
+  }
+}

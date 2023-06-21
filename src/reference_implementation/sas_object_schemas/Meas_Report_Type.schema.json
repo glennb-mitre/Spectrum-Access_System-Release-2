@@ -1,0 +1,16 @@
+{
+  "title": "Meas_Report_Type JSON Schema",
+  "$ref": "#/definitions/Meas_Report_Type",
+  "definitions": {
+    "Meas_Report_Type": {
+      "title": "Meas_Report_Type",
+      "description": "Used to specify the possible choices for the 'meas_capability' parameter of a Registration_Request object\nThe permitted values are specified in section 7 of <2>",
+      "enum": [
+        "RECEIVED_POWER_WITHOUT_GRANT",
+        "RECEIVED_POWER_WITH_GRANT",
+        "INDOOR_LOSS_USING_GNSS"
+      ],
+      "type": "string"
+    }
+  }
+}

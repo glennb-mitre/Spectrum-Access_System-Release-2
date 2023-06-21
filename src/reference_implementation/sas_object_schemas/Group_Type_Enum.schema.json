@@ -1,0 +1,14 @@
+{
+  "title": "Group_Type_Enum JSON Schema",
+  "$ref": "#/definitions/Group_Type_Enum",
+  "definitions": {
+    "Group_Type_Enum": {
+      "title": "Group_Type_Enum",
+      "description": "Used to specify the possible choices for the 'group_type' parameter of a Group_Param object\nNote that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that \"additional group\ntypes are expected to be defined in future revisions.\"",
+      "enum": [
+        "INTERFERENCE_COORDINATION"
+      ],
+      "type": "string"
+    }
+  }
+}
