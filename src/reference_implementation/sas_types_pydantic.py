@@ -752,4 +752,55 @@ deregistrationResponse = Dict[str, List[DeregistrationResponse]]
 # "Zones" : "zone/$CREATOR/$ZONE_ID"
 # "Coordination events" : "coordination/$ADMINISTRATOR_ID/$EVENT_ID"
 # Note: "the symbol “$” before any token refers to a token chosen by the entity issuing the token."
+#
+# Notes:
+# 1) "All messages in the [SAS-SAS] Protocol are extensible using JSON extension mechanisms."
+# 2) "In every message and object, all fields are optional unless specifically described as required.
+
+
+class MessageAggregation(BaseModel):
+    """
+    Defined in Table 3 of <3>
+
+    7.3: "Multiple required data elements may be placed into a single request for a push exchange, and similarly,
+    in a pull exchange, the response message may contain aggregated data elements.
+
+    When using the individual record GET or POST methods described in Table 2, the SAS shall encode message payloads
+    as a JSON object. When responding to the time-range record GET or POST methods, the SAS shall encode message
+    payloads as a MessageAggregation object of the type in Table 3. This payload includes an array of JSON objects.
+    The elements in such an array will be objects of the requested (or provided) message type.
+
+    In the case of error conditions in the SAS-SAS requests, the SAS shall use the appropriate HTTP status codes and
+    an empty response. For example, an error in constructing the appropriate URL or a URL unsupported by the target
+    SAS should be answered by a 404 status code. A syntactically correct request for which the SAS has no data shall
+    produce the response of an empty JSON object (equivalent to “{}”)."
+
+    All fields are required.
+    """
+    startTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    endTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    recordData: List[Any]
+
+
+class ContactInformation(BaseModel):
+    """
+    ContactInformation object as defined in 8.1.1 of <3>
+    """
+    contactType: Optional[str]
+    name: Optional[str]
+    # Format: should follow the E.123 ITU-T recommendation
+    phoneNumber: Optional[List[str]]
+    # Format: should follow the E.123 ITU-T recommendation
+    email: Optional[List[str]]
+    address: Optional[List[str]]
+    note: Optional[List[str]]
+
+
+class SasAdministrator(BaseModel):
+    """
+    SasAdministrator object as defined in 8.1 of <3>.
+    """
+    id: Optional[str] = Field(default=None, regex=r'sas_admin/.*')
+    name: Optional[str]
+    contactInformation: Optional[List[ContactInformation]]
 
