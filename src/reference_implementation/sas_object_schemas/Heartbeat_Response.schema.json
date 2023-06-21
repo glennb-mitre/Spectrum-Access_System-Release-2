@@ -29,15 +29,15 @@
       "description": "A data object that \"includes information on whether the corresponding CBSD request is approved or disapproved for a\nresponse,\" defined in 10.2.2 of <1>.\nRequired parameter of Registration_Response.",
       "type": "object",
       "properties": {
-        "response_code": {
+        "responseCode": {
           "$ref": "#/definitions/Response_Code_Enum"
         },
-        "response_message": {
-          "title": "Response Message",
+        "responseMessage": {
+          "title": "Responsemessage",
           "type": "string"
         },
-        "response_data": {
-          "title": "Response Data",
+        "responseData": {
+          "title": "Responsedata",
           "type": "array",
           "items": {
             "type": "string"
@@ -45,7 +45,7 @@
         }
       },
       "required": [
-        "response_code"
+        "responseCode"
       ]
     },
     "Operation_Param": {
@@ -53,8 +53,8 @@
       "description": "\"This data object includes operation parameters of the requested Grant.\"\nRequired param for Grant_Request.\nAll fields are required.",
       "type": "object",
       "properties": {
-        "max_eirp": {
-          "title": "Max Eirp",
+        "maxEirp": {
+          "title": "Maxeirp",
           "anyOf": [
             {
               "type": "integer",
@@ -70,7 +70,7 @@
         }
       },
       "required": [
-        "max_eirp"
+        "maxEirp"
       ]
     },
     "Meas_Report_Type": {
@@ -91,32 +91,32 @@
         "response": {
           "$ref": "#/definitions/Response"
         },
-        "transmit_expire_time": {
-          "title": "Transmit Expire Time",
+        "transmitExpireTime": {
+          "title": "Transmitexpiretime",
           "pattern": "\\d{4}-[01]\\d-[0123]\\dT[012]\\d:[012345]\\d:[012345]\\dZ",
           "type": "string"
         },
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "type": "string"
         },
-        "grant_id": {
-          "title": "Grant Id",
+        "grantId": {
+          "title": "Grantid",
           "type": "string"
         },
-        "grant_expire_time": {
-          "title": "Grant Expire Time",
+        "grantExpireTime": {
+          "title": "Grantexpiretime",
           "type": "string"
         },
-        "heartbeat_interval": {
-          "title": "Heartbeat Interval",
+        "heartbeatInterval": {
+          "title": "Heartbeatinterval",
           "exclusiveMinimum": 0,
           "type": "integer"
         },
-        "operation_param": {
+        "operationParam": {
           "$ref": "#/definitions/Operation_Param"
         },
-        "meas_report_config": {
+        "measReportConfig": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Meas_Report_Type"
@@ -125,7 +125,7 @@
       },
       "required": [
         "response",
-        "transmit_expire_time"
+        "transmitExpireTime"
       ]
     }
   }

@@ -7,18 +7,18 @@
       "description": "RelinquishmentRequest object as defined in 10.9.1 of <1>\nAll fields are required.",
       "type": "object",
       "properties": {
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "type": "string"
         },
-        "grant_id": {
-          "title": "Grant Id",
+        "grantId": {
+          "title": "Grantid",
           "type": "string"
         }
       },
       "required": [
-        "cbsd_id",
-        "grant_id"
+        "cbsdId",
+        "grantId"
       ]
     }
   }

@@ -7,20 +7,20 @@
       "description": "A data object that \"describes the spectrum for which the CBSD seeks information on spectrum availability.\"\nDefined in section 10.3.2 of <1>.\nRequired parameter of Spectrum_Inquiry_Request.\nAll fields are required",
       "type": "object",
       "properties": {
-        "low_frequency": {
-          "title": "Low Frequency",
+        "lowFrequency": {
+          "title": "Lowfrequency",
           "exclusiveMinimum": 0,
           "type": "number"
         },
-        "high_frequency": {
-          "title": "High Frequency",
+        "highFrequency": {
+          "title": "Highfrequency",
           "exclusiveMinimum": 0,
           "type": "number"
         }
       },
       "required": [
-        "low_frequency",
-        "high_frequency"
+        "lowFrequency",
+        "highFrequency"
       ]
     },
     "Meas_Report_Type": {
@@ -38,21 +38,21 @@
       "description": "SpectrumInquiryRequest object as defined in 10.3.1 of <1>",
       "type": "object",
       "properties": {
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "type": "string"
         },
-        "inquired_spectrum": {
+        "inquiredSpectrum": {
           "$ref": "#/definitions/Frequency_Range"
         },
-        "meas_report": {
+        "measReport": {
           "$ref": "#/definitions/Meas_Report_Type"
         }
       },
       "required": [
-        "cbsd_id",
-        "inquired_spectrum",
-        "meas_report"
+        "cbsdId",
+        "inquiredSpectrum",
+        "measReport"
       ]
     }
   }

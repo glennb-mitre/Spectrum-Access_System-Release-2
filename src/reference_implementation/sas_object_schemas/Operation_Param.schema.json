@@ -7,8 +7,8 @@
       "description": "\"This data object includes operation parameters of the requested Grant.\"\nRequired param for Grant_Request.\nAll fields are required.",
       "type": "object",
       "properties": {
-        "max_eirp": {
-          "title": "Max Eirp",
+        "maxEirp": {
+          "title": "Maxeirp",
           "anyOf": [
             {
               "type": "integer",
@@ -24,7 +24,7 @@
         }
       },
       "required": [
-        "max_eirp"
+        "maxEirp"
       ]
     }
   }

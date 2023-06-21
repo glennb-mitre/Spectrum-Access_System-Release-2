@@ -7,13 +7,13 @@
       "description": "DeregistrationRequest object as defined in 10.11.1 of <1>\nAll fields are required.",
       "type": "object",
       "properties": {
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "type": "string"
         }
       },
       "required": [
-        "cbsd_id"
+        "cbsdId"
       ]
     }
   }

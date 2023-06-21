@@ -29,15 +29,15 @@
       "description": "A data object that \"includes information on whether the corresponding CBSD request is approved or disapproved for a\nresponse,\" defined in 10.2.2 of <1>.\nRequired parameter of Registration_Response.",
       "type": "object",
       "properties": {
-        "response_code": {
+        "responseCode": {
           "$ref": "#/definitions/Response_Code_Enum"
         },
-        "response_message": {
-          "title": "Response Message",
+        "responseMessage": {
+          "title": "Responsemessage",
           "type": "string"
         },
-        "response_data": {
-          "title": "Response Data",
+        "responseData": {
+          "title": "Responsedata",
           "type": "array",
           "items": {
             "type": "string"
@@ -45,7 +45,7 @@
         }
       },
       "required": [
-        "response_code"
+        "responseCode"
       ]
     },
     "Meas_Report_Type": {
@@ -66,12 +66,12 @@
         "response": {
           "$ref": "#/definitions/Response"
         },
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "maxLength": 256,
           "type": "string"
         },
-        "meas_report_config": {
+        "measReportConfig": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Meas_Report_Type"

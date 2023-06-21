@@ -32,55 +32,55 @@
           "title": "Height",
           "type": "number"
         },
-        "height_type": {
+        "heightType": {
           "$ref": "#/definitions/Height_Type_Enum"
         },
-        "horizontal_accuracy": {
-          "title": "Horizontal Accuracy",
+        "horizontalAccuracy": {
+          "title": "Horizontalaccuracy",
           "exclusiveMaximum": 50,
           "type": "number"
         },
-        "vertical_accuracy": {
-          "title": "Vertical Accuracy",
+        "verticalAccuracy": {
+          "title": "Verticalaccuracy",
           "exclusiveMaximum": 3,
           "type": "number"
         },
-        "indoor_deployment": {
-          "title": "Indoor Deployment",
+        "indoorDeployment": {
+          "title": "Indoordeployment",
           "type": "boolean"
         },
-        "antenna_azimuth": {
-          "title": "Antenna Azimuth",
+        "antennaAzimuth": {
+          "title": "Antennaazimuth",
           "minimum": 0,
           "maximum": 359,
           "type": "integer"
         },
-        "antenna_downtilt": {
-          "title": "Antenna Downtilt",
+        "antennaDowntilt": {
+          "title": "Antennadowntilt",
           "minimum": -90,
           "maximum": 90,
           "type": "integer"
         },
-        "antenna_gain": {
-          "title": "Antenna Gain",
+        "antennaGain": {
+          "title": "Antennagain",
           "minimum": -127,
           "maximum": 128,
           "type": "integer"
         },
-        "eirp_capability": {
-          "title": "Eirp Capability",
+        "eirpCapability": {
+          "title": "Eirpcapability",
           "minimum": -127,
           "maximum": 4,
           "type": "integer"
         },
-        "antenna_beamwitdth": {
-          "title": "Antenna Beamwitdth",
+        "antennaBeamwitdth": {
+          "title": "Antennabeamwitdth",
           "minimum": 0,
           "maximum": 360,
           "type": "integer"
         },
-        "antenna_model": {
-          "title": "Antenna Model",
+        "antennaModel": {
+          "title": "Antennamodel",
           "maxLength": 128,
           "type": "string"
         }

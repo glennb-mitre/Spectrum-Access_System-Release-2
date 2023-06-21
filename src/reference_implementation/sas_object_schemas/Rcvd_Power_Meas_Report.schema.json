@@ -7,27 +7,27 @@
       "description": "A data object containing information about the \"Recived Power\" measurement, a \"Measurement of the radio frequency\nenergy received over a set of frequency ranges during a measurement interval with results reported to a SAS for each\nof the frequency ranges in terms of effective received power for each frequency range.\"\n\nDefined in table 7.1-2 of section 7.1.1 and table 7.1-4 of section 7.1.2 of <2> as RcvdPowerMeasReport\n\n7.1.1: RECEIVED_POWER_WITHOUT_GRANT:\n    \"Semantics: Received Power can be measured and reported when the CBSD does\n    not have a spectrum grant from the SAS. If this measurement report capability is indicated by the SAS to the\n    CBSD, the CBSD performs and reports Received Power measurements over the entire CBRS band in segments that do not\n    exceed 10 MHz per measurement report. Those measurement reports are sent to the SAS in the first Spectrum Inquiry\n    Request message and first Grant Request message.\n\n    A given CBSD can include unsolicited (i.e., even if SAS did not send measReportConfig to CBSD) measReport object\n    in spectrumInquiryRequest object or grantRequest object, if the CBSD included measCapability parameter in\n    registrationRequest object to SAS with a value of RECEIVED_POWER_WITHOUT_GRANT.\n\n    A given CBSD must include measReport parameter in spectrumInquiryRequest object, if SAS included measReportConfig\n    parameter in registrationResponse object to CBSD.\"\n\n7.1.2: RECEIVED_POWER_WITH_GRANT:\n    \"Semantics: Received Power can be measured and reported when the CBSD has a\n    spectrum grant from the SAS. If this measurement report capability is indicated by the SAS to the CBSD,\n    the CBSD performs and reports Received Power measurements over one or more frequency ranges that do not exceed 10\n    MHz per measurement report. The measurement report(s) are sent to the SAS in the subsequent Heartbeat Request\n    message.\n\n    A given CBSD can include unsolicited (i.e., even if SAS did not send measReportConfig to CBSD) measReport object\n    in spectrumInquiryRequest or heartbeatRequest object, if the CBSD included measCapability parameter in\n    registrationRequest object to SAS with a value of RECEIVED_POWER_WITH_GRANT.\n\n    A given CBSD must include measReport parameter in the first heartbeatRequest object, if SAS included\n    measReportConfig parameter in either grantResponse or heartbeatResponse objects to CBSD.\"\n\nAll fields are required",
       "type": "object",
       "properties": {
-        "meas_frequency": {
-          "title": "Meas Frequency",
+        "measFrequency": {
+          "title": "Measfrequency",
           "exclusiveMinimum": 0,
           "type": "integer"
         },
-        "meas_bandwidth": {
-          "title": "Meas Bandwidth",
+        "measBandwidth": {
+          "title": "Measbandwidth",
           "exclusiveMinimum": 0,
           "type": "integer"
         },
-        "meas_rcvd_power": {
-          "title": "Meas Rcvd Power",
+        "measRcvdPower": {
+          "title": "Measrcvdpower",
           "minimum": -100,
           "maximum": -25,
           "type": "number"
         }
       },
       "required": [
-        "meas_frequency",
-        "meas_bandwidth",
-        "meas_rcvd_power"
+        "measFrequency",
+        "measBandwidth",
+        "measRcvdPower"
       ]
     }
   }

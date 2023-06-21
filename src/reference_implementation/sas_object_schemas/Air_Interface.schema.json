@@ -19,12 +19,12 @@
       "description": "A data object that includes information on the air interface technology of the CBSD.\nREG-Conditional for Registration_Request\nDefined in 10.1.2 of <1>",
       "type": "object",
       "properties": {
-        "radio_technology": {
+        "radioTechnology": {
           "$ref": "#/definitions/Radio_Technology_Enum"
         }
       },
       "required": [
-        "radio_technology"
+        "radioTechnology"
       ]
     }
   }

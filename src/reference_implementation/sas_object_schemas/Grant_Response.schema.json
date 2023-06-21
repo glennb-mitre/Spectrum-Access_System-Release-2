@@ -29,15 +29,15 @@
       "description": "A data object that \"includes information on whether the corresponding CBSD request is approved or disapproved for a\nresponse,\" defined in 10.2.2 of <1>.\nRequired parameter of Registration_Response.",
       "type": "object",
       "properties": {
-        "response_code": {
+        "responseCode": {
           "$ref": "#/definitions/Response_Code_Enum"
         },
-        "response_message": {
-          "title": "Response Message",
+        "responseMessage": {
+          "title": "Responsemessage",
           "type": "string"
         },
-        "response_data": {
-          "title": "Response Data",
+        "responseData": {
+          "title": "Responsedata",
           "type": "array",
           "items": {
             "type": "string"
@@ -45,7 +45,7 @@
         }
       },
       "required": [
-        "response_code"
+        "responseCode"
       ]
     },
     "Meas_Report_Type": {
@@ -63,8 +63,8 @@
       "description": "\"This data object includes operation parameters of the requested Grant.\"\nRequired param for Grant_Request.\nAll fields are required.",
       "type": "object",
       "properties": {
-        "max_eirp": {
-          "title": "Max Eirp",
+        "maxEirp": {
+          "title": "Maxeirp",
           "anyOf": [
             {
               "type": "integer",
@@ -80,12 +80,12 @@
         }
       },
       "required": [
-        "max_eirp"
+        "maxEirp"
       ]
     },
     "Channel_Type_Enum": {
       "title": "Channel_Type_Enum",
-      "description": "Contains the valid choices for the channel_type parameter of an Available_Channel object.\nDefined in 10.4.2 of <1>",
+      "description": "Contains the valid choices for the channelType parameter of an Available_Channel object.\nDefined in 10.4.2 of <1>",
       "enum": [
         "PAL",
         "GAA"
@@ -94,39 +94,39 @@
     },
     "Grant_Response": {
       "title": "Grant_Response",
-      "description": "GrantResponse object as defined in 10.6.1 of <1>\n\ngrant_expire_time: \"The grantExpireTime indicates the time when the Grant associated with the grantId expires. This\nparameter is UTC time expressed in the format, YYYY-MM-DDThh:mm:ssZ as defined by [n.7]. This parameter shall be\nincluded if and only if the responseCode parameter indicates SUCCESS. If the channelType parameter is included in\nthis object and the value is set to 'PAL', the grantExpireTime parameter shall be set to the value that does not\nextend beyond the licenseExpiration of the corresponding PAL recorded in the PAL Database [n.23].\"",
+      "description": "GrantResponse object as defined in 10.6.1 of <1>\n\ngrantExpireTime: \"The grantExpireTime indicates the time when the Grant associated with the grantId expires. This\nparameter is UTC time expressed in the format, YYYY-MM-DDThh:mm:ssZ as defined by [n.7]. This parameter shall be\nincluded if and only if the responseCode parameter indicates SUCCESS. If the channelType parameter is included in\nthis object and the value is set to 'PAL', the grantExpireTime parameter shall be set to the value that does not\nextend beyond the licenseExpiration of the corresponding PAL recorded in the PAL Database [n.23].\"",
       "type": "object",
       "properties": {
         "response": {
           "$ref": "#/definitions/Response"
         },
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "type": "string"
         },
-        "grant_id": {
-          "title": "Grant Id",
+        "grantId": {
+          "title": "Grantid",
           "type": "string"
         },
-        "grant_expire_time": {
-          "title": "Grant Expire Time",
+        "grantExpireTime": {
+          "title": "Grantexpiretime",
           "type": "string"
         },
-        "heartbeat_interval": {
-          "title": "Heartbeat Interval",
+        "heartbeatInterval": {
+          "title": "Heartbeatinterval",
           "exclusiveMinimum": 0,
           "type": "integer"
         },
-        "meas_report_config": {
+        "measReportConfig": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Meas_Report_Type"
           }
         },
-        "operation_param": {
+        "operationParam": {
           "$ref": "#/definitions/Operation_Param"
         },
-        "channel_type": {
+        "channelType": {
           "$ref": "#/definitions/Channel_Type_Enum"
         }
       },

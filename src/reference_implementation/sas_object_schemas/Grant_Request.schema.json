@@ -7,8 +7,8 @@
       "description": "\"This data object includes operation parameters of the requested Grant.\"\nRequired param for Grant_Request.\nAll fields are required.",
       "type": "object",
       "properties": {
-        "max_eirp": {
-          "title": "Max Eirp",
+        "maxEirp": {
+          "title": "Maxeirp",
           "anyOf": [
             {
               "type": "integer",
@@ -24,7 +24,7 @@
         }
       },
       "required": [
-        "max_eirp"
+        "maxEirp"
       ]
     },
     "Meas_Report_Type": {
@@ -42,20 +42,20 @@
       "description": "GrantRequest object as defined in 10.5.1 of <1>\n\n\"A GrantRequest object contains operating parameters that the CBSD plans to operate with. Operation parameters\ninclude a continuous segment of spectrum and the maximum EIRP.\"",
       "type": "object",
       "properties": {
-        "cbsd_id": {
-          "title": "Cbsd Id",
+        "cbsdId": {
+          "title": "Cbsdid",
           "type": "string"
         },
-        "operation_param": {
+        "operationParam": {
           "$ref": "#/definitions/Operation_Param"
         },
-        "meas_report": {
+        "measReport": {
           "$ref": "#/definitions/Meas_Report_Type"
         }
       },
       "required": [
-        "cbsd_id",
-        "operation_param"
+        "cbsdId",
+        "operationParam"
       ]
     }
   }
