@@ -1,11 +1,13 @@
 """
 This module contains class definitions for objects used in SAS-CBSD interactions according to the following documents:
 <1> WINNF-TS-0016-V1.2.7 SAS to CBSD Technical Specification
-<2> WINNF-SSC-0002 v6.0.0.0 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS):
+<2> WINNF-SSC-0002 v10.0.0 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS):
     WInnForum Recognized CBRS Air Interfaces and Measurements
 *2  <1> cites <2> for several object field definitions
-<3> WINNF-TS-0096-V1.3.2 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS): Spectrum Access
+<3> WINNF-TS-0096-V1.4.0 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS): Spectrum Access
     System (SAS) - SAS Interface Technical Specification
+
+The above documents may be found at https://cbrs.wirelessinnovation.org/release-1-standards-specifications
 
 Note 1: <1> Marks each parameter's requirement level with (R)equired, (O)ptional, or (C)onditional.
 In the case of Registration Request Message objects, some parameters are marked as "REG-Conditional," indicating that
@@ -85,6 +87,11 @@ class Radio_Technology_Enum(str, Enum):
     FOURG_BBW_SAA_1 = "4G_BBW_SAA_1"
     NR = "NR"
     DOODLE_CBRS = "DOODLE_CBRS"
+    # See documentation; should never request nor grant an EIRP of > 20 dBm for Category A or 37 dBm for Category B
+    CW = "CW"
+    REDLINE = "REDLINE"
+    TARANA_WIRELESS = "TARANA_WIRELESS"
+    FAROS = "FAROS"
 
 
 class AirInterface(BaseModel):
@@ -284,7 +291,7 @@ class RegistrationRequest(BaseModel):
     """
     # Required
     userId: str
-    # Required
+    # Required; TODO: there's a constraint here
     fccId: str
     # Required
     cbsdSerialNumber: str
