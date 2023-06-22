@@ -804,3 +804,83 @@ class SasAdministrator(BaseModel):
     name: Optional[str]
     contactInformation: Optional[List[ContactInformation]]
 
+
+class FCCInformation(BaseModel):
+    """
+    FCCInformation object as defined in table 7 (8.2.1) of <3>
+    """
+    certificationId: Optional[str]
+    certificationDate: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\d')
+    certificationExpiration: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\d')
+    certificationConditions: Optional[str]
+    frn: Optional[str]
+    sasPhase: str = Field(regex=r'1|2')
+
+
+class SasImplementation(BaseModel):
+    """
+    SasImplementation object as defined in table 6 (section 8.2) of <3>
+    """
+    id: Optional[str] = Field(default=None, regex=r'sas_admin/.*/.*')
+    name: Optional[str]
+    # Reference: ID of a SasAdministrator object
+    administratorId: Optional[str]
+    contactInformation: Optional[List[ContactInformation]]
+    # X.509 key
+    publicKey: Optional[str]
+    fccInformation: Optional[FCCInformation]
+    url: Optional[str]
+
+
+class GrantData(BaseModel):
+    """
+    GrantData object as defined in table 9 (8.3) of <3>
+    """
+    id: Optional[str]
+    terminated: Optional[bool]
+    operationParam: Optional[OperationParam]
+    requestedOperationParam: Optional[OperationParam]
+    channelType: Optional[Channel_Type_Enum]
+    grantExpireTime: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+
+
+class CbsdData(BaseModel):
+    """
+    CbsdData object as defined in table 8 (8.3) of <3>
+
+    "The following parameters of the RegistrationRequest object included in the CbsdData object shall be exchanged as
+    they are registered:
+        fccId, cbsdCategory, airInterface, installationParam (see below), measCapability,
+    groupingParam (see below).
+    These parameters (and any others) are optional:
+        userId, cbsdSerialNumber, cbsdInfo, callSign"
+    "The following parameters of the InstallationParam object included in the CbsdData object shall be exchanged. Any
+    other parameters are optional:
+        latitude, longitude, height, heightType, indoorDeployment, antennaAzimuth,
+    antennaGain, antennaBeamwidth"
+    "The following parameters of the GroupParam object shall be exchanged as they are registered when the groupType
+    parameter of that object is equal to “INTERFERENCE_COORDINATION” or any other group type and accompanying group
+    information identified as SAS-Essential data. Otherwise, the GroupParam objects are not required to be exchanged.
+        groupType, groupId, other accompanying data"
+
+    "Other fields from the RegistrationRequest object may be optionally included in this message as registered. Fields
+    not required to be exchanged in this protocol, but required by syntactic constraints of the SAS-CBSD protocol [n.10]
+    to be present or carry a particular format may be populated using an empty placeholder or a dummy value."
+
+    "The following parameters of the GrantData objects included in the CbsdData object shall be exchanged as they are
+    allocated for use by the CBSD (that is, a successful Grant response has been returned for that CBSD in response
+    to a Grant procedure containing these OperationParamdata elements), and the Grant has not subsequently been
+    terminated.
+        grantExpireTime, operationParam (see below), channelType
+
+    In addition, requestedOperationParam shall also be exchanged to facilitate operations described in [n.8]
+    R2-SGN-16. The following parameters of the OperationParam objects included in the CbsdData object within the
+    grants parameter shall be exchanged as they are allocated.
+        maxEirp, operationFrequencyRange (including both lowFrequency and highFrequency data elements)
+    """
+    # see <3>
+    id: Optional[str] = Field(regex=r'cbsd/.*/[abcdefABCDEF\d]{40}')
+    # TODO: Specify in some way the following:
+    registration: Optional[registrationRequest]
+    grants: Optional[List[GrantData]]
+
