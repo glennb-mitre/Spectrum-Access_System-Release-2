@@ -77,7 +77,7 @@ class CbsdInfo(BaseModel, extra=Extra.allow):
     firmwareVersion: Optional[constr(max_length=64)] = None
 
 
-class Radio_Technology_Enum(str, Enum):
+class RadioTechnologyEnum(str, Enum):
     """
     Used to specify the possible choices for the 'radio_technology' parameter of an AirInterface object
     The peritted values are specified in section 6 of <2>
@@ -101,15 +101,15 @@ class AirInterface(BaseModel):
     Defined in 10.1.2 of <1>
     """
     # REG-Conditional
-    radioTechnology: Radio_Technology_Enum
+    radioTechnology: RadioTechnologyEnum
 
 
-class Height_Type_Enum(str, Enum):
+class HeightTypeEnum(str, Enum):
     """
     Used to specify the possible choices for the 'height_type' parameter of an InstallationParam object
     """
-    agl = "AGL" # measured relative to ground level
-    amsl = "AMSL" # measured relative to mean sea level
+    AGL = "AGL" # measured relative to ground level
+    AMSL = "AMSL" # measured relative to mean sea level
 
 
 class InstallationParam(BaseModel):
@@ -131,7 +131,7 @@ class InstallationParam(BaseModel):
     # coordinates from the WGS84 datum to the NAD83 datum.See “REG-Conditional Registration Request Parameters” above.
     height: Optional[Decimal] = None
     # REG-Conditional
-    heightType: Optional[Height_Type_Enum] = None
+    heightType: Optional[HeightTypeEnum] = None
     # Optional
     horizontalAccuracy: Optional[condecimal(lt=Decimal(50))] = None
     # Optional
@@ -155,7 +155,7 @@ class InstallationParam(BaseModel):
     antennaModel: Optional[constr(max_length=128)] = None
 
 
-class Meas_Report_Type(str, Enum):
+class MeasReportType(str, Enum):
     """
     Used to specify the possible choices for the 'meas_capability' parameter of a RegistrationRequest object
     The permitted values are specified in section 7 of <2>
@@ -165,7 +165,7 @@ class Meas_Report_Type(str, Enum):
     INDOOR_LOSS_USING_GNSS = "INDOOR_LOSS_USING_GNSS"
 
 
-class Group_Type_Enum(str, Enum):
+class GroupTypeEnum(str, Enum):
     """
     Used to specify the possible choices for the 'group_type' parameter of a GroupParam object
     Note that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that "additional group
@@ -195,7 +195,7 @@ class GroupParam(BaseModel):
 
     All fields are required.
     """
-    groupType: Group_Type_Enum
+    groupType: GroupTypeEnum
     groupId: str
 
 
@@ -268,7 +268,7 @@ class CpiSignatureData(BaseModel):
     digitalSignature: str
 
 
-class Cbsd_Category_Enum(str, Enum):
+class CbsdCategoryEnum(str, Enum):
     """
     Allowed values for the cbsd_category parameter of a RegistrationRequest object, as defined in table 4 of <1>.
     """
@@ -298,7 +298,7 @@ class RegistrationRequest(BaseModel):
     # Optional
     callSign: Optional[str] = None
     # REG-Conditional
-    cbsdCategory: Optional[Cbsd_Category_Enum] = None
+    cbsdCategory: Optional[CbsdCategoryEnum] = None
     # Optional
     cbsdInfo: Optional[CbsdInfo] = None
     # REG-Conditional
@@ -306,14 +306,14 @@ class RegistrationRequest(BaseModel):
     # REG-Conditional
     installationParam: Optional[InstallationParam] = None
     # REG-Conditional
-    measCapability: Optional[List[Meas_Report_Type]] = None
+    measCapability: Optional[List[MeasReportType]] = None
     # Optional
     groupingParam: Optional[List[GroupParam]] = None
     # Optional
     cpiSignatureData: Optional[CpiSignatureData] = None
 
 
-class Response_Code_Enum(IntEnum):
+class ResponseCodeEnum(IntEnum):
     """
     Contains the valid response codes for the response_code parameter of a Response object.
     Defined in 10.1.3 of <1>
@@ -394,7 +394,7 @@ class Response(BaseModel):
     Required parameter of RegistrationResponse.
     """
     # Required
-    responseCode: Response_Code_Enum
+    responseCode: ResponseCodeEnum
     # Optional
     responseMessage: Optional[str] = None
     # Optional
@@ -416,7 +416,7 @@ class RegistrationResponse(BaseModel):
     # Conditional; included IFF response_code indicates SUCCESS
     cbsdId: Optional[constr(max_length=256)] = None
     # Optional
-    measReportConfig: Optional[List[Meas_Report_Type]] = None
+    measReportConfig: Optional[List[MeasReportType]] = None
 
 
 class FrequencyRange(BaseModel):
@@ -439,10 +439,10 @@ class SpectrumInquiryRequest(BaseModel):
     # Required
     inquiredSpectrum: FrequencyRange
     # Conditional; the document does not specify when this parameter should be included
-    measReport: Meas_Report_Type
+    measReport: MeasReportType
 
 
-class Channel_Type_Enum(str, Enum):
+class ChannelTypeEnum(str, Enum):
     """
     Contains the valid choices for the channelType parameter of an AvailableChannel object.
     Defined in 10.4.2 of <1>
@@ -460,7 +460,7 @@ class AvailableChannel(BaseModel):
     # Required
     frequencyRange: FrequencyRange
     # Req
-    channelType: Channel_Type_Enum
+    channelType: ChannelTypeEnum
     # Req; "the regulatory rule used to generate this response, e.g., 'FCC_PART_96'."
     ruleApplied: str
     # Optional; Maximum EIRP likely to be permitted for a Grant on this frequencyRange, given the CBSD registration
@@ -503,7 +503,7 @@ class GrantRequest(BaseModel):
     # Req
     operationParam: OperationParam
     # Cond; the document does not specify when this parameter should be included
-    measReport: Optional[Meas_Report_Type] = None
+    measReport: Optional[MeasReportType] = None
 
 
 class GrantResponse(BaseModel):
@@ -527,14 +527,14 @@ class GrantResponse(BaseModel):
     # Cond; included IFF response_code indicates SUCCESS
     heartbeatInterval: Optional[conint(gt=0)] = None
     # Optional
-    measReportConfig: Optional[List[Meas_Report_Type]] = None
+    measReportConfig: Optional[List[MeasReportType]] = None
     # Optional
     operationParam: Optional[OperationParam] = None
     # Cond; included IFF response_code indicates SUCCESS
-    channelType: Optional[Channel_Type_Enum] = None
+    channelType: Optional[ChannelTypeEnum] = None
 
 
-class Operation_State_Enum(str, Enum):
+class OperationStateEnum(str, Enum):
     """
     Defines the possible values of the required operationState parameter of a HeartbeatRequest object
     """
@@ -542,7 +542,7 @@ class Operation_State_Enum(str, Enum):
     GRANTED = "GRANTED"
 
 
-class Rcvd_Power_Meas_Report(BaseModel):
+class RcvdPowerMeasReport(BaseModel):
     """
     A data object containing information about the "Recived Power" measurement, a "Measurement of the radio frequency
     energy received over a set of frequency ranges during a measurement interval with results reported to a SAS for each
@@ -586,9 +586,9 @@ class Rcvd_Power_Meas_Report(BaseModel):
     measRcvdPower: confloat(ge=-100, le=-25)
 
 
-class Indoor_Loss_Technology_Type_Enum(str, Enum):
+class IndoorLossTechnologyTypeEnum(str, Enum):
     """
-    Contains the permitted values for the "technologyType" parameter of an Indoor_Loss_GNSS_Meas_Report object.
+    Contains the permitted values for the "technologyType" parameter of an IndoorLossGnssMeasReport object.
     Defined in table 7.2-2 of section 7.2.1 of <2>
     """
     GPS_L1 = "GPS_L1"
@@ -606,7 +606,7 @@ class Indoor_Loss_Technology_Type_Enum(str, Enum):
     BEIDOU_B3 = "BEIDOU_B3"
 
 
-class Indoor_Loss_GNSS_Meas_Report(BaseModel):
+class IndoorLossGnssMeasReport(BaseModel):
     """
     A data object containing information about the "Indoor Loss" measurement, a "Measurement of indoor loss at physical
     location of CBSD. This indoor attenuation data will be sent to a SAS to provide power and frequency management of the CBSD"
@@ -628,10 +628,10 @@ class Indoor_Loss_GNSS_Meas_Report(BaseModel):
     indoorLoss: confloat(ge=0, le=70)
     azimuthAngleWithGnss: conint(ge=0, le=359)
     elevationAngleWithGnss: conint(ge=0, le=90)
-    technologyType: Indoor_Loss_Technology_Type_Enum
+    technologyType: IndoorLossTechnologyTypeEnum
 
 
-Meas_Report = Union[List[Rcvd_Power_Meas_Report], List[Indoor_Loss_GNSS_Meas_Report]]
+MeasReport = Union[List[RcvdPowerMeasReport], List[IndoorLossGnssMeasReport]]
 
 
 class HeartbeatRequest(BaseModel):
@@ -643,12 +643,11 @@ class HeartbeatRequest(BaseModel):
     # Req
     grantId: str
     # Req
-    operationState: Operation_State_Enum
+    operationState: OperationStateEnum
     # Opt
     grantRenew: Optional[bool] = None
     # Conditional; see 8.6 for inclusion rules
-    # TODO: Check if this is a List of Meas_Report objects
-    measReport: Optional[Meas_Report] = None
+    measReport: Optional[MeasReport] = None
 
 
 class HeartbeatResponse(BaseModel):
@@ -678,7 +677,7 @@ class HeartbeatResponse(BaseModel):
     # Optional
     operationParam: Optional[OperationParam] = None
     # Optional
-    measReportConfig: Optional[List[Meas_Report_Type]]
+    measReportConfig: Optional[List[MeasReportType]]
 
 
 class RelinquishmentRequest(BaseModel):
@@ -847,7 +846,7 @@ class GrantData(BaseModel):
     terminated: Optional[bool]
     operationParam: Optional[OperationParam]
     requestedOperationParam: Optional[OperationParam]
-    channelType: Optional[Channel_Type_Enum]
+    channelType: Optional[ChannelTypeEnum]
     grantExpireTime: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
 
 
