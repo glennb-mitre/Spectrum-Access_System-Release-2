@@ -385,7 +385,7 @@ class FakeSas(sas_interface.SasInterface):
             ssl_key: Path to SSL key file, if None, will use default key file.
         Returns:
             A dictionary of Esc Sensor Data Message object specified in
-            WINNF-16-S-0096
+            WINNF-TS-0096-V1.4.0
         """
         # Get the Esc Sensor record
         with open(os.path.join('../harness/testcases', 'testdata', 'esc_sensor_record_0.json')) as fd:
