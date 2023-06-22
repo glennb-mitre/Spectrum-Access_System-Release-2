@@ -1,0 +1,16 @@
+numpy~=1.21.5
+six~=1.16.0
+jwt~=1.3.1
+portpicker~=1.5.2
+cryptography~=37.0.1
+jsonschema~=4.4.0
+openssl~=1.1.1u
+shapely~=1.7.1
+pytz~=2022.7
+pykml~=0.2.0
+pygc~=1.1.0
+matplotlib~=3.5.1
+cartopy~=0.18.0
+scipy~=1.7.3
+pycurl~=7.45.1
+pydantic~=1.10.2
