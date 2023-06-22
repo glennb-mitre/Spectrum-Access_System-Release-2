@@ -292,9 +292,9 @@ class RegistrationRequest(BaseModel):
     # Required
     userId: str
     # Required; TODO: there's a constraint here
-    fccId: str
+    fccId: constr(max_length=19)
     # Required
-    cbsdSerialNumber: str
+    cbsdSerialNumber: constr(max_length=64)
     # Optional
     callSign: Optional[str] = None
     # REG-Conditional
@@ -488,7 +488,7 @@ class OperationParam(BaseModel):
     All fields are required.
     """
     maxEirp: Union[conint(ge=-137, le=37), confloat(ge=-137.0, le=37.0)]
-    operationFrequencyRange = FrequencyRange
+    operationFrequencyRange: FrequencyRange
 
 
 class GrantRequest(BaseModel):
