@@ -125,10 +125,10 @@ class InstallationParam(BaseModel):
     latitude: Optional[condecimal(ge=Decimal(-90.000000), le=Decimal(90.000000), decimal_places=6)]
     # REG-Conditional
     longitude: Optional[condecimal(ge=Decimal(-180.000000), le=Decimal(180.000000), decimal_places=6)]
-    # REG-Conditional - The CBSD antenna height in meters.When the heightType parameter value is “AGL”, the antenna
+    # REG-Conditional - The CBSD antenna height in meters. When the heightType parameter value is “AGL”, the antenna
     # height should be given relative to ground level. When the heightType parameter value is “AMSL”, it is given
-    # with respect to WGS84 datum. For reporting the CBSD location to the FCC, the SAS is responsible forconverting
-    # coordinates from the WGS84 datum to the NAD83 datum.See “REG-Conditional Registration Request Parameters” above.
+    # with respect to WGS84 datum. For reporting the CBSD location to the FCC, the SAS is responsible for converting
+    # coordinates from the WGS84 datum to the NAD83 datum. See “REG-Conditional Registration Request Parameters” above.
     height: Optional[Decimal] = None
     # REG-Conditional
     heightType: Optional[HeightTypeEnum] = None
@@ -841,13 +841,125 @@ class SasImplementation(BaseModel):
 class GrantData(BaseModel):
     """
     GrantData object as defined in table 9 (8.3) of <3>
+    The optionality of these parameters are given in 8.3.1 of <3>
     """
     id: Optional[str]
     terminated: Optional[bool]
-    operationParam: Optional[OperationParam]
-    requestedOperationParam: Optional[OperationParam]
-    channelType: Optional[ChannelTypeEnum]
-    grantExpireTime: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    operationParam: OperationParam
+    requestedOperationParam: OperationParam
+    channelType: ChannelTypeEnum
+    grantExpireTime: str = Field(regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+
+class _CbsdDataInstallationParam(BaseModel):
+    """
+    Used to track the required and optional parameters of an InstallationParam object included as an argument to the
+    installationParam parameter of a _CbsdDatRegistrationRequest object.
+
+    "The following parameters of the InstallationParam object included in the CbsdData object shall be exchanged. Any
+    other parameters are optional:
+        latitude, longitude, height, heightType, indoorDeployment, antennaAzimuth, antennaGain, antennaBeamwidth"
+
+    Notes:
+        1) A comment starting with a single asterisk (*) indicates that the parameter directly beneath it is Optional or
+            REG-Conditional in the specification of the InstallationParam object (see above) but is Required when used
+            as an argument to the installationParam parameter of a RegistrationRequest object, that is in turn used as
+            the argument to the registration paramater of a CbsdData object.
+        2) A comment starting with two asterisks (**) indicates that the parameter directly beneath it is Required in
+            the specification of the InstallatationParam object, but Optional when used as an argument to the
+            installationParam parameter of a RegistrationRequest object, that is in turn used as the argument to the
+            registration paramater of a CbsdData object.
+    """
+    # * Required ... May need to write a custom validator since condecimal's arguments don't include trailing zeroes
+    latitude: condecimal(ge=Decimal(-90.000000), le=Decimal(90.000000), decimal_places=6)
+    # * Required
+    longitude: condecimal(ge=Decimal(-180.000000), le=Decimal(180.000000), decimal_places=6)
+    # * Required
+    height: Decimal
+    # * Required
+    heightType: HeightTypeEnum
+    # Optional
+    horizontalAccuracy: Optional[condecimal(lt=Decimal(50))] = None
+    # Optional
+    verticalAccuracy: Optional[condecimal(lt=Decimal(3))] = None
+    # * Required
+    indoorDeployment: bool
+    # * Required
+    antennaAzimuth: conint(ge=0, le=359)
+    # REG-Conditional - Opt for Cat A; REG-Conditional for Cat B
+    antennaDowntilt: Optional[conint(ge=-90, le=90)] = None
+    # * Required
+    antennaGain: conint(ge=-127, le=128)
+    # Optional - This parameter is the maximum EIRP in units of dBm/10MHz to be used by this CBSD and shall be no
+    # more than the rounded-up FCC certified maximum EIRP. The Value of this parameter is an integer with a value
+    # between -127 and +47 (dBm/10MHz) inclusive. If not included, SAS shall set eirpCapability as the rounded up FCC
+    # certified maximum EIRP of the CBSD.
+    eirpCapability: Optional[conint(ge=-127, le=4)] = None
+    # * Required
+    antennaBeamwitdth: conint(ge=0, le=360)
+    # Optional
+    antennaModel: Optional[constr(max_length=128)] = None
+
+
+class _CbsdDataGroupParam(GroupParam, extra=Extra.allow):
+    """
+    Equivalent to the GroupParam class, but permits inclusion of extra information, which is specified as allowed for
+    when included in a SAS-SAS exchange:
+
+    "The following parameters of the GroupParam object shall be exchanged as they are registered when the groupType
+    parameter of that object is equal to “INTERFERENCE_COORDINATION” or any other group type and accompanying group
+    information identified as SAS-Essential data. Otherwise, the GroupParam objects are not required to be exchanged.
+        groupType, groupId, other accompanying data"
+    """
+    pass
+
+
+class _CbsdDataRegistrationRequest(BaseModel):
+    """
+    Used to track the required and optional parameters of a RegistrationRequest object included in a CbsdData object.
+    <3> 8.3:
+        "The following parameters of the RegistrationRequest object included in the CbsdData object shall be exchanged
+        as they are registered:
+            fccId, cbsdCategory, airInterface, installationParam (see below), measCapability, groupingParam (see below).
+        These parameters (and any others) are optional:
+            userId, cbsdSerialNumber, cbsdInfo, callSign"
+
+        ""Other fields from the RegistrationRequest object may be optionally included in this message as registered.
+        Fields not required to be exchanged in this protocol, but required by syntactic constraints of the SAS-CBSD
+        protocol [n.10] to be present or carry a particular format may be populated using an empty placeholder or a
+        dummy value."
+
+    Notes:
+        1) A comment starting with a single asterisk (*) indicates that the parameter directly beneath it is Optional or
+            REG-Conditional in the specification of the RegistrationRequest object (see above) but is Required when an
+            object of this type is used as an argument to the registration parameter of a CbsdData object.
+        2) A comment starting with two asterisks (**) indicates that the parameter directly beneath it is Required in
+            the specification of the RegistrationRequest object, but Optional when used as an argument to the
+            registration parameter of a CbsdData object.
+        **
+    """
+    # ** Optional
+    userId: Optional[str] = None
+    # Required
+    fccId: constr(max_length=19)
+    # ** Optional
+    cbsdSerialNumber: Optional[constr(max_length=64)] = None
+    # Optional
+    callSign: Optional[str] = None
+    # * Required
+    cbsdCategory: CbsdCategoryEnum
+    # Optional
+    cbsdInfo: Optional[CbsdInfo] = None
+    # * Required
+    airInterface: AirInterface
+    # * Required
+    installationParam: _CbsdDataInstallationParam
+    # * Required
+    measCapability: List[MeasReportType]
+    # * Required IFF groupType of the GroupParam object is equal to "INTERFERENCE_COORDINATION"... "or any other group
+    # type and accompanying group information identified as SAS-Essential data."
+    groupingParam: List[_CbsdDataGroupParam]
+    # Optional
+    cpiSignatureData: Optional[CpiSignatureData] = None
 
 
 class CbsdData(BaseModel):
@@ -856,14 +968,14 @@ class CbsdData(BaseModel):
 
     "The following parameters of the RegistrationRequest object included in the CbsdData object shall be exchanged as
     they are registered:
-        fccId, cbsdCategory, airInterface, installationParam (see below), measCapability,
-    groupingParam (see below).
+        fccId, cbsdCategory, airInterface, installationParam (see below), measCapability, groupingParam (see below).
     These parameters (and any others) are optional:
         userId, cbsdSerialNumber, cbsdInfo, callSign"
+
     "The following parameters of the InstallationParam object included in the CbsdData object shall be exchanged. Any
     other parameters are optional:
-        latitude, longitude, height, heightType, indoorDeployment, antennaAzimuth,
-    antennaGain, antennaBeamwidth"
+        latitude, longitude, height, heightType, indoorDeployment, antennaAzimuth, antennaGain, antennaBeamwidth"
+
     "The following parameters of the GroupParam object shall be exchanged as they are registered when the groupType
     parameter of that object is equal to “INTERFERENCE_COORDINATION” or any other group type and accompanying group
     information identified as SAS-Essential data. Otherwise, the GroupParam objects are not required to be exchanged.
@@ -875,7 +987,7 @@ class CbsdData(BaseModel):
 
     "The following parameters of the GrantData objects included in the CbsdData object shall be exchanged as they are
     allocated for use by the CBSD (that is, a successful Grant response has been returned for that CBSD in response
-    to a Grant procedure containing these OperationParamdata elements), and the Grant has not subsequently been
+    to a Grant procedure containing these OperationParam data elements), and the Grant has not subsequently been
     terminated.
         grantExpireTime, operationParam (see below), channelType
 
@@ -886,7 +998,6 @@ class CbsdData(BaseModel):
     """
     # see <3>
     id: Optional[str] = Field(regex=r'cbsd/.*/[abcdefABCDEF\d]{40}')
-    # TODO: Specify in some way the following:
-    registration: Optional[registrationRequest]
+    registration: Optional[_CbsdDataRegistrationRequest]
     grants: Optional[List[GrantData]]
 
