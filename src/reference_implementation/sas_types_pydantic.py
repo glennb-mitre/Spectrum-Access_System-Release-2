@@ -171,7 +171,7 @@ class GroupTypeEnum(str, Enum):
     Note that there is currently only one permitted value as of version 1.2.7 of <1>, but it notes that "additional group
     types are expected to be defined in future revisions."
     """
-    interferenceCoordination = "INTERFERENCE_COORDINATION"
+    INTERFERENCE_COORDINATION = "INTERFERENCE_COORDINATION"
 
 
 class GroupParam(BaseModel):
@@ -1000,4 +1000,40 @@ class CbsdData(BaseModel):
     id: Optional[str] = Field(regex=r'cbsd/.*/[abcdefABCDEF\d]{40}')
     registration: Optional[_CbsdDataRegistrationRequest]
     grants: Optional[List[GrantData]]
+
+
+class RadiationPattern(BaseModel):
+    """
+    RadiationPattern object as defined in Table 12 (8.4) of <3>
+    TODO: Determine suitable method of implementing the 'angle' parameter, which the table suggests is one number,
+        but is in fact, two distinct integers.
+    """
+    angle_azimuth: Optional[conint(ge=0, le=359)]
+    angle_elevation: Optional[conint(ge=-180, le=180)]
+    gain: Optional[conint(ge=-127, le=128)]
+
+
+class EscInstallationParam(BaseModel):
+    """
+    EscInstallationParam as defined in Table 11 (8.4) of <3>
+    """
+    latitude: Optional[condecimal(ge=Decimal(-90.000000), le=Decimal(90.000000), decimal_places=6)] = None
+    longitude: Optional[condecimal(ge=Decimal(-180.000000), le=Decimal(180.000000), decimal_places=6)] = None
+    height: Optional[Union[float, int]] = None
+    heightType: Optional[HeightTypeEnum] = None
+    antennaAzimuth: Optional[conint(ge=0, le=359)] = None
+    antennaDowntilt: Optional[conint(ge=-90, le=90)] = None
+    antennaRadiationPattern: Optional[List[RadiationPattern]] = None
+    elevationRadiationPattern: Optional[List[RadiationPattern]]
+
+
+class EscSensorData(BaseModel):
+    """
+    EscSensorData object as defined in Table 10 (8.4) of <3>.
+    """
+    id: Optional[str] = Field(regex=r'esc_sensor/.*/.*')
+    installationParam: Optional[EscInstallationParam]
+    # units of dBm/MHz
+    protectionLevel: Optional[Decimal]
+
 
