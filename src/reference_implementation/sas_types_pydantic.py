@@ -47,6 +47,8 @@ from pydantic import (
     constr,
     Field,
     Extra,
+    AnyUrl,
+    AnyHttpUrl,
 )
 
 OptStr = Optional[str]
@@ -1156,4 +1158,58 @@ class CoordinationEvent(BaseModel):
     # - Event specific
     # - Extensible anchor for any other metadata needed for automated handling of particular coordination events
     coordinationData: Optional[Dict] = None
+
+
+class SASRecordTypeEnum(str, Enum):
+    """
+    Permitted values of the recordType parameter of an ActivityDumpFile object.
+    Specified in Table 2: URL constructions and return types for SAS-SAS methods of <3>
+    """
+    # Associated with SasAdministrator type
+    SAS_ADMIN = "sas_admin"
+    # Associated with SasImplementation type
+    SAS_IMPL = "sas_impl"
+    # Associated with CbsdData type
+    CBSD = "cbsd"
+    # Associated with EscSensorData type
+    ESC_SENSOR = "esc_sensor"
+    # Associated with ZoneData type
+    ZONE = "zone"
+    # Associated with CoordinationEvent type
+    COORDINATION = "coordination"
+    # Associated with FullActivityDump type
+    DUMP = "dump"
+
+
+class ActivityDumpFile(BaseModel):
+    """
+    ActivityDumpFile object as defined in Table 17 (8.7.1) of <3>. The files parameter of a FullActivityDump object is a
+    typed as a List of these objects.
+
+    url: "The retrieval URLs at which the peer can retrieve the activity dump file. Retrieval of the resources at these
+        URLs shall support byte-range requests using the standard HTTP Content-Range mechanisms.
+
+        Retrieval of these URLs shall occur only within the security context of section 5.1."
+
+    Table 17 specifies the Size and Version parameters as Uppercase.
+    """
+    # TODO: Check to ensure that only http(s) urls support HTTP Content-Range mechanism; if this isn't True, then this
+    #  field should be of type Optional[AnyUrl] instead.
+    url: Optional[AnyHttpUrl] = None
+    # SHA-1 checksum of the contents of the activity dump file referred to by the url arg
+    checksum: Optional[str] = Field(None, regex=r'[abcdefABCDEF\d]{40}')
+    # Table 17, which sp specifies this parameter as Uppercase
+    Size: Optional[int] = None
+    # version string format specified in 7.2 of <3>
+    Version: Optional[str] = Field(None, regex=r'v\d+\.\d+')
+    recordType: Optional[SASRecordTypeEnum] = None
+
+
+class FullActivityDump(BaseModel):
+    """
+    FullActivityDump object as defined in Table 16 (8.7) of <3>.
+    """
+    files: Optional[List[ActivityDumpFile]] = None
+    generationDateTime: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    description: Optional[str] = None
 
