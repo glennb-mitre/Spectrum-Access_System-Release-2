@@ -25,6 +25,8 @@ This module uses pydantic to validate objects, inputs, and outputs
 from enum import Enum, IntEnum
 from decimal import Decimal
 from typing import Optional, Any, Union, List, Dict, Tuple
+
+import pydantic
 # See https://docs.pydantic.dev/latest/usage/types/#constrained-types
 from pydantic import (
     BaseModel,
@@ -1036,4 +1038,88 @@ class EscSensorData(BaseModel):
     # units of dBm/MHz
     protectionLevel: Optional[Decimal]
 
+
+class ZoneDataUsageEnum(str, Enum):
+    """
+    Contains the permitted values of the usage parameter of a ZoneData object.
+    """
+    CENSUS_TRACT = "CENSUS_TRACT"
+    PPA = "PPA"
+    EXCLUSION_ZONE = "EXCLUSION_ZONE"
+
+
+class PPARegionTypeEnum(str, Enum):
+    """
+    Contains the permitted values of the ppaRegionType parameter of a PPAInformation obeject,
+    as defined in 8.5.1 of <3>.
+    """
+    URBAN = "URBAN"
+    SUBURBAN = "SUBURBAN"
+    RURAL = "RURAL"
+
+
+class PPAInformation(BaseModel):
+    """
+    PPAInformation object as defined in Table 14 (8.5.1) of <3>
+    The type of the ppaInfo parameter of a ZoneData object.
+
+    palChannel: "If included, this parameter defines the 10 MHz channel for palId that may be different from
+        primaryAssignment in [n.15].
+        NOTE: This field was added in V1.4.0 of this document after SAS Initial Certification. Support of this parameter
+            is at the discretion of each SAS Administrator."
+   """
+    # PAL Database record ID
+    palId: Optional[List[str]]
+    cbsdReferenceId: Optional[List[str]]
+    ppaBeginDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    ppaExpirationDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    ppaRegionType: Optional[PPARegionTypeEnum]
+    # "If included, this parameter defines the 10 MHz channel for palId that may be different from primaryAssignment in
+    # [n.15].
+    # NOTE: This field was added in V1.4.0 of this document after SAS Initial Certification. Support of this parameter
+    # is at the discretion of each SAS Administrator."
+    palChannel: Optional[FrequencyRange]
+
+
+class ZoneData(BaseModel):
+    """
+    ZoneData object as defined in Table 13 (8.5) of <3>
+
+    id parameter:
+        - Format: zone/$CREATOR/$ZONE_ID
+        - $CREATOR: SAS Administrator ID or
+        static government zone definition source
+        ID
+        - $ZONE_ID: the identification of the
+        referenced zone defined by the
+        $CREATOR
+
+        When usage is equal to "PPA" the format of the $CREATOR string is "ppa/$ADMINISTRATOR_ID" and the $ZONE_ID is equal
+        to the PPA-ID string.
+
+        When usage is equal to "CENSUS_TRACT" the format of the $CREATOR string is "census_tract/census/$YEAR" and the
+        $ZONE_ID is equal to the FIPS code of the census tract. $YEAR is equal to the census year in which the census tract
+        was defined. (Note: this zone type exchange is optional.)
+
+        When usage is equal to "EXCLUSION_ZONE" the format of the $CREATOR string is "exclusion_zone/ntia/$DATE", and $DATE
+        is a unique "YYYY_MM_DD" string describing the date on which NTIA issued the definition of the exclusion zone.
+        $ZONE_ID is a unique reference to an exclusion zone.
+
+    """
+    id: Optional[str] = Field(regex=r'''zone/
+    (
+    ppa/.*|
+    census_tract/census/\d{4}|
+    exclusion_zone/ntia/\d{4}_[01]\d_[0123]\d
+    )
+    /.*
+    ''')
+    name: Optional[str]
+    creator: Optional[str]
+    usage: Optional[ZoneDataUsageEnum]
+    terminated: Optional[bool]
+    # included if usage argument is ZoneDataUsageEnum.PPA
+    ppaInfo: Optional[PPAInformation]
+    # See n.13
+    zone: Optional[pydantic.Json]
 
