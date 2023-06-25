@@ -768,30 +768,6 @@ deregistrationResponse = Dict[str, List[DeregistrationResponse]]
 # 2) "In every message and object, all fields are optional unless specifically described as required."
 
 
-class MessageAggregation(BaseModel):
-    """
-    Defined in Table 3 of <3>
-
-    7.3: "Multiple required data elements may be placed into a single request for a push exchange, and similarly,
-    in a pull exchange, the response message may contain aggregated data elements.
-
-    When using the individual record GET or POST methods described in Table 2, the SAS shall encode message payloads
-    as a JSON object. When responding to the time-range record GET or POST methods, the SAS shall encode message
-    payloads as a MessageAggregation object of the type in Table 3. This payload includes an array of JSON objects.
-    The elements in such an array will be objects of the requested (or provided) message type.
-
-    In the case of error conditions in the SAS-SAS requests, the SAS shall use the appropriate HTTP status codes and
-    an empty response. For example, an error in constructing the appropriate URL or a URL unsupported by the target
-    SAS should be answered by a 404 status code. A syntactically correct request for which the SAS has no data shall
-    produce the response of an empty JSON object (equivalent to “{}”)."
-
-    All fields are required.
-    """
-    startTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
-    endTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
-    recordData: List[Any]
-
-
 class ContactInformation(BaseModel):
     """
     ContactInformation object as defined in 8.1.1 of <3>
@@ -999,8 +975,19 @@ class CbsdData(BaseModel):
     R2-SGN-16. The following parameters of the OperationParam objects included in the CbsdData object within the
     grants parameter shall be exchanged as they are allocated.
         maxEirp, operationFrequencyRange (including both lowFrequency and highFrequency data elements)
+
+    id: Format: cbsd/$CBSD_REFERENCE_ID
+        $CBSD_REFERENCE_ID is defined as $FCC_ID + “/” + sha1($SERIAL_NUMBER), the SHA-1 hash of the device manufacturer
+        serial number that is unique within the FCC ID namespace scope. This creates a persistent, unique mapping from
+        specific device parameters to the ID.
+
+        $FCC_ID and $SERIAL_NUMBER are the unescaped fccId and cbsdSerialNumber strings registered by the CBSD in the
+        RegistrationRequestJSON object [n.10]
+
+        SHA-1 is to be applied to the string with no additional line termination characters. Reference implementation:
+        the Python hashlib.sha1() implementation.
     """
-    # see <3>
+    # see Docstring
     id: Optional[str] = Field(regex=r'cbsd/.*/[abcdefABCDEF\d]{40}')
     registration: Optional[_CbsdDataRegistrationRequest]
     grants: Optional[List[GrantData]]
@@ -1213,3 +1200,26 @@ class FullActivityDump(BaseModel):
     generationDateTime: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
     description: Optional[str] = None
 
+
+class MessageAggregation(BaseModel):
+    """
+    Defined in Table 3 of <3>
+
+    7.3: "Multiple required data elements may be placed into a single request for a push exchange, and similarly,
+    in a pull exchange, the response message may contain aggregated data elements.
+
+    When using the individual record GET or POST methods described in Table 2, the SAS shall encode message payloads
+    as a JSON object. When responding to the time-range record GET or POST methods, the SAS shall encode message
+    payloads as a MessageAggregation object of the type in Table 3. This payload includes an array of JSON objects.
+    The elements in such an array will be objects of the requested (or provided) message type.
+
+    In the case of error conditions in the SAS-SAS requests, the SAS shall use the appropriate HTTP status codes and
+    an empty response. For example, an error in constructing the appropriate URL or a URL unsupported by the target
+    SAS should be answered by a 404 status code. A syntactically correct request for which the SAS has no data shall
+    produce the response of an empty JSON object (equivalent to “{}”)."
+
+    All fields are required.
+    """
+    startTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    endTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    recordData: List[Union[CbsdData,ZoneData,CoordinationEvent]]
