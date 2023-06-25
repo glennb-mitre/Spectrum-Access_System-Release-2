@@ -763,7 +763,7 @@ deregistrationResponse = Dict[str, List[DeregistrationResponse]]
 #
 # Notes:
 # 1) "All messages in the [SAS-SAS] Protocol are extensible using JSON extension mechanisms."
-# 2) "In every message and object, all fields are optional unless specifically described as required.
+# 2) "In every message and object, all fields are optional unless specifically described as required."
 
 
 class MessageAggregation(BaseModel):
@@ -1122,4 +1122,38 @@ class ZoneData(BaseModel):
     ppaInfo: Optional[PPAInformation]
     # See n.13
     zone: Optional[pydantic.Json]
+
+
+class CoordinationTypeEnum(str, Enum):
+    """
+    Contains the permitted values of the coordinationType parameter of a CoordinationEvent object as defined in table 15
+    (8.6) of <3>.
+    """
+    INTERFERENCE_REPORT = "INTERFERENCE_REPORT"
+    AD_HOC_EXCLUSION_ZONE = "AD_HOC_EXCLUSION_ZONE"
+    ENFORCEMENT_ACTION = "ENFORCEMENT_ACTION"
+    ESC_SENSOR_DEPLOYMENT = "ESC_SENSOR_DEPLOYMENT"
+
+
+class CoordinationEvent(BaseModel):
+    """
+    CoordinationEvent object as defined in Table 15 (8.6) of <3>.
+    """
+    id: Optional[str] = Field(None, regex=r'coordination/.*/.*')
+    name: Optional[str] = None
+    creator: Optional[str] = None
+    creationDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    expirationDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    description: Optional[str] = None
+    coordinationType: Optional[CoordinationTypeEnum] = None
+    #  Reference: ID(s) of the involved device (e.g. a CbsdData ID or an EscSensorData ID). May be empty May also refer
+    #  to a specific incumbent device or area.
+    coordinationDevice: Optional[List[str]] = None
+    # Reference: Array of IDs of the involved ZoneData objects. May be empty.
+    coordinationZone: Optional[List[str]] = None
+    # object: type is dependent upon the CoordinationType field
+    # Structured object describing the coordination data:
+    # - Event specific
+    # - Extensible anchor for any other metadata needed for automated handling of particular coordination events
+    coordinationData: Optional[Dict] = None
 
