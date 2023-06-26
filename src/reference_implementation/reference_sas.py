@@ -373,7 +373,7 @@ class FakeSas(sas_interface.SasInterface):
         request: ListDictMsg,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> Dict:
+    ) -> EscSensorData:
         """
         SAS-SAS ESC Sensor Record Exchange interface
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -402,7 +402,7 @@ class FakeSas(sas_interface.SasInterface):
         version,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> Dict:
+    ) -> FullActivityDump:
         """
         SAS-SAS Full Activity Dump interface.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -525,7 +525,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def BlacklistByFccIdAndSerialNumber(self, request):
+    def BlacklistByFccIdAndSerialNumber(
+        self,
+        request: Dict[str, str]
+    ):
         """
         Inject an (FCC ID, serial number) pair which will be blacklisted by the SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -536,7 +539,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def PreloadRegistrationData(self, request):
+    def PreloadRegistrationData(
+        self,
+        request: Dict[str, RegistrationRequest]
+    ):
         """
         SAS admin interface to preload registration data into SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -545,8 +551,9 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
                 "registrationData" and the value is a list of individual CBSD
                 registration data which need to be preloaded into SAS (each of which is
                 itself a dictionary). The dictionary is a RegistrationRequest object,
-                the fccId and cbsdSerialNumber fields are required, other fields are
+                the fccId and cbsdSerialNumber* fields are required, other fields are
                 optional.
+                * the userId field is also required.
         """
         pass
 
@@ -568,7 +575,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def InjectZoneData(
         self,
-        request: Dict[str, Dict],
+        request: Dict[str, ZoneData],
         # ssl_cert: OptStr = None,
         # ssl_key: OptStr = None
     ):
@@ -618,7 +625,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def InjectSasAdministratorRecord(self, request):
+    def InjectSasAdministratorRecord(
+        self,
+        request: Dict[str, SasAdministrator]
+    ):
         """
         SAS admin interface to inject SAS Administrator Record into SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -630,7 +640,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def InjectEscSensorDataRecord(self, request):
+    def InjectEscSensorDataRecord(
+        self,
+        request: Dict[str, EscSensorData]
+    ):
         """
         SAS admin interface to inject ESC Sensor Data Record into SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
