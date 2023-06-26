@@ -24,26 +24,15 @@ This module uses pydantic to validate objects, inputs, and outputs
 
 from enum import Enum, IntEnum
 from decimal import Decimal
-from typing import Optional, Any, Union, List, Dict, Tuple
+from typing import Optional, Union, List, Dict
 
 import pydantic
 # See https://docs.pydantic.dev/latest/usage/types/#constrained-types
 from pydantic import (
     BaseModel,
-    NegativeFloat,
-    NegativeInt,
-    PositiveFloat,
-    PositiveInt,
-    NonNegativeFloat,
-    NonNegativeInt,
-    NonPositiveFloat,
-    NonPositiveInt,
-    conbytes,
     condecimal,
     confloat,
     conint,
-    conlist,
-    conset,
     constr,
     Field,
     Extra,
@@ -126,9 +115,9 @@ class InstallationParam(BaseModel):
     """
     # REG-Conditional ... May need to write a custom validator since condecimal's arguments don't include trailing
     # zeroes
-    latitude: Optional[condecimal(ge=Decimal(-90.000000), le=Decimal(90.000000), decimal_places=6)]
+    latitude: Optional[condecimal(ge=Decimal(-90.000000), le=Decimal(90.000000), decimal_places=6)] = None
     # REG-Conditional
-    longitude: Optional[condecimal(ge=Decimal(-180.000000), le=Decimal(180.000000), decimal_places=6)]
+    longitude: Optional[condecimal(ge=Decimal(-180.000000), le=Decimal(180.000000), decimal_places=6)] = None
     # REG-Conditional - The CBSD antenna height in meters. When the heightType parameter value is “AGL”, the antenna
     # height should be given relative to ground level. When the heightType parameter value is “AMSL”, it is given
     # with respect to WGS84 datum. For reporting the CBSD location to the FCC, the SAS is responsible for converting
@@ -237,8 +226,6 @@ class CpiSignedData(BaseModel):
     installationParam: InstallationParam
     professionalInstallerData: ProfessionalInstallerData
 
-    def base64_encode(self):
-        pass
 
 class CpiSignatureData(BaseModel):
     """
@@ -295,7 +282,7 @@ class RegistrationRequest(BaseModel):
     """
     # Required
     userId: str
-    # Required; TODO: there's a constraint here
+    # Required
     fccId: constr(max_length=19)
     # Required
     cbsdSerialNumber: constr(max_length=64)
@@ -681,7 +668,7 @@ class HeartbeatResponse(BaseModel):
     # Optional
     operationParam: Optional[OperationParam] = None
     # Optional
-    measReportConfig: Optional[List[MeasReportType]]
+    measReportConfig: Optional[List[MeasReportType]] = None
 
 
 class RelinquishmentRequest(BaseModel):
@@ -772,50 +759,50 @@ class ContactInformation(BaseModel):
     """
     ContactInformation object as defined in 8.1.1 of <3>
     """
-    contactType: Optional[str]
-    name: Optional[str]
+    contactType: Optional[str] = None
+    name: Optional[str] = None
     # Format: should follow the E.123 ITU-T recommendation
-    phoneNumber: Optional[List[str]]
+    phoneNumber: Optional[List[str]] = None
     # Format: should follow the E.123 ITU-T recommendation
-    email: Optional[List[str]]
-    address: Optional[List[str]]
-    note: Optional[List[str]]
+    email: Optional[List[str]] = None
+    address: Optional[List[str]] = None
+    note: Optional[List[str]] = None
 
 
 class SasAdministrator(BaseModel):
     """
     SasAdministrator object as defined in 8.1 of <3>.
     """
-    id: Optional[str] = Field(default=None, regex=r'sas_admin/.*')
-    name: Optional[str]
-    contactInformation: Optional[List[ContactInformation]]
+    id: Optional[str] = Field(None, regex=r'sas_admin/.*')
+    name: Optional[str] = None
+    contactInformation: Optional[List[ContactInformation]] = None
 
 
 class FCCInformation(BaseModel):
     """
     FCCInformation object as defined in table 7 (8.2.1) of <3>
     """
-    certificationId: Optional[str]
-    certificationDate: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\d')
-    certificationExpiration: Optional[str] = Field(regex=r'\d{4}-[01]\d-[0123]\d')
-    certificationConditions: Optional[str]
-    frn: Optional[str]
-    sasPhase: str = Field(regex=r'1|2')
+    certificationId: Optional[str] = None
+    certificationDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\d')
+    certificationExpiration: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\d')
+    certificationConditions: Optional[str] = None
+    frn: Optional[str] = None
+    sasPhase: Optional[str] = Field(None, regex=r'1|2')
 
 
 class SasImplementation(BaseModel):
     """
     SasImplementation object as defined in table 6 (section 8.2) of <3>
     """
-    id: Optional[str] = Field(default=None, regex=r'sas_admin/.*/.*')
-    name: Optional[str]
+    id: Optional[str] = Field(None, regex=r'sas_admin/.*/.*')
+    name: Optional[str] = None
     # Reference: ID of a SasAdministrator object
-    administratorId: Optional[str]
-    contactInformation: Optional[List[ContactInformation]]
+    administratorId: Optional[str] = None
+    contactInformation: Optional[List[ContactInformation]] = None
     # X.509 key
-    publicKey: Optional[str]
-    fccInformation: Optional[FCCInformation]
-    url: Optional[str]
+    publicKey: Optional[str] = None
+    fccInformation: Optional[FCCInformation] = None
+    url: Optional[AnyUrl] = None
 
 
 class GrantData(BaseModel):
@@ -823,8 +810,8 @@ class GrantData(BaseModel):
     GrantData object as defined in table 9 (8.3) of <3>
     The optionality of these parameters are given in 8.3.1 of <3>
     """
-    id: Optional[str]
-    terminated: Optional[bool]
+    id: Optional[str] = None
+    terminated: Optional[bool] = None
     operationParam: OperationParam
     requestedOperationParam: OperationParam
     channelType: ChannelTypeEnum
@@ -988,9 +975,9 @@ class CbsdData(BaseModel):
         the Python hashlib.sha1() implementation.
     """
     # see Docstring
-    id: Optional[str] = Field(regex=r'cbsd/.*/[abcdefABCDEF\d]{40}')
-    registration: Optional[_CbsdDataRegistrationRequest]
-    grants: Optional[List[GrantData]]
+    id: Optional[str] = Field(None, regex=r'cbsd/.*/[abcdefABCDEF\d]{40}')
+    registration: Optional[_CbsdDataRegistrationRequest] = None
+    grants: Optional[List[GrantData]] = None
 
 
 class RadiationPattern(BaseModel):
@@ -999,9 +986,9 @@ class RadiationPattern(BaseModel):
     TODO: Determine suitable method of implementing the 'angle' parameter, which the table suggests is one number,
         but is in fact, two distinct integers.
     """
-    angle_azimuth: Optional[conint(ge=0, le=359)]
-    angle_elevation: Optional[conint(ge=-180, le=180)]
-    gain: Optional[conint(ge=-127, le=128)]
+    angle_azimuth: Optional[conint(ge=0, le=359)] = None
+    angle_elevation: Optional[conint(ge=-180, le=180)] = None
+    gain: Optional[conint(ge=-127, le=128)] = None
 
 
 class EscInstallationParam(BaseModel):
@@ -1015,17 +1002,17 @@ class EscInstallationParam(BaseModel):
     antennaAzimuth: Optional[conint(ge=0, le=359)] = None
     antennaDowntilt: Optional[conint(ge=-90, le=90)] = None
     antennaRadiationPattern: Optional[List[RadiationPattern]] = None
-    elevationRadiationPattern: Optional[List[RadiationPattern]]
+    elevationRadiationPattern: Optional[List[RadiationPattern]] = None
 
 
 class EscSensorData(BaseModel):
     """
     EscSensorData object as defined in Table 10 (8.4) of <3>.
     """
-    id: Optional[str] = Field(regex=r'esc_sensor/.*/.*')
-    installationParam: Optional[EscInstallationParam]
+    id: Optional[str] = Field(None, regex=r'esc_sensor/.*/.*')
+    installationParam: Optional[EscInstallationParam] = None
     # units of dBm/MHz
-    protectionLevel: Optional[Decimal]
+    protectionLevel: Optional[Decimal] = None
 
 
 class ZoneDataUsageEnum(str, Enum):
@@ -1058,16 +1045,16 @@ class PPAInformation(BaseModel):
             is at the discretion of each SAS Administrator."
    """
     # PAL Database record ID
-    palId: Optional[List[str]]
-    cbsdReferenceId: Optional[List[str]]
+    palId: Optional[List[str]] = None
+    cbsdReferenceId: Optional[List[str]] = None
     ppaBeginDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
     ppaExpirationDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
-    ppaRegionType: Optional[PPARegionTypeEnum]
+    ppaRegionType: Optional[PPARegionTypeEnum] = None
     # "If included, this parameter defines the 10 MHz channel for palId that may be different from primaryAssignment in
     # [n.15].
     # NOTE: This field was added in V1.4.0 of this document after SAS Initial Certification. Support of this parameter
     # is at the discretion of each SAS Administrator."
-    palChannel: Optional[FrequencyRange]
+    palChannel: Optional[FrequencyRange] = None
 
 
 class ZoneData(BaseModel):
@@ -1095,7 +1082,7 @@ class ZoneData(BaseModel):
         $ZONE_ID is a unique reference to an exclusion zone.
 
     """
-    id: Optional[str] = Field(regex=r'''zone/
+    id: Optional[str] = Field(None, regex=r'''zone/
     (
     ppa/.*|
     census_tract/census/\d{4}|
@@ -1103,14 +1090,14 @@ class ZoneData(BaseModel):
     )
     /.*
     ''')
-    name: Optional[str]
-    creator: Optional[str]
-    usage: Optional[ZoneDataUsageEnum]
-    terminated: Optional[bool]
+    name: Optional[str] = None
+    creator: Optional[str] = None
+    usage: Optional[ZoneDataUsageEnum] = None
+    terminated: Optional[bool] = None
     # included if usage argument is ZoneDataUsageEnum.PPA
-    ppaInfo: Optional[PPAInformation]
+    ppaInfo: Optional[PPAInformation] = None
     # See n.13
-    zone: Optional[pydantic.Json]
+    zone: Optional[pydantic.Json] = None
 
 
 class CoordinationTypeEnum(str, Enum):
