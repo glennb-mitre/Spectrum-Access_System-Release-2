@@ -6,6 +6,8 @@ This module contains class definitions for objects used in SAS-CBSD interactions
 *2  <1> cites <2> for several object field definitions
 <3> WINNF-TS-0096-V1.4.0 Signaling Protocols and Procedures for Citizens Broadband Radio Service (CBRS): Spectrum Access
     System (SAS) - SAS Interface Technical Specification
+<4> WINNF-TS-0245-V1.2.0 Operations for Citizens Broadband Radio Service (CBRS): Priority Access License (PAL) Database
+    Technical Specification
 
 The above documents may be found at https://cbrs.wirelessinnovation.org/release-1-standards-specifications
 
@@ -38,6 +40,7 @@ from pydantic import (
     Extra,
     AnyUrl,
     AnyHttpUrl,
+    Json,
 )
 
 OptStr = Optional[str]
@@ -1210,3 +1213,65 @@ class MessageAggregation(BaseModel):
     startTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
     endTime: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
     recordData: List[Union[CbsdData,ZoneData,CoordinationEvent]]
+
+
+# The following type(s) are defined in <4>.
+
+class RegistrationInformation(BaseModel, extra=Extra.allow):
+    """
+    RegistrationInformation object as defined in Table 3 (6.1.1) of <4>.
+    The type of the required registrationInformation field of a PalInfoRecord object.
+    The object "contains various extensible registration information for the PAL licensee."
+
+    "This object is extensible and other fields can be added to reflect more needed information about the PAL licensee
+    as reflected in the FCC auction records and needed for SAS verification of PAL licensee identity."
+    """
+    # Required
+    frn: str
+    # The below fields are optional
+    registrationDate: Optional[str] = Field(None, regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    licenseConditions: Optional[str] = None
+    callSign: Optional[str] = None
+
+
+class LicenseInformation(BaseModel):
+    """
+    LicenseInformation object as defined in Table 4 (6.1.2) of <4>.
+    The type of the required licenseInformation field of a PalInfoRecord object.
+    Contains "information regarding the license described in [the containing] PAL database record."
+    """
+    licenseExpiration: str = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    # FIPS county code
+    licenseAreaIdentifier: str = Field(..., regex=r'\d{5}')
+    # TODO: Verify format of this field... "Reference to a record in a geographical database represented as a SAS-SAS
+    #  Zone record (See [<3>]) providing the extents of the license area. (e.g. 'zone/county/census/$YEAR/$FIPS')"
+    licenseAreaExtent: str = Field(..., regex=r'zone/county/census/\d{4}/.*')
+    # The below fields are optional
+    licenseId: Optional[str] = None
+    licenseDate: Optional[str] = Field(..., regex=r'\d{4}-[01]\d-[0123]\dT[012]\d:[012345]\d:[012345]\dZ')
+    licenseFrequencyChannelId: Optional[str] = None
+
+
+class ChannelAssignment(BaseModel):
+    """
+    ChannelAssignment object as defined in Table 5 (6.1.3) of <4>.
+    Type of the required channelAssignment field of a PalInfoRecordObject.
+    Contains "the consistent channel assignment information for this PAL."
+    """
+    primaryAssignment: FrequencyRange
+    secondaryAssignment: Optional[FrequencyRange] = None
+
+
+class PalInfoRecord(BaseModel):
+    """
+    PalInfoRecord object as defined in Table 2 (6.1) of <4>.
+    """
+    # The below fields are required
+    palId: str
+    licensee: str
+    userId: str
+    registrationInformation: RegistrationInformation
+    license: LicenseInformation
+    channelAssignment: ChannelAssignment
+    # The below field is optional. If included, the value is "VALID"
+    licenseStatus: Optional[str] = None
