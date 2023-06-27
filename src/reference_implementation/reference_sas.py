@@ -492,7 +492,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def InjectUserId(self, request):
+    def InjectUserId(self, request: Dict[str, str]):
         """
         SAS admin interface to whitelist a user ID in the SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -515,7 +515,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def BlacklistByFccId(self, request):
+    def BlacklistByFccId(self, request: Dict[str, str]):
         """
         Inject an FCC ID which will be blacklisted by the SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -559,7 +559,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def InjectExclusionZone(
         self,
-        request,
+        request: Dict[str, Union[Json, FrequencyRange]],
         # ssl_cert=None,
         # ssl_key=None
     ):
@@ -609,7 +609,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
             request: A dictionary with a single key-value pair where the key is
             "record" and the value is a fixed satellite service object
             (which is itself a dictionary). The dictionary is an
-            IncumbentProtectionData object (specified in SAS-SAS TS) -- WINNF-16-S-0096: Section 8.5.
+                IncumbentProtectionData object (specified in SAS-SAS TS) -- WINNF-16-S-0096: Section 8.5.
         """
         pass
 
@@ -655,7 +655,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def InjectPeerSas(self, request):
+    def InjectPeerSas(self, request: Dict[str, str]):
         """
         SAS admin interface to inject a peer SAS into the SAS UUT.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -686,10 +686,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def TriggerPpaCreation(
         self,
-        request: Dict,
+        request: Dict[str, Union[List[str], Json]],
         # ssl_cert: Optional[str] = None,
         # ssl_key: Optional[str] = None
-    ):
+    ) -> Dict[str, str]:
         """
         SAS admin interface implementation to trigger PPA creation based on the CBSD Ids, Pal Ids and Provided Contour
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -730,9 +730,13 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def QueryPropagationAndAntennaModel(self, request) -> Dict:
+    def QueryPropagationAndAntennaModel(
+        self,
+        request: Dict[str, Union[float, Dict[str, Any], Json]]
+    ) -> Tuple[float, ...]:
         """
-        SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS    or Provided PPA Contour
+        SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS or Provided PPA
+        Contour
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
@@ -778,7 +782,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def TriggerBulkDpaActivation(self, request):
+    def TriggerBulkDpaActivation(self, request: Dict[str, bool]):
         """
         SAS admin interface to bulk DPA activation/deactivation
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -789,7 +793,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def TriggerDpaActivation(self, request):
+    def TriggerDpaActivation(
+        self,
+        request: Dict[str, Union[str, FrequencyRange]]
+    ):
         """
         SAS admin interface to activate specific DPA on specific channel
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -809,7 +816,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def TriggerDpaDeactivation(self, request):
+    def TriggerDpaDeactivation(
+        self,
+        request: Dict[str, Union[str, FrequencyRange]]
+    ):
         """
         SAS admin interface to deactivate specific DPA on specific channel
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -827,7 +837,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         pass
 
-    def InjectDatabaseUrl(self, request):
+    def InjectDatabaseUrl(
+        self,
+        request: Dict[str, str]
+    ):
         """
         Inject the Database URL into SAS.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
