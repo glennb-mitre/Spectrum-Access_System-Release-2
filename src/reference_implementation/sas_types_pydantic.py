@@ -1294,17 +1294,15 @@ class TriggerPpaCreationRequestType(BaseModel):
     palIds: List[str]
     providedContour: Optional[Json] = None
 
-    # @validator('request')
-    # def validate_key_value_pairs(cls, v):
-    #     assert 'cbsdIds' in v.keys(), "request must contain the 'cbsdIds' key."
-    #     assert 'palIds' in v.keys(), "request must contain the 'palIds' key."
-    #     assert isinstance(v['cbsdIds'], list), "request['cbsdIds'] must be a list of strings."
-    #     assert isinstance(v['palIds'], list), "request['palIds'] must be a list of strings."
-    #     for i in v['cbsdIds']:
-    #         assert isinstance(i, str), "request['cbsdIds'] must be a list of strings."
-    #     for i in v['palIds']:
-    #         assert isinstance(i, str), "request['palIds'] must be a list of strings."
-    #     if 'providedContour' in v.keys():
-    #         assert isinstance(v['providedContour'], str) or isinstance(v['providedContour'], dict), "If provided, request['providedContour'] must be a GeoJSON object."
-    #     return v
 
+class TriggerDpaActionType(BaseModel):
+    """
+    The type of the request parameter of the TriggerDpaActivation and TriggerDpaDeactivation methods of the
+    SasAdminInterface.
+    "Args:
+            request: A dictionary with the following key-value pairs:
+                "dpaId": (string) it represents the field "name" in the kml file of DPAs
+                "frequencyRange": frequencyRange of DPA Channel with lowFrequency, highFrequency"
+    """
+    dpaId: str
+    frequencyRange: FrequencyRange
