@@ -162,6 +162,7 @@ class FakeSas(sas_interface.SasInterface):
         """
         SAS-CBSD SpectrumInquiry reference implementation.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
 
         Performs spectrum inquiry for CBSDs.
 
@@ -206,6 +207,7 @@ class FakeSas(sas_interface.SasInterface):
         """
         SAS-CBSD Grant reference implementation.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
 
         Request and response are both lists of dictionaries. Each dictionary
         contains all fields of a single request/response.
@@ -242,7 +244,7 @@ class FakeSas(sas_interface.SasInterface):
                     response['grantResponse'].append(
                         {
                             'cbsdId': req['cbsdId'],
-                            'grantId': 'fake_grant_id_%s' % datetime.utcnow().isoformat(),
+                            'grantId': f'fake_grant_id_{datetime.utcnow().isoformat()}',
                             'channelType': 'GAA',
                             'response': self._GetSuccessResponse()
                         }
@@ -258,6 +260,7 @@ class FakeSas(sas_interface.SasInterface):
         """
         SAS-CBSD Heartbeat reference implementation (RI).
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
 
         Requests heartbeat for a grant for CBSDs.
 
@@ -299,6 +302,8 @@ class FakeSas(sas_interface.SasInterface):
         """
         SAS-CBSD Relinquishment RI.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
+
         Relinquishes grant for CBSDs.
 
         Request and response are both lists of dictionaries. Each dictionary
@@ -333,8 +338,9 @@ class FakeSas(sas_interface.SasInterface):
         ssl_key: OptStr = None
     ) -> deregistrationResponse:
         """
-        SAS-CBSD Deregistration interface.
+        SAS-CBSD Deregistration RI.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function (almost) always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
         Deregisters CBSDs.
 
         Request and response are both lists of dictionaries. Each dictionary
@@ -373,7 +379,7 @@ class FakeSas(sas_interface.SasInterface):
         request: ListDictMsg,
         ssl_cert: OptStr = None,
         ssl_key: OptStr = None
-    ) -> EscSensorData:
+    ) -> Union[EscSensorData, None, Dict]:
         """
         SAS-SAS ESC Sensor Record Exchange interface
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -598,9 +604,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         Inject a PAL Database record into the SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
         Args:
-            request:
-            For the contents of this request, please refer to the PAL Database TS
-            (WINNF-16-S-0245) - Section 6.x.
+            request: a PalInfoRecord object (specified in WINNF-TS-0245).
         """
         pass
 
@@ -693,10 +697,11 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         request: TriggerPpaCreationRequestType,
         # ssl_cert: Optional[str] = None,
         # ssl_key: Optional[str] = None
-    ) -> Dict[str, str]:
+    ) -> str:
         """
         SAS admin interface implementation to trigger PPA creation based on the CBSD Ids, Pal Ids and Provided Contour
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function (may) always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
                 cbsdIds: array of string containing CBSD Id
@@ -706,8 +711,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         Returns:
             PPA Id in string format (contained within a dictionary returned by the request_handler.RequestPost() function).
         """
-        return 'zone/ppa/fake_sas/%s/%s' % (request['palIds'][0],
-                                            uuid.uuid4().hex)
+        return f"zone/ppa/fake_sas/{request['palIds'][0]}/{uuid.uuid4().hex}"
 
     def TriggerDailyActivitiesImmediately(self):
         """
@@ -742,6 +746,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS or Provided PPA
         Contour
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        TODO: This function is unreasonably coupled to an arbitrary testcase module, which this module inexplicably imports.
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
                 reliabilityLevel: (permitted values: -1, 0.05, 0.95)
@@ -766,6 +771,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
             A dictionary with a single, fixed key-value pair: {"completed":True},
             indicating that the daily activities have completed successfully.
         """
+        # TODO: This function always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
         return {'completed': True}
 
     def GetPpaCreationStatus(self) -> Dict[str, bool]:
@@ -777,6 +783,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
             A dictionary with a two key-value pairs where the keys are "completed" and
             "withError". The values for these keys are True and False, respectively.
         """
+        # TODO: This function always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
         return {'completed': True, 'withError': False}
 
     def TriggerLoadDpas(self):
@@ -799,7 +806,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def TriggerDpaActivation(
         self,
-        request: Dict[str, Union[str, FrequencyRange]]
+        request: TriggerDpaActionType
     ):
         """
         SAS admin interface to activate specific DPA on specific channel
@@ -822,7 +829,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def TriggerDpaDeactivation(
         self,
-        request: Dict[str, Union[str, FrequencyRange]]
+        request: TriggerDpaActionType
     ):
         """
         SAS admin interface to deactivate specific DPA on specific channel
@@ -855,8 +862,18 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
 
 class FakeSasHandler(BaseHTTPRequestHandler):
+    """
+    An HTTP Socket server to handle SAS requests.
+    """
     @classmethod
-    def SetVersion(cls, cbsd_sas_version: str, sas_sas_version: str):
+    def SetVersion(cls, cbsd_sas_version: str, sas_sas_version: str) -> NoReturn:
+        """
+        Sets the protocol version in use for the class.
+
+        Args:
+            cbsd_sas_version: the version of the CBSD-to-SAS protocol
+            sas_sas_version: the version of SAS-to-SAS protocol
+        """
         cls.cbsd_sas_version = cbsd_sas_version
         cls.sas_sas_version = sas_sas_version
 
@@ -880,17 +897,17 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get('content-length'))
         if length > 0:
             request = json.loads(self.rfile.read(length))
-        if self.path == '/%s/registration' % self.cbsd_sas_version:
+        if self.path == f'/{self.cbsd_sas_version}/registration':
             response = FakeSas().Registration(request)
-        elif self.path == '/%s/spectrumInquiry' % self.cbsd_sas_version:
+        elif self.path == f'/{self.cbsd_sas_version}/spectrumInquiry':
             response = FakeSas().SpectrumInquiry(request)
-        elif self.path == '/%s/grant' % self.cbsd_sas_version:
+        elif self.path == f'/{self.cbsd_sas_version}/grant':
             response = FakeSas().Grant(request)
-        elif self.path == '/%s/heartbeat' % self.cbsd_sas_version:
+        elif self.path == f'/{self.cbsd_sas_version}/heartbeat':
             response = FakeSas().Heartbeat(request)
-        elif self.path == '/%s/relinquishment' % self.cbsd_sas_version:
+        elif self.path == f'/{self.cbsd_sas_version}/relinquishment':
             response = FakeSas().Relinquishment(request)
-        elif self.path == '/%s/deregistration' % self.cbsd_sas_version:
+        elif self.path == f'/{self.cbsd_sas_version}/deregistration':
             response = FakeSas().Deregistration(request)
         elif self.path == '/admin/injectdata/zone':
             response = FakeSasAdmin().InjectZoneData(request)
@@ -909,7 +926,8 @@ class FakeSasHandler(BaseHTTPRequestHandler):
                 self.send_response(400)
                 self.end_headers()
             return
-        elif self.path in ('/admin/reset', '/admin/injectdata/fcc_id',
+        elif self.path in ('/admin/reset',
+                           '/admin/injectdata/fcc_id',
                            '/admin/injectdata/user_id',
                            '/admin/injectdata/conditional_registration',
                            '/admin/injectdata/blacklist_fcc_id',
@@ -946,9 +964,9 @@ class FakeSasHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         """Handles GET requests."""
         path, value = self._parseUrl(self.path)
-        if path == '%s/esc_sensor' % self.sas_sas_version:
+        if path == f'{self.sas_sas_version}/esc_sensor':
             response = FakeSas().GetEscSensorRecord(value)
-        elif path == '%s/dump' % self.sas_sas_version:
+        elif path == f'{self.sas_sas_version}/dump':
             response = FakeSas().GetFullActivityDump(self.sas_sas_version)
         else:
             self.send_response(404)
@@ -963,8 +981,9 @@ class FakeSasHandler(BaseHTTPRequestHandler):
 def ParseCrlIndex(index_filename: str) -> List[str]:
     """Returns the list of CRL filenames from a CRL index file."""
     dirname = os.path.dirname(index_filename)
-    return [os.path.join(dirname, line.rstrip())
-            for line in open(index_filename)]
+    with open(index_filename) as fp:
+        crl_file_names = [os.path.join(dirname, line.rstrip()) for line in fp.readlines()]
+    return crl_file_names
 
 
 def RunFakeServer(
@@ -988,7 +1007,7 @@ def RunFakeServer(
         try:
             crl_files = ParseCrlIndex(crl_index)
         except IOError as e:
-            print("Failed to parse CRL index file %r: %s" % (crl_index, e))
+            print(f"Failed to parse CRL index file {crl_index}: {e}")
 
         # https://tools.ietf.org/html/rfc5280#section-4.2.1.13 specifies that
         # CRLs MUST be DER-encoded, but SSLContext expects the name of a PEM-encoded
@@ -1001,15 +1020,15 @@ def RunFakeServer(
                     try:
                         crl = crypto.load_crl(crypto.FILETYPE_ASN1, der)
                     except crypto.Error as e:
-                        print("Failed to parse CRL file %r as DER format: %s" % (f, e))
+                        print(f"Failed to parse CRL file {f} as DER format: {e}")
                         return
                     with tempfile.NamedTemporaryFile() as tmp:
                         tmp.write(crypto.dump_crl(crypto.FILETYPE_PEM, crl))
                         tmp.flush()
                         ssl_context.load_verify_locations(cafile=tmp.name)
-                print("Loaded CRL file: %r" % f)
+                print(f"Loaded CRL file: {f}")
             except IOError as e:
-                print("Failed to load CRL file %r: %s" % (f, e))
+                print(f"Failed to load CRL file {f}: {e}")
                 return
 
     ssl_context.load_verify_locations(cafile=CA_CERT)
@@ -1021,7 +1040,7 @@ def RunFakeServer(
     # before the following line, the verify_mode is <VerifyMode.CERT_NONE: 0>
     ssl_context.verify_mode = ssl.CERT_REQUIRED
     server.socket = ssl_context.wrap_socket(server.socket, server_side=True)
-    print('Will start server at localhost:%d, use <Ctrl-C> to stop.' % PORT)
+    print(f'Will start server at localhost:{PORT}, use <Ctrl-C> to stop.')
     server.serve_forever()
 
 
@@ -1038,7 +1057,8 @@ if __name__ == '__main__':
     )
     try:
         args = parser.parse_args()
-    except:
+    except (argparse.ArgumentError, argparse.ArgumentTypeError) as e:
+        parser.error(f"Exception: {e}") # TODO: Make this appear IFF debug mode enabled
         parser.print_help()
         sys.exit(0)
     config_parser = configparser.RawConfigParser()
