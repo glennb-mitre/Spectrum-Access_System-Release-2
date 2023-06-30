@@ -41,6 +41,7 @@ from pydantic import (
     AnyUrl,
     AnyHttpUrl,
     Json,
+    validator
 )
 
 OptStr = Optional[str]
@@ -986,8 +987,8 @@ class CbsdData(BaseModel):
 class RadiationPattern(BaseModel):
     """
     RadiationPattern object as defined in Table 12 (8.4) of <3>
-    TODO: Determine suitable method of implementing the 'angle' parameter, which the table suggests is one number,
-        but is in fact, two distinct integers.
+    NOTE: angle_azimuth and angle_elevation, together, form the specification's 'angle' parameter. In the spec, it is
+        given as one field, with two quantities.
     """
     angle_azimuth: Optional[conint(ge=0, le=359)] = None
     angle_elevation: Optional[conint(ge=-180, le=180)] = None
@@ -1275,3 +1276,35 @@ class PalInfoRecord(BaseModel):
     channelAssignment: ChannelAssignment
     # The below field is optional. If included, the value is "VALID"
     licenseStatus: Optional[str] = None
+
+
+# The following Pydantic types are defined for the purpose of validating the Dict-based input to reference_sas functions
+# that don't use protocol-specified objects.
+
+class TriggerPpaCreationRequestType(BaseModel):
+    """
+    The type of the "request" parameter of the sas_interface.SasAdminInterface.TriggerPpaCreation method.
+    request: A dictionary with multiple key-value pairs where the keys are
+                cbsdIds: array of string containing CBSD Id
+                palIds: array of string containing PAL Id
+                providedContour(optional): GeoJSON Object
+    """
+    # request: Dict[str, Union[str, Json]]
+    cbsdIds: List[str]
+    palIds: List[str]
+    providedContour: Optional[Json] = None
+
+    # @validator('request')
+    # def validate_key_value_pairs(cls, v):
+    #     assert 'cbsdIds' in v.keys(), "request must contain the 'cbsdIds' key."
+    #     assert 'palIds' in v.keys(), "request must contain the 'palIds' key."
+    #     assert isinstance(v['cbsdIds'], list), "request['cbsdIds'] must be a list of strings."
+    #     assert isinstance(v['palIds'], list), "request['palIds'] must be a list of strings."
+    #     for i in v['cbsdIds']:
+    #         assert isinstance(i, str), "request['cbsdIds'] must be a list of strings."
+    #     for i in v['palIds']:
+    #         assert isinstance(i, str), "request['palIds'] must be a list of strings."
+    #     if 'providedContour' in v.keys():
+    #         assert isinstance(v['providedContour'], str) or isinstance(v['providedContour'], dict), "If provided, request['providedContour'] must be a GeoJSON object."
+    #     return v
+
