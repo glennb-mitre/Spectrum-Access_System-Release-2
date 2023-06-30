@@ -590,7 +590,10 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         return request['record']['id']
 
-    def InjectPalDatabaseRecord(self, request):
+    def InjectPalDatabaseRecord(
+        self,
+        request: PalInfoRecord
+    ):
         """
         Inject a PAL Database record into the SAS under test.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
@@ -604,7 +607,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
     def InjectFss(self, request):
         """
         SAS admin interface to inject FSS information into SAS under test.
-        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        (Don't) FIXME: Irreparably broken - the IncumbentProtectionData object definition was removed from WINNF-TS-0096
         Args:
             request: A dictionary with a single key-value pair where the key is
             "record" and the value is a fixed satellite service object
@@ -616,7 +619,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
     def InjectWisp(self, request):
         """
         SAS admin interface to inject WISP information into SAS under test.
-        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
+        (Don't) FIXME: Irreparably broken - the IncumbentProtectionData object definition was removed from WINNF-TS-0096
         Args:
             request: A dictionary with two key-value pairs where the keys are "record" and "zone" with the values
                     IncumbentProtectionData object (specified in SAS-SAS TS) and a GeoJSON Object respectively
@@ -686,7 +689,8 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def TriggerPpaCreation(
         self,
-        request: Dict[str, Union[List[str], Json]],
+        # request: Dict[str, Union[List[str], Json]],
+        request: TriggerPpaCreationRequestType,
         # ssl_cert: Optional[str] = None,
         # ssl_key: Optional[str] = None
     ) -> Dict[str, str]:
