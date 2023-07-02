@@ -70,8 +70,33 @@ from six.moves.BaseHTTPServer import HTTPServer
 
 import sas_interface
 
-from typing import Dict, List, Tuple, Any, Optional, Union, NoReturn
-from sas_types_pydantic import *
+from typing import Dict, List, Tuple, Optional, Union, NoReturn
+# from sas_types_pydantic import *
+from sas_types_pydantic import (
+    RegistrationRequest,
+    EscSensorData,
+    FullActivityDump,
+    PalInfoRecord,
+    registrationRequest,
+    registrationResponse,
+    spectrumInquiryRequest,
+    spectrumInquiryResponse,
+    grantRequest,
+    grantResponse,
+    heartbeatRequest,
+    heartbeatResponse,
+    relinquishmentRequest,
+    relinquishmentResponse,
+    deregistrationRequest,
+    deregistrationResponse,
+    SasAdministrator,
+    TriggerPpaCreationRequestType,
+    TriggerDpaActionRequestType,
+    ZoneData,
+    Json,
+    FrequencyRange,
+    QueryPropagationAndAntennaModelRequestType,
+)
 
 # Type alias for convenience of type hinting request/response objects:
 # a dictionary with a single key-value pair, with the key being a string
@@ -340,7 +365,8 @@ class FakeSas(sas_interface.SasInterface):
         """
         SAS-CBSD Deregistration RI.
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
-        TODO: This function (almost) always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
+        TODO: This function (almost) always returns success, which is useless in a Real or Reference SAS.
+
         Deregisters CBSDs.
 
         Request and response are both lists of dictionaries. Each dictionary
@@ -399,9 +425,8 @@ class FakeSas(sas_interface.SasInterface):
 
         if request == esc_sensor_record['id']:
             return esc_sensor_record
-        else:
-            # Return Empty if invalid Id
-            return {}
+        # Return Empty if invalid Id
+        return {}
 
     def GetFullActivityDump(
         self,
@@ -430,17 +455,20 @@ class FakeSas(sas_interface.SasInterface):
                         'version': version, 'recordType': "cbsd"
                     },
                     {
-                        'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
+                        'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System'
+                               '/master/schema/empty_activity_dump_file.json',
                         'checksum': 'da39a3ee5e6b4b0d3255bfef95601890afd80709', 'size': 19,
                         'version': version, 'recordType': "zone"
                     },
                     {
-                        'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
+                        'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System'
+                               '/master/schema/empty_activity_dump_file.json',
                         'checksum': 'da39a3ee5e6b4b0d3255bfef95601890afd80709', 'size': 19,
                         'version': version, 'recordType': "esc_sensor"
                     },
                     {
-                        'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
+                        'url': 'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System'
+                               '/master/schema/empty_activity_dump_file.json',
                         'checksum': 'da39a3ee5e6b4b0d3255bfef95601890afd80709', 'size': 19,
                         'version': version, 'recordType': "coordination"
                     }
@@ -701,7 +729,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         SAS admin interface implementation to trigger PPA creation based on the CBSD Ids, Pal Ids and Provided Contour
         TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
-        TODO: This function (may) always returns success (i.e., useless in a SAS RI), so we need to properly implement this.
+        TODO: This function (may) always returns success, which is useless in a Real or Reference SAS.
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
                 cbsdIds: array of string containing CBSD Id
@@ -709,7 +737,8 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
                 providedContour(optional): GeoJSON Object
 
         Returns:
-            PPA Id in string format (contained within a dictionary returned by the request_handler.RequestPost() function).
+            PPA Id in string format (contained within a dictionary returned by the request_handler.RequestPost()
+            function).
         """
         return f"zone/ppa/fake_sas/{request['palIds'][0]}/{uuid.uuid4().hex}"
 
@@ -745,8 +774,9 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
         """
         SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS or Provided PPA
         Contour
-        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed
-        TODO: This function is unreasonably coupled to an arbitrary testcase module, which this module inexplicably imports.
+        TODO: This documentation was taken from sas_interface.py; Once proper implementation verified, modify as needed.
+        TODO: Implement a Request type for this function.
+        TODO: This function is unreasonably coupled to an arbitrary testcase module imported from this method's body.
         Args:
             request: A dictionary with multiple key-value pairs where the keys are
                 reliabilityLevel: (permitted values: -1, 0.05, 0.95)
@@ -865,6 +895,7 @@ class FakeSasHandler(BaseHTTPRequestHandler):
     """
     An HTTP Socket server to handle SAS requests.
     """
+
     @classmethod
     def SetVersion(cls, cbsd_sas_version: str, sas_sas_version: str) -> NoReturn:
         """
@@ -881,11 +912,12 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         """
         Parse the URL into the path and value.
 
-        Examples: If _parseUrl were called with the following argument:
-        'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json',
+        Examples: If _parseUrl were called with the following argument (without the newline):
+            'https://raw.githubusercontent.com/Wireless-Innovation-Forum/Spectrum-Access-System/
+            master/schema/empty_activity_dump_file.json',
         the function would return:
         ('/raw.githubusercontent.com',
- 'Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json')
+        'Wireless-Innovation-Forum/Spectrum-Access-System/master/schema/empty_activity_dump_file.json')
         """
         splitted_url = url.split('/')[1:]
         # Returns path and value
@@ -1058,7 +1090,7 @@ if __name__ == '__main__':
     try:
         args = parser.parse_args()
     except (argparse.ArgumentError, argparse.ArgumentTypeError) as e:
-        parser.error(f"Exception: {e}") # TODO: Make this appear IFF debug mode enabled
+        parser.error(f"Exception: {e}")  # TODO: Make this appear IFF debug mode enabled
         parser.print_help()
         sys.exit(0)
     config_parser = configparser.RawConfigParser()
