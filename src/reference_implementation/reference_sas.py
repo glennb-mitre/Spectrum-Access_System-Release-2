@@ -740,7 +740,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def QueryPropagationAndAntennaModel(
         self,
-        request: Dict[str, Union[float, Dict[str, Any], Json]]
+        request: QueryPropagationAndAntennaModelRequestType
     ) -> Tuple[float, ...]:
         """
         SAS admin interface implementation to query propagation and antenna gains for CBSD and FSS or Provided PPA
@@ -806,7 +806,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def TriggerDpaActivation(
         self,
-        request: TriggerDpaActionType
+        request: TriggerDpaActionRequestType
     ):
         """
         SAS admin interface to activate specific DPA on specific channel
@@ -829,7 +829,7 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
 
     def TriggerDpaDeactivation(
         self,
-        request: TriggerDpaActionType
+        request: TriggerDpaActionRequestType
     ):
         """
         SAS admin interface to deactivate specific DPA on specific channel

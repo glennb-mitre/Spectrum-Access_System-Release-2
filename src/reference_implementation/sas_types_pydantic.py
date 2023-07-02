@@ -1295,7 +1295,7 @@ class TriggerPpaCreationRequestType(BaseModel):
     providedContour: Optional[Json] = None
 
 
-class TriggerDpaActionType(BaseModel):
+class TriggerDpaActionRequestType(BaseModel):
     """
     The type of the request parameter of the TriggerDpaActivation and TriggerDpaDeactivation methods of the
     SasAdminInterface.
@@ -1306,3 +1306,29 @@ class TriggerDpaActionType(BaseModel):
     """
     dpaId: str
     frequencyRange: FrequencyRange
+
+
+class QueryPropagationAndAntennaModelRequestType(BaseModel):
+    """
+    The type of the request parameter of the QueryPropagationAndAntennaModel method of SasAdminInterface.
+    "Args:
+        request: A dictionary with multiple key-value pairs where the keys are
+            reliabilityLevel: (permitted values: -1, 0.05, 0.95)
+            cbsd: dictionary defining cbsd
+            fss(optional): dictionary defining fss
+            ppa(optional): GeoJSON Object"
+    """
+    reliabilityLevel: float
+    cbsd: Dict
+    fss: Optional[Dict] = None
+    ppa: Optional[Json] = None
+
+    @validator('reliabilityLevel')
+    def _validate_reliability_level(cls, v):
+        """
+        Pydantic validator method that is automatically called when instantiating an object of this type.
+        This is a class method that, due to the @validator decorator, doesn't use @classmethod.
+        """
+        if v not in {-1, 0.05, 0.95}:
+            raise ValueError("reliabilityLevel may only be one of the following values: -1, 0.05, or 0.95.")
+        return v
