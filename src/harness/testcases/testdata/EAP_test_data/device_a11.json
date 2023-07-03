@@ -1,0 +1,23 @@
+{
+  "fccId": "test_fcc_id_a11",
+  "userId": "test_user_id_a11",
+  "SerialNumber": "test_serial_number_a11",
+  "callSign": "callsign_a11",
+  "cbsdCategory": "A",
+  "airInterface": {
+    "radioTechnology": "E_UTRA"
+  },
+  "installationParam": {
+    "latitude": 39.0119,
+    "longitude": -98.4842,
+    "height": 3,
+    "heightType": "AGL",
+    "indoorDeployment": true,
+    "antennaGain": 16,
+    "antennaBeamwidth": 60,
+    "antennaVerticalBeamwidth": 20,
+    "antennaDowntilt": 5,
+    "frontToBackRatio": []
+  },
+  "measCapability": []
+}

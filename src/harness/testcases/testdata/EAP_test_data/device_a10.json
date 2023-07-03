@@ -1,0 +1,25 @@
+{
+  "fccId": "test_fcc_id_a10",
+  "userId": "test_user_id_a10",
+  "SerialNumber": "test_serial_number_a10",
+  "callSign": "callsign_a10",
+  "cbsdCategory": "A",
+  "airInterface": {
+    "radioTechnology": "E_UTRA"
+  },
+  "installationParam": {
+    "latitude": 39.0119,
+    "longitude": -98.4842,
+    "height": 3,
+    "heightType": "AGL",
+    "indoorDeployment": true,
+    "antennaGain": 16,
+    "azimuth": [],
+    "antennaBeamwidth": [],
+    "antennaVerticalBeamwidth": [],
+    "antennaDowntilt": 25,
+    "frontToBackRatio": 40,
+    "antennaModel": []
+  },
+  "measCapability": []
+}
