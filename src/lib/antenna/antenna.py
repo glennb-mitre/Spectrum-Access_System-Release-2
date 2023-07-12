@@ -174,7 +174,15 @@ def c_antenna_gain(
     return gain_two_dimensional
 
 
-def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidth, fbr):
+def d_antenna_gain(
+    dirs: Union[Mapping, Iterable],
+    ant_az: float,
+    peak_ant_gain: int,
+    hor_patt: Mapping,
+    downtilt: float,
+    ver_beamwidth: float,
+    fbr: float
+) -> Union[Mapping, np.ndarray]:
     """REL2-R3-SGN-52107: Method D based Antenna Gain Calculation:
     Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively),
     where the horizontal antenna pattern (denoted as GH(theta)) is recorded in the CBSD Antenna
@@ -196,48 +204,32 @@ def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidt
     fbr:            antenna front-to-back-ratio(dB)
 
     Returns:
-    The CBSD two dimensional antenna gains (in dB) relative to peak antenna gain.
+    The CBSD two-dimensional antenna gains (in dB) relative to peak antenna gain.
     Either a scalar if dirs is scalar or an ndarray otherwise.
     """
 
-    alpha = dirs['hor']
     # azimuth angle of the line between the CBSD main beam and the receiver location relative to
     # the CBSD antenna boresight
-    theta_r = alpha - ant_az
+    theta_r = dirs['hor'] - ant_az
     theta_r = np.atleast_1d(theta_r)
     theta_r[theta_r > 180] -= 360
     theta_r[theta_r < -180] += 360
 
-    beta = dirs['ver']
     # vertical of the line between the CBSD main beam and the receiver location relative to
     # the CBSD antenna boresight
-    phi_r = beta + downtilt * np.cos(theta_r * 180 / np.pi)
+    phi_r = dirs['ver'] + downtilt * np.cos(theta_r * 180 / np.pi)
 
     if downtilt < -15:
         downtilt = -15
-    if downtilt > 15:
-        downtilt = 15
+    downtilt = min(downtilt, 15)
 
-    dirs_relative_boresight = {}
-    dirs_relative_boresight['hor'] = theta_r
-    dirs_relative_boresight['ver'] = phi_r
+    dirs_relative_boresight = {'hor': theta_r, 'ver': phi_r}
 
-    # in degrees
-    theta_0 = 0
-    theta_180 = 180
-
-    phi_r_sup = 180 - phi_r
-
-    dirs_0 = {}
-    dirs_180 = {}
-    dirs_phi_r_sup = {}
-
-    dirs_0['hor'] = theta_0
-    dirs_180['hor'] = theta_180
-    dirs_phi_r_sup['ver'] = phi_r_sup
+    # supplementary angle of phi (in degrees)
+    dirs_phi_r_sup = {'ver': 180 - phi_r}
 
     # horizontal gain at thetaR angle, G_H (thetaR)
-    [g_h_theta_r, _, _] = get_given_2d_pattern_gains(dirs_relative_boresight,
+    g_h_theta_r, *_ = get_given_2d_pattern_gains(dirs_relative_boresight,
                                                      hor_pattern=hor_patt,
                                                      ant_azimuth=ant_az)
     # G_H(0)
@@ -246,20 +238,20 @@ def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidt
     g_h_theta_180 = hor_patt['gain'][0]
 
     # G_V(phiR)
-    [_, g_v_phi_r] = get_standard_2d_gains(dirs_relative_boresight, ant_az,
+    _, g_v_phi_r = get_standard_2d_gains(dirs_relative_boresight, ant_az,
                                            peak_ant_gain,
                                            ant_mech_downtilt=downtilt,
                                            ant_ver_beamwidth=ver_beamwidth, ant_fbr=fbr)
     # G_V(180-phiR)
-    [_, g_v_phi_r_sup] = get_standard_2d_gains(dirs_phi_r_sup, ant_az, peak_ant_gain,
+    _, g_v_phi_r_sup = get_standard_2d_gains(dirs_phi_r_sup, ant_az, peak_ant_gain,
                                                ant_mech_downtilt=downtilt,
                                                ant_ver_beamwidth=ver_beamwidth,
                                                ant_fbr=fbr)
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
-    g_cbsd = get_2d_antenna_gain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r,
+    # gain_two_dimensional AKA g_cbsd
+    gain_two_dimensional = get_2d_antenna_gain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r,
                                  g_v_phi_r_sup, g_h_theta_0,
                                  g_h_theta_180, peak_ant_gain)
-    gain_two_dimensional = g_cbsd
 
     return gain_two_dimensional
 
