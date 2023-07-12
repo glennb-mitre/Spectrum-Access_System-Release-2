@@ -50,8 +50,8 @@ def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
         ver_pattern:    antenna gain pattern in vertical plane
         donwtilt:       Antenna mechanical downtilt(degrees), limited to +-15 degrees
 
-      Returns:
-        The CBSD two dimensional antenna gains (in dB) relative to peak antenna gain
+    Returns:
+        The CBSD two-dimensional antenna gains (in dB) relative to peak antenna gain
         Either a scalar if dirs is scalar or an ndarray otherwise.
    """
 
@@ -65,32 +65,29 @@ def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
 
     if downtilt < -15:
         downtilt = -15
-    if downtilt > 15:
-        downtilt = 15
+    # use saturating counter behavior
+    downtilt = min(downtilt, 15)
 
     beta = dirs['ver']
     # vertical angle of the line between the CBSD main beam and the receiver location relative to
     # the CBSD antenna boresight
     phi_r = beta + downtilt * np.cos(theta_r * 180 / np.pi)
 
-    dirs_relative_boresight = {}
-    dirs_relative_boresight['hor'] = theta_r
-    dirs_relative_boresight['ver'] = phi_r
+    dirs_relative_boresight = {'hor': theta_r, 'ver': phi_r}
 
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
     # horizontal gain at thetaR, G_H (thetaR), vertical gains at phiR and at 180-phiR angle,
     # G_V (phiR) and G_V (180-phiR)
-    [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = get_given_2d_pattern_gains(dirs_relative_boresight,
+    g_h_theta_r, g_v_phi_r, g_v_phi_rsup = get_given_2d_pattern_gains(dirs_relative_boresight,
                                                                         hor_pattern,
                                                                         ver_pattern,
                                                                         ant_az, downtilt)
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
-    g_cbsd = get_2d_antenna_gain(dirs, g_h_theta_r, g_v_phi_r, g_v_phi_rsup,
+    # gain_two_dimensional AKA g_cbsd
+    gain_two_dimensional = get_2d_antenna_gain(dirs, g_h_theta_r, g_v_phi_r, g_v_phi_rsup,
                                  hor_pattern['gain'][180], hor_pattern['gain'][0],
                                  peak_ant_gain)
-
-    gain_two_dimensional = g_cbsd
 
     return gain_two_dimensional
 
