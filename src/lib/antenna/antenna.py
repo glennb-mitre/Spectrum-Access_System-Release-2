@@ -277,30 +277,17 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
     Either a scalar if dirs is scalar or an ndarray otherwise.
     """
 
-    alpha = dirs['hor']
     # azimuth angle of the line between the CBSD main beam and the receiver location relative
     # to the CBSD antenna boresight
-    theta_r = alpha - ant_az
+    theta_r = dirs['hor'] - ant_az
     theta_r = np.atleast_1d(theta_r)
     theta_r[theta_r > 180] -= 360
     theta_r[theta_r < -180] += 360
 
-    dirs_relative_boresight = {}
-    dirs_relative_boresight['hor'] = theta_r
-    dirs_relative_boresight['ver'] = 0
-
-    # in degrees
-    theta_0 = 0
-    theta_180 = 180
-
-    dirs_0 = {}
-    dirs_180 = {}
-
-    dirs_0['hor'] = theta_0
-    dirs_180['hor'] = theta_180
+    dirs_relative_boresight = {'hor': theta_r, 'ver': 0}
 
     # horizontal gain at thetaR angle, G_H (thetaR)
-    [g_h_theta_r, _, _] = get_given_2d_pattern_gains(dirs_relative_boresight,
+    g_h_theta_r, *_ = get_given_2d_pattern_gains(dirs_relative_boresight,
                                                      hor_pattern=hor_patt,
                                                      ant_azimuth=ant_az)
     # G_H(0)
@@ -312,10 +299,10 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
     g_v_phi_r_sup = 0
 
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
-    g_cbsd = get_2d_antenna_gain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r,
+    # gain_two_dimensional AKA g_cbsd
+    gain_two_dimensional = get_2d_antenna_gain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r,
                                  g_v_phi_r_sup, g_h_theta_0,
                                  g_h_theta_180, peak_ant_gain)
-    gain_two_dimensional = g_cbsd
 
     return gain_two_dimensional
 
