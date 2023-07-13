@@ -32,6 +32,59 @@ Typical usage:
 import numpy as np
 from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping
 
+
+def get_dirs_relative_boresight(
+    dirs: Mapping,
+    ant_az: int,
+    downtilt: Optional[int] = None
+) -> Dict[str, int]:
+    """
+    Helper function to calculate the relative_boresight (see Returns).
+
+    Args:
+        dirs: Horizontal and vertical directions (degrees) at which the gain needs to be calculated. Either a scalar or
+            an iterable.
+        ant_az: Antenna azimuth (degrees).
+        downtilt: Antenna mechanical downtilt(degrees), limited to +-15 degrees. If not used, then the value of the
+            "ver" key in the returned dictionary is 0.
+
+    Returns: A mapping with the keys "hor" and "ver" with the following respective valuse: azimuth angle of the line
+        between the CBSD main beam and the receiver location relative to the CBSD antenna boresight, and the vertical
+        angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna boresight
+    """
+    # azimuth angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna
+    # boresight
+    theta_r = dirs['hor'] - ant_az
+    theta_r = np.atleast_1d(theta_r)
+    theta_r[theta_r > 180] -= 360
+    theta_r[theta_r < -180] += 360
+
+    # if downtilt is not provided, phi_r remains 0
+    phi_r = 0
+
+    if downtilt is not None:
+        # vertical angle of the line between the CBSD main beam and the receiver location relative to the CBSD antenna
+        # boresight
+        phi_r = dirs['ver'] + downtilt * np.cos(theta_r * 180 / np.pi)
+
+    return {'hor': theta_r, 'ver': phi_r}
+
+
+def limit_downtilt_value(downtilt: int) -> int:
+    """
+    Restrict the value of downtilt to within +- 15 (degrees)
+    Args:
+        downtilt: An integer
+
+    Returns: downtilt but restricted to the above range.
+    """
+    if downtilt < -15:
+        downtilt = -15
+    # Use saturating counter behavior
+    downtilt = min(downtilt, 15)
+    return downtilt
+
+
 def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
                     hor_pattern, ver_pattern, downtilt):
     """REL2-R3-SGN-52105: Method B1 based antenna gain calculation.
