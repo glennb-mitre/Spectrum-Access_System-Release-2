@@ -25,7 +25,9 @@ then
   then
     echo A directory was given
     declare -a dircerts
+    declare -a expcerts
 
+    # Find certs in directory.
     for dircontent in "$dirpath"/*
     do
       if [[ $(file -b "$dircontent") == "PEM certificate" ]];
@@ -34,17 +36,25 @@ then
       fi    
     done
 
-    for index in "${!dircerts[@]}"
+    # Check for expired certs.
+    for index in ${!dircerts[@]}
     do
-      #echo ${dircerts[$index]}
-      if openssl x509 -checkend 86400 -noout -in ${dircerts[$index]}
+      if !(openssl x509 -checkend 86400 -noout -in ${dircerts[$index]} 1>/dev/null)
       then
-        echo "Certificate is good for another day!"
-      else
-        echo "Certificate has expired or will do so within 24 hours!"
-        echo "(or is invalid/not found)"
+        expcerts+=( ${dircerts[$index]} )
       fi
     done
+
+    if [ expcerts == 0 ]
+    then 
+      echo "There are no expired certs in the directory"
+    else
+      echo "Expired Certs:"
+      for expcert in ${expcerts[@]}
+      do
+        echo ${expcert}
+      done
+    fi
   fi
 
 # If arguments were given at runtime.
