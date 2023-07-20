@@ -35,6 +35,7 @@ then
     # Find certs in directory.
     for dircontent in "$dirpath"/*
     do
+      dircontent=$(basename "$dircontent")
       if [[ $(file -b "$dircontent") == "PEM certificate" ]];
       then
         dircerts+=( $dircontent )
@@ -64,15 +65,32 @@ then
     fi
 
     # Check if CA cert is in the system certificate store.
+    printf "\nCerts in the system keychain:\n"
+
+    # Get an array of the default ca directory filenames.
     for cadir in "/etc/ssl/certs"/*
     do
-      cacerts+=( $cadir )
+      cadirfile=$(basename "$cadir")
+      cadirfiles+=( $cadirfile )
+
+      if [[ ${dircerts[*]} =~ $cadirfile ]]
+      then
+        printf "${cadirfile}\n"
+      fi
     done
 
-    # for cert in ${cacerts[@]}
-    # do 
-    #   echo $cert
-    # done
+    # Check if any local certs are in the system ca store.
+    printf "\nCerts not in system keychain:\n"
+    for dircert in ${dircerts[@]}
+    do 
+      if [[ ${cadirfiles[*]} =~ $dircert ]]
+      then
+        cacerts+=( $dircert )
+        echo "***************IN FUNCTION******************* ${dircert}"
+      else
+        echo $dircert
+      fi
+    done
 
   fi
 
@@ -93,12 +111,6 @@ else
     echo "-d, --directory      Check for valid certs in the given directory"
     echo "-f, --file           Check if the given file is a valid certificate"
     echo "-h, --help           Display this help dialog"
-    echo ""
-    echo "File Options:"
-    echo "-c, --ca"
-    echo ""
-    echo "Directory Options:"
-    echo "-v, --invert           Inverts match from certs to non-certs"
   fi   
 fi
 
