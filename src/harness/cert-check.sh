@@ -9,7 +9,7 @@ then
   # File Operations.
   if [ -f $dirpath ] 
   then
-    echo "A file was given"
+    printf "\nA file was provided\n\n"
 
     if [[ $(file -b "$dirpath") == "PEM certificate" ]]; 
     then
@@ -23,16 +23,23 @@ then
   # Directory Operations.
   if [ -d $dirpath ] 
   then
-    echo A directory was given
+    printf "\nA directory was provided\n"
+
     declare -a dircerts
     declare -a expcerts
+    declare -a cacerts
+    declare -a cadir
 
+    
+    printf "\nNon certificate files in directory:\n"
     # Find certs in directory.
     for dircontent in "$dirpath"/*
     do
       if [[ $(file -b "$dircontent") == "PEM certificate" ]];
       then
         dircerts+=( $dircontent )
+      else
+        echo $dircontent
       fi    
     done
 
@@ -45,16 +52,28 @@ then
       fi
     done
 
+    printf "\nExpired Certs:\n"
     if [ expcerts == 0 ]
     then 
       echo "There are no expired certs in the directory"
     else
-      echo "Expired Certs:"
       for expcert in ${expcerts[@]}
       do
         echo ${expcert}
       done
     fi
+
+    # Check if CA cert is in the system certificate store.
+    for cadir in "/etc/ssl/certs"/*
+    do
+      cacerts+=( $cadir )
+    done
+
+    # for cert in ${cacerts[@]}
+    # do 
+    #   echo $cert
+    # done
+
   fi
 
 # If arguments were given at runtime.
@@ -65,7 +84,7 @@ else
   then
     echo Multiple arguments entered
 
-  # Help Menu.
+  # Help menu.
   else [ $1 = -h ] || [ $1 = --help ] 
     echo "Usage: cert-check.sh [FILE] [DIR]"
     echo "Validate the given certificate(s) or directory of certificates."
