@@ -85,48 +85,38 @@ def limit_downtilt_value(downtilt: int) -> int:
     return downtilt
 
 
-def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
-                    hor_pattern, ver_pattern, downtilt):
-    """REL2-R3-SGN-52105: Method B1 based antenna gain calculation.
-      Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively)
-      derived from the CBSD Registration parameters.
+def b1_antenna_gain(
+    dirs: Dict[str, Union[int, float]],
+    ant_az: int,
+    peak_ant_gain: Union[float, int],
+    hor_pattern: Dict[str, List[float]],
+    ver_pattern: Dict[str, List[float]],
+    downtilt: int
+):
+    """
+    REL2-R3-SGN-52105: Method B1 based antenna gain calculation.
+    Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively)
+    derived from the CBSD Registration parameters.
 
       Directions and azimuth are defined compared to the north in clockwise
       direction and shall be within [0..360] degrees.
 
-      Inputs:
+    Args:
         dirs:           Horizontal and vertical directions (degrees) at which the gain needs to be
                         calculated Either a scalar or an iterable.
         ant_az:         Antenna azimuth (degrees).
         peak_ant_gain:  cbsd antenna gain(dBi) at boresight
         hor_pattern:    antenna gain pattern in horizontal plane
         ver_pattern:    antenna gain pattern in vertical plane
-        donwtilt:       Antenna mechanical downtilt(degrees), limited to +-15 degrees
+        downtilt:       Antenna mechanical downtilt(degrees), limited to +-15 degrees
 
     Returns:
         The CBSD two-dimensional antenna gains (in dB) relative to peak antenna gain
         Either a scalar if dirs is scalar or an ndarray otherwise.
-   """
+    """
+    dirs_relative_boresight = get_dirs_relative_boresight(dirs, ant_az, downtilt)
 
-    alpha = dirs['hor']
-    # azimuth angle of the line between the CBSD main beam and the receiver location relative to
-    # the CBSD antenna boresight
-    theta_r = alpha - ant_az
-    theta_r = np.atleast_1d(theta_r)
-    theta_r[theta_r > 180] -= 360
-    theta_r[theta_r < -180] += 360
-
-    if downtilt < -15:
-        downtilt = -15
-    # use saturating counter behavior
-    downtilt = min(downtilt, 15)
-
-    beta = dirs['ver']
-    # vertical angle of the line between the CBSD main beam and the receiver location relative to
-    # the CBSD antenna boresight
-    phi_r = beta + downtilt * np.cos(theta_r * 180 / np.pi)
-
-    dirs_relative_boresight = {'hor': theta_r, 'ver': phi_r}
+    downtilt = limit_downtilt_value(downtilt)
 
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
