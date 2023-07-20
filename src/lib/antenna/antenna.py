@@ -34,7 +34,7 @@ from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping
 
 
 def get_dirs_relative_boresight(
-    dirs: Mapping,
+    dirs: Dict[str, Union[int, float]],
     ant_az: int,
     downtilt: Optional[int] = None
 ) -> Dict[str, int]:
