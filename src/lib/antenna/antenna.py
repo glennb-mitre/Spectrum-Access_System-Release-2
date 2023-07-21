@@ -514,7 +514,7 @@ def get_2d_antenna_gain(dirs, hor_gain, ver_gain, ver_gain_sup_angle, hor_gain_0
     Inputs:
       dirs:                Horizontal and vertical directions at which antenna gain is to be
                            calculated (degrees). Either a scalar or an iterable.
-      hor_gain:            antenna relative gain(w.r.t peak antenna gain) at the given
+      hor_gain:            (AKA g_h_theta_r) antenna relative gain(w.r.t peak antenna gain) at the given
                            direction(theta_R) in horizontal plane(dB)
       ver_gain:            antenna relative gain(w.r.t peak antenna gain) at the given
                            direction(phi_R) in vertical plane(dB)
@@ -530,22 +530,15 @@ def get_2d_antenna_gain(dirs, hor_gain, ver_gain, ver_gain_sup_angle, hor_gain_0
       peak_ant_gain:       Antenna gain (dBi)at boresight
 
     Outputs:
-      gain_two_dimensional: cbsd two dimensional antenna gain(dB) relative to peak antenna gain
+      gain_two_dimensional: cbsd two-dimensional antenna gain(dB) relative to peak antenna gain
 
     """
     hor_dir = dirs['hor']
+    g_cbsd_relative = hor_gain + ((1 - abs(hor_dir) / 180) * (ver_gain - hor_gain_0) +
+                                  (abs(hor_dir) / 180) * (ver_gain_sup_angle - hor_gain_180))
+    g_cbsd = g_cbsd_relative + peak_ant_gain
 
-    g_h_theta_r = hor_gain
-    g_0 = peak_ant_gain
-    g_h_theta_0 = hor_gain_0
-    g_h_theta_180 = hor_gain_180
-    g_v_phi_r = ver_gain
-    g_v_phi_rsup = ver_gain_sup_angle
-
-    g_cbsd_relative = g_h_theta_r + ((1 - abs(hor_dir) / 180) * (g_v_phi_r - g_h_theta_0) +
-                                     (abs(hor_dir) / 180) * (g_v_phi_rsup - g_h_theta_180))
-    g_cbsd = g_cbsd_relative + g_0
-    gain_two_dimensional = g_cbsd
+    return g_cbsd
 
     return gain_two_dimensional
 
