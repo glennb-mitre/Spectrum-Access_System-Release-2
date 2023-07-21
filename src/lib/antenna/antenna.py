@@ -240,24 +240,11 @@ def d_antenna_gain(
     The CBSD two-dimensional antenna gains (in dB) relative to peak antenna gain.
     Either a scalar if dirs is scalar or an ndarray otherwise.
     """
+    dirs_relative_boresight = get_dirs_relative_boresight(dirs, ant_az, downtilt)
 
-    # azimuth angle of the line between the CBSD main beam and the receiver location relative to
-    # the CBSD antenna boresight
-    theta_r = dirs['hor'] - ant_az
-    theta_r = np.atleast_1d(theta_r)
-    theta_r[theta_r > 180] -= 360
-    theta_r[theta_r < -180] += 360
+    downtilt = limit_downtilt_value(downtilt)
 
-    # vertical of the line between the CBSD main beam and the receiver location relative to
-    # the CBSD antenna boresight
-    phi_r = dirs['ver'] + downtilt * np.cos(theta_r * 180 / np.pi)
-
-    if downtilt < -15:
-        downtilt = -15
-    downtilt = min(downtilt, 15)
-
-    dirs_relative_boresight = {'hor': theta_r, 'ver': phi_r}
-
+    phi_r = dirs_relative_boresight['ver']
     # supplementary angle of phi (in degrees)
     dirs_phi_r_sup = {'ver': 180 - phi_r}
 
