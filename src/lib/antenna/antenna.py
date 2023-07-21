@@ -296,15 +296,7 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
     The CBSD  antenna gains (in dB) in vertical plane relative to peak antenna gain, 
     Either a scalar if dirs is scalar or an ndarray otherwise.
     """
-
-    # azimuth angle of the line between the CBSD main beam and the receiver location relative
-    # to the CBSD antenna boresight
-    theta_r = dirs['hor'] - ant_az
-    theta_r = np.atleast_1d(theta_r)
-    theta_r[theta_r > 180] -= 360
-    theta_r[theta_r < -180] += 360
-
-    dirs_relative_boresight = {'hor': theta_r, 'ver': 0}
+    dirs_relative_boresight = get_dirs_relative_boresight(dirs, ant_az)
 
     # horizontal gain at thetaR angle, G_H (thetaR)
     g_h_theta_r, *_ = get_given_2d_pattern_gains(dirs_relative_boresight,
