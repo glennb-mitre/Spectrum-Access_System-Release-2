@@ -137,12 +137,12 @@ def b1_antenna_gain(
 
 def c_antenna_gain(
     dirs: Union[Mapping, Iterable],
-    ant_az: float,
+    ant_az: int,
     peak_ant_gain: int,
-    downtilt: float,
-    hor_beamwidth: float,
-    ver_beamwidth: float,
-    fbr: float
+    downtilt: int,
+    hor_beamwidth: int,
+    ver_beamwidth: int,
+    fbr: int
 ) -> Union[Mapping, np.ndarray]:
     """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation
     Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively)
@@ -168,20 +168,9 @@ def c_antenna_gain(
     """
     # azimuth angle of the line between the CBSD main beam and the receiver location relative to
     # the CBSD antenna boresight
-    theta_r = dirs['hor'] - ant_az
-    theta_r = np.atleast_1d(theta_r)
-    theta_r[theta_r > 180] -= 360
-    theta_r[theta_r < -180] += 360
+    dirs_relative_boresight = get_dirs_relative_boresight(dirs, ant_az, downtilt)
 
-    # vertical angle of the line between the CBSD main beam and the receiver location relative to
-    # the CBSD antenna boresight
-    phi_r = dirs['ver'] + downtilt * np.cos(theta_r * 180 / np.pi)
-
-    if downtilt < -15:
-        downtilt = -15
-    downtilt = min(downtilt, 15)
-
-    dirs_relative_boresight = {'hor': theta_r, 'ver': phi_r}
+    downtilt = limit_downtilt_value(downtilt)
 
     # horizontal gain at thetaR, vertical gains at phiR
     g_h_theta_r, g_v_phi_r = get_standard_2d_gains(dirs_relative_boresight,
@@ -193,6 +182,7 @@ def c_antenna_gain(
     dirs_0 = {'hor': 0}
     dirs_180 = {'hor': 180}
 
+    phi_r = dirs_relative_boresight['ver']
     # supplementary angle of phi
     dirs_phi_r_sup = {'ver': 180 - phi_r}
 
