@@ -352,9 +352,7 @@ def get_standard_2d_gains(dirs, ant_azimuth=None, peak_ant_gain=0,
     if ant_fbr is None:
         ant_fbr = 20
 
-    dirs_keys = list(dirs.keys())
-
-    if 'hor' in dirs_keys:
+    if 'hor' in dirs:
         theta_r = dirs['hor']
         theta_r = np.atleast_1d(theta_r)
         if (ant_hor_beamwidth is None or ant_azimuth is None or
@@ -364,7 +362,7 @@ def get_standard_2d_gains(dirs, ant_azimuth=None, peak_ant_gain=0,
             g_h_theta_r = -min([12 * (theta_r / float(ant_hor_beamwidth)) ** 2, ant_fbr])
             g_h_theta_r += peak_ant_gain
 
-    if 'ver' in dirs_keys:
+    if 'ver' in dirs:
         phi_r = dirs['ver']
         phi_r = np.atleast_1d(phi_r)
         if (ant_ver_beamwidth is None or ant_mech_downtilt is None or
