@@ -375,8 +375,13 @@ def get_standard_2d_gains(dirs, ant_azimuth=None, peak_ant_gain=0,
     return g_h_theta_r, g_v_phi_r
 
 
-def get_given_2d_pattern_gains(dirs, hor_pattern=None, ver_pattern=None, ant_azimuth=None,
-                               ant_mech_downtilt=None):
+def get_given_2d_pattern_gains(
+    dirs,
+    hor_pattern: Optional[Mapping] = None,
+    ver_pattern: Optional[Mapping] = None,
+    ant_azimuth: Optional[float] = None,
+    ant_mech_downtilt: Optional[float] = None
+) -> Tuple[Union[List, float], ...]:
     """ REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
     Computes the gain at a given direction from a given antenna pattern(horizontal and vertical).
@@ -398,29 +403,31 @@ def get_given_2d_pattern_gains(dirs, hor_pattern=None, ver_pattern=None, ant_azi
                     relative to peak antenna gain
     """
 
-    hor_dir = dirs['hor']
-    ver_dir = dirs['ver']
+    # horizontal direction
+    theta_r = dirs['hor']
 
-    theta_r = hor_dir
-    phi_r = ver_dir
+    # vertical direction
+    phi_r = dirs['ver']
 
     g_h_theta_r = []
     g_v_phi_r = []
     g_v_phi_rsup = []
 
-    if not hor_pattern == None:
+    if hor_pattern is not None:
         theta_list = hor_pattern['angle']
         g_h_list = hor_pattern['gain']
         theta_r_idx = [i for i, j in enumerate(theta_list) if j == theta_r]
         if theta_r_idx:
             g_h_theta_r = g_h_list[theta_r_idx[0]]
         else:
+            # Find the two values that are closest to theta, one being positive, the other being negative
             theta_diff = [theta_r - i for i in theta_list]
             theta_diff_pos = [i for i in theta_diff if i > 0]
+            # positive
             theta_m = theta_list[theta_diff.index(min(theta_diff_pos))]
 
             theta_diff_neg = [i for i in theta_diff if i < 0]
-
+            # negative
             theta_m_1 = theta_list[theta_diff.index(max(theta_diff_neg))]
 
             theta_m_idx = [i for i, j in enumerate(theta_list) if j == theta_m]
@@ -429,11 +436,11 @@ def get_given_2d_pattern_gains(dirs, hor_pattern=None, ver_pattern=None, ant_azi
             theta_m_1_idx = [i for i, j in enumerate(theta_list) if j == theta_m_1]
             g_h_theta_m_1 = g_h_list[theta_m_1_idx[0]]
 
-            g_h_theta_r_interp = ((theta_m_1 - theta_r) * g_h_theta_m + (theta_r - theta_m) *
-                                  g_h_theta_m_1) / (theta_m_1 - theta_m)
-            g_h_theta_r = g_h_theta_r_interp
+            # g_h_theta_r AKA g_h_theta_r_interp
+            g_h_theta_r = ((theta_m_1 - theta_r) * g_h_theta_m + (theta_r - theta_m) *
+                           g_h_theta_m_1) / (theta_m_1 - theta_m)
 
-    if not ver_pattern == None:
+    if ver_pattern is not None:
 
         phi_list = list(ver_pattern['angle'])
 
@@ -467,9 +474,9 @@ def get_given_2d_pattern_gains(dirs, hor_pattern=None, ver_pattern=None, ant_azi
             phi_n_1_idx = [i for i, j in enumerate(phi_list) if j == phi_n_1]
             g_v_phi_n_1 = g_v_list[phi_n_1_idx[0]]
 
-            g_v_phi_r_interp = ((phi_n_1 - phi_r) * g_v_phi_n + (phi_r - phi_n) * g_v_phi_n_1) /\
-                               (phi_n_1 - phi_n)
-            g_v_phi_r = g_v_phi_r_interp
+            # g_v_phi_r AKA g_v_phi_r_interp
+            g_v_phi_r = ((phi_n_1 - phi_r) * g_v_phi_n + (phi_r - phi_n) * g_v_phi_n_1) / \
+                        (phi_n_1 - phi_n)
 
         if phi_rs_idx:
             g_v_phi_rsup = g_v_list[phi_rs_idx[0]]
@@ -487,9 +494,9 @@ def get_given_2d_pattern_gains(dirs, hor_pattern=None, ver_pattern=None, ant_azi
             phi_k_1_idx = [i for i, j in enumerate(phi_list) if j == phi_k_1]
             g_v_phi_k_1 = g_v_list[phi_k_1_idx[0]]
 
-            g_v_phi_rsup_interp = ((phi_k_1 - phi_r_supplementary_angle) * g_v_phi_k + (
-                        phi_r_supplementary_angle - phi_k) * g_v_phi_k_1) / (phi_k_1 - phi_k)
-            g_v_phi_rsup = g_v_phi_rsup_interp
+            # g_v_phi_rsup AKA g_v_phi_rsup_interp
+            g_v_phi_rsup = ((phi_k_1 - phi_r_supplementary_angle) * g_v_phi_k + (
+                    phi_r_supplementary_angle - phi_k) * g_v_phi_k_1) / (phi_k_1 - phi_k)
 
     return g_h_theta_r, g_v_phi_r, g_v_phi_rsup
 
