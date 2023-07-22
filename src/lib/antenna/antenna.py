@@ -540,7 +540,6 @@ def get_2d_antenna_gain(dirs, hor_gain, ver_gain, ver_gain_sup_angle, hor_gain_0
 
     return g_cbsd
 
-    return gain_two_dimensional
 
 
 def get_given_1d_pattern_gains(hor_dirs, ant_azimuth,
@@ -666,10 +665,15 @@ def get_radar_normalized_gains(hor_dirs,
     return gains
 
 
-def get_fss_gains(hor_dirs, ver_dirs,
-                  fss_pointing_azimuth, fss_pointing_elevation,
-                  fss_antenna_gain,
-                  w_1=0, w_2=1.0):
+def get_fss_gains(
+    hor_dirs,
+    ver_dirs,
+    fss_pointing_azimuth,
+    fss_pointing_elevation,
+    fss_antenna_gain,
+    w_1=0,
+    w_2=1.0
+) -> Union[float, np.ndarray]:
     """Computes the FSS earth station antenna gain.
 
     See R2-SGN-21.
@@ -713,7 +717,7 @@ def get_fss_gains(hor_dirs, ver_dirs,
     return gains
 
 
-def get_gso_gains(theta, nominal_gain):
+def get_gso_gains(theta, nominal_gain) -> Tuple[np.ndarray, ...]:
     """Returns FSS earth station gains from the off-axis angle.
 
     GSO means the 'Geostationary Satellite Orbit'.
