@@ -29,8 +29,8 @@ Typical usage:
   gains = GetFssAntennaGains(hor_dirs, ver_dirs,
                              fss_azimuth, fss_elevation, fss_ant_gain)
 """
-import numpy as np
 from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping
+import numpy as np
 
 
 def get_dirs_relative_boresight(
@@ -98,8 +98,8 @@ def b1_antenna_gain(
     Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively)
     derived from the CBSD Registration parameters.
 
-      Directions and azimuth are defined compared to the north in clockwise
-      direction and shall be within [0..360] degrees.
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.
 
     Args:
         dirs:           Horizontal and vertical directions (degrees) at which the gain needs to be
@@ -122,15 +122,15 @@ def b1_antenna_gain(
 
     # horizontal gain at thetaR, G_H (thetaR), vertical gains at phiR and at 180-phiR angle,
     # G_V (phiR) and G_V (180-phiR)
-    g_h_theta_r, g_v_phi_r, g_v_phi_rsup = get_given_2d_pattern_gains(dirs_relative_boresight,
-                                                                        hor_pattern,
-                                                                        ver_pattern,
-                                                                        ant_az, downtilt)
+    g_h_theta_r, g_v_phi_r, g_v_phi_rsup = get_given_2d_pattern_gains(
+        dirs_relative_boresight, hor_pattern, ver_pattern, ant_az, downtilt
+    )
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
     # gain_two_dimensional AKA g_cbsd
-    gain_two_dimensional = get_2d_antenna_gain(dirs, g_h_theta_r, g_v_phi_r, g_v_phi_rsup,
-                                 hor_pattern['gain'][180], hor_pattern['gain'][0],
-                                 peak_ant_gain)
+    gain_two_dimensional = get_2d_antenna_gain(
+        dirs, g_h_theta_r, g_v_phi_r, g_v_phi_rsup, hor_pattern['gain'][180],
+        hor_pattern['gain'][0], peak_ant_gain
+    )
 
     return gain_two_dimensional
 
@@ -173,10 +173,10 @@ def c_antenna_gain(
     downtilt = limit_downtilt_value(downtilt)
 
     # horizontal gain at thetaR, vertical gains at phiR
-    g_h_theta_r, g_v_phi_r = get_standard_2d_gains(dirs_relative_boresight,
-                                                     ant_az, peak_ant_gain,
-                                                     downtilt, hor_beamwidth,
-                                                     ver_beamwidth, ant_fbr=fbr)
+    g_h_theta_r, g_v_phi_r = get_standard_2d_gains(
+        dirs_relative_boresight, ant_az, peak_ant_gain, downtilt,
+        hor_beamwidth, ver_beamwidth, ant_fbr=fbr
+    )
 
     # in degrees
     dirs_0 = {'hor': 0}
@@ -187,22 +187,29 @@ def c_antenna_gain(
     dirs_phi_r_sup = {'ver': 180 - phi_r}
 
     # horizontal gain at 0 degrees, G_H (0)
-    g_h_theta_0, _ = get_standard_2d_gains(dirs_0, ant_az, peak_ant_gain,
-                                             ant_hor_beamwidth=hor_beamwidth,
-                                             ant_fbr=fbr)
+    g_h_theta_0, _ = get_standard_2d_gains(
+        dirs_0, ant_az, peak_ant_gain, ant_hor_beamwidth=hor_beamwidth,
+        ant_fbr=fbr
+    )
+
     # horizontal gain at 180 degrees, G_H (180)
-    g_h_theta_180, _ = get_standard_2d_gains(dirs_180, ant_az, peak_ant_gain,
-                                               ant_hor_beamwidth=hor_beamwidth,
-                                               ant_fbr=fbr)
+    g_h_theta_180, _ = get_standard_2d_gains(
+        dirs_180, ant_az, peak_ant_gain, ant_hor_beamwidth=hor_beamwidth,
+        ant_fbr=fbr
+    )
+
     # vertical gain at 180-phiR vertical angle, G_V (180-phiR)
-    _, g_v_phi_r_sup = get_standard_2d_gains(dirs_phi_r_sup, ant_az, peak_ant_gain,
-                                               ant_mech_downtilt=downtilt,
-                                               ant_ver_beamwidth=ver_beamwidth,
-                                               ant_fbr=fbr)
+    _, g_v_phi_r_sup = get_standard_2d_gains(
+        dirs_phi_r_sup, ant_az, peak_ant_gain, ant_mech_downtilt=downtilt,
+        ant_ver_beamwidth=ver_beamwidth, ant_fbr=fbr
+    )
+
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
     # gain_two_dimensional AKA g_cbsd
-    gain_two_dimensional = get_2d_antenna_gain(dirs, g_h_theta_r, g_v_phi_r, g_v_phi_r_sup,
-                                 g_h_theta_0, g_h_theta_180, peak_ant_gain)
+    gain_two_dimensional = get_2d_antenna_gain(
+        dirs, g_h_theta_r, g_v_phi_r, g_v_phi_r_sup, g_h_theta_0,
+        g_h_theta_180, peak_ant_gain
+    )
 
     return gain_two_dimensional
 
@@ -249,29 +256,33 @@ def d_antenna_gain(
     dirs_phi_r_sup = {'ver': 180 - phi_r}
 
     # horizontal gain at thetaR angle, G_H (thetaR)
-    g_h_theta_r, *_ = get_given_2d_pattern_gains(dirs_relative_boresight,
-                                                     hor_pattern=hor_patt,
-                                                     ant_azimuth=ant_az)
+    g_h_theta_r, *_ = get_given_2d_pattern_gains(
+        dirs_relative_boresight, hor_pattern=hor_patt, ant_azimuth=ant_az
+    )
     # G_H(0)
     g_h_theta_0 = hor_patt['gain'][180]
     # G_H(180)
     g_h_theta_180 = hor_patt['gain'][0]
 
     # G_V(phiR)
-    _, g_v_phi_r = get_standard_2d_gains(dirs_relative_boresight, ant_az,
-                                           peak_ant_gain,
-                                           ant_mech_downtilt=downtilt,
-                                           ant_ver_beamwidth=ver_beamwidth, ant_fbr=fbr)
+    _, g_v_phi_r = get_standard_2d_gains(
+        dirs_relative_boresight, ant_az, peak_ant_gain,
+        ant_mech_downtilt=downtilt, ant_ver_beamwidth=ver_beamwidth,
+        ant_fbr=fbr
+    )
+
     # G_V(180-phiR)
-    _, g_v_phi_r_sup = get_standard_2d_gains(dirs_phi_r_sup, ant_az, peak_ant_gain,
-                                               ant_mech_downtilt=downtilt,
-                                               ant_ver_beamwidth=ver_beamwidth,
-                                               ant_fbr=fbr)
+    _, g_v_phi_r_sup = get_standard_2d_gains(
+        dirs_phi_r_sup, ant_az, peak_ant_gain, ant_mech_downtilt=downtilt,
+        ant_ver_beamwidth=ver_beamwidth, ant_fbr=fbr
+    )
+
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
     # gain_two_dimensional AKA g_cbsd
-    gain_two_dimensional = get_2d_antenna_gain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r,
-                                 g_v_phi_r_sup, g_h_theta_0,
-                                 g_h_theta_180, peak_ant_gain)
+    gain_two_dimensional = get_2d_antenna_gain(
+        dirs_relative_boresight, g_h_theta_r, g_v_phi_r, g_v_phi_r_sup,
+        g_h_theta_0, g_h_theta_180, peak_ant_gain
+    )
 
     return gain_two_dimensional
 
@@ -299,9 +310,9 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
     dirs_relative_boresight = get_dirs_relative_boresight(dirs, ant_az)
 
     # horizontal gain at thetaR angle, G_H (thetaR)
-    g_h_theta_r, *_ = get_given_2d_pattern_gains(dirs_relative_boresight,
-                                                     hor_pattern=hor_patt,
-                                                     ant_azimuth=ant_az)
+    g_h_theta_r, *_ = get_given_2d_pattern_gains(
+        dirs_relative_boresight, hor_pattern=hor_patt, ant_azimuth=ant_az
+    )
     # G_H(0)
     g_h_theta_0 = hor_patt['gain'][180]
     # G_H(180)
@@ -312,16 +323,19 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
 
     # REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
     # gain_two_dimensional AKA g_cbsd
-    gain_two_dimensional = get_2d_antenna_gain(dirs_relative_boresight, g_h_theta_r, g_v_phi_r,
-                                 g_v_phi_r_sup, g_h_theta_0,
-                                 g_h_theta_180, peak_ant_gain)
+    gain_two_dimensional = get_2d_antenna_gain(
+        dirs_relative_boresight, g_h_theta_r, g_v_phi_r, g_v_phi_r_sup,
+        g_h_theta_0, g_h_theta_180, peak_ant_gain
+    )
 
     return gain_two_dimensional
 
 
-def get_standard_2d_gains(dirs, ant_azimuth=None, peak_ant_gain=0,
-                          ant_mech_downtilt=None, ant_hor_beamwidth=None,
-                          ant_ver_beamwidth=None, ant_fbr=None):
+def get_standard_2d_gains(
+    dirs, ant_azimuth=None, peak_ant_gain=0,
+    ant_mech_downtilt=None, ant_hor_beamwidth=None,
+    ant_ver_beamwidth=None, ant_fbr=None
+):
     """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation, step a
     Computes the antenna gain pattern using both horizontal and vertical properties.
 
@@ -501,8 +515,15 @@ def get_given_2d_pattern_gains(
     return g_h_theta_r, g_v_phi_r, g_v_phi_rsup
 
 
-def get_2d_antenna_gain(dirs, hor_gain, ver_gain, ver_gain_sup_angle, hor_gain_0,
-                        hor_gain_180, peak_ant_gain=0):
+def get_2d_antenna_gain(
+    dirs,
+    hor_gain,
+    ver_gain,
+    ver_gain_sup_angle,
+    hor_gain_0,
+    hor_gain_180,
+    peak_ant_gain=0
+):
     """REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step b
 
     Computes the two-dimensional antenna gain at a given direction, from horizontal and
@@ -541,10 +562,12 @@ def get_2d_antenna_gain(dirs, hor_gain, ver_gain, ver_gain_sup_angle, hor_gain_0
     return g_cbsd
 
 
-
-def get_given_1d_pattern_gains(hor_dirs, ant_azimuth,
-                               hor_pattern,
-                               ant_gain=0):
+def get_given_1d_pattern_gains(
+    hor_dirs,
+    ant_azimuth,
+    hor_pattern,
+    ant_gain=0
+):
     """Computes the gain for a given antenna pattern.
 
     Directions and azimuth are defined compared to the north in clockwise
@@ -585,7 +608,12 @@ def get_given_1d_pattern_gains(hor_dirs, ant_azimuth,
     return gains
 
 
-def get_standard_gains(hor_dirs, ant_azimuth=None, ant_beamwidth=None, ant_gain=0):
+def get_standard_gains(
+    hor_dirs,
+    ant_azimuth=None,
+    ant_beamwidth=None,
+    ant_gain=0
+):
     """Computes the antenna gains from a standard antenna defined by beamwidth.
 
     See R2-SGN-20.
