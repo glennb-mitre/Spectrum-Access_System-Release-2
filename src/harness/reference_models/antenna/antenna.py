@@ -30,37 +30,99 @@ Typical usage:
                              fss_azimuth, fss_elevation, fss_ant_gain)
 """
 import numpy as np
-from reference_models.geo import vincenty
+import os
+import csv
 from reference_models.propagation import wf_itm
 
 # Frequency used in propagation model (in MHz) [R2-SGN-04]
 FREQ_PROP_MODEL_MHZ = 3625.0
-ANT_PAT_DATABASE_FILENAME = "/home/rrahman/winnf/Sas-Rel2-forked/Spectrum-Access_System-Release-2/src/lib/antenna/antenna_database/antennaPatternDatabase.csv"
+ANT_PAT_DATABASE_FILENAME = os.path.dirname(os.path.realpath(__file__)) + '/antenna database/antennaPatternDatabase.csv'
 
 def import_antenna_pattern_database():
-    
+    ant_pat_file = ANT_PAT_DATABASE_FILENAME
+    ant_database = []
+    with open(ant_pat_file) as f:
+        for line in csv.DictReader(f):
+            ant_database.append(line)
+    return ant_database
+            
 
 
 def calculate_antenna_gain_EAP(tx, rx):
     
-    db_loss_itm, incidence_angles, internals = wf_itm.CalcItmPropagationLoss(
-      tx.latitude, tx.longitude, tx.height_agl,
-      rx.latitude, rx.longitude, rx.antenna_height,
-      tx.indoor_deployment, reliability=-1,
-      freq_mhz=FREQ_PROP_MODEL_MHZ)
+    _, incidence_angles, _ = wf_itm.CalcItmPropagationLoss(
+                                                            tx['installationParam']['latitude'], tx['installationParam']['longitude'], tx['installationParam']['height'],
+                                                            rx['latitude'], rx['longitude'], rx['height'],
+                                                            tx['installationParam']['indoorDeployment'], reliability=-1,
+                                                            freq_mhz=FREQ_PROP_MODEL_MHZ)
     
-    dirs = []
+    dirs = {}
     dirs["hor"] = incidence_angles.hor_cbsd
     dirs["ver"] = incidence_angles.ver_cbsd
-    antennaModel = tx.installationParam.antennaModel
+    ant_database = import_antenna_pattern_database()
+    antennaModel = tx['installationParam']['antennaModel']
 
     
+    if antennaModel['horizontalPattern']:
+        if antennaModel['verticalPattern']:
+            antennaPatternId = antennaModel['horizontalPattern']['antennaPatternId']
+            for i, dic in enumerate(ant_database):
+                if dic['antennaPatternId'] == antennaPatternId:
+                    hor_patt_filename = os.path.dirname(os.path.realpath(__file__)) + '/antenna database/' + dic['azimuthRadiationPattern']
+                    ver_patt_filename = os.path.dirname(os.path.realpath(__file__)) + '/antenna database/' + dic['elevationRadiationPattern']
+                    break
+            hor_pattern = {}
+            angles = []
+            gains = []
+            with open(hor_patt_filename,'r') as csvfile:
+                csv_reader = csv.reader(csvfile,delimiter=',')
+                for row in csv_reader:
+                    if any(row):
+                        angles.append(float(row[0]))            
+                        gains.append(float(row[1]))
+            hor_pattern['angle'] = list(angles)
+            hor_pattern['gain'] = list(gains)
 
-    if antennaModel.horizontalPattern and antennaModel.verticalPattern:
-        antennaPatternId = antennaModel.horizontalPattern.antennaPatternId
-        gain  = b1_antenna_gain(dirs, tx.installationParam.azimuth, tx.installationParam.antennaGain, hor_pattern, ver_pattern, ant_mech_downtilt)
+            ver_pattern = {}
+
+            angles = []
+            gains = []      
+            with open(ver_patt_filename) as csvfile:
+                csv_reader = csv.reader(csvfile,delimiter=',')
+                for row in csv_reader:
+                    if any(row):
+                        angles.append(float(row[0]))            
+                        gains.append(float(row[1]))              
+            ver_pattern['angle'] = list(angles)
+            ver_pattern['gain'] = list(gains)
+
+            gain  = b1_antenna_gain(
+                dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
+                hor_pattern, ver_pattern,tx['installationParam']['antennaDowntilt'] )
+        
+        elif(tx['installationParam']['antennaDowntilt'] and tx['installationParam']
+             ['antennaVerticalBeamwidth'] and tx['installationParam']['frontToBackRatio']):
+            gain = d_antenna_gain(
+                dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
+                hor_pattern, tx['installationParam']['antennaDowntilt'],
+                tx['installationParam']['antennaVerticalBeamwidth'], 
+                tx['installationParam']['frontToBackRatio'])
+        else:
+            gain  = antenna_gain_method_e(dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], hor_pattern)
+
+    elif(tx['installationParam']['antennaDowntilt'] and tx['installationParam']['antennaBeamwidth'],
+         tx['installationParam']['antennaVerticalBeamwidth'] and tx['installationParam']['frontToBackRatio']):
+        
+        gain = c_antenna_gain(dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
+                              tx['installationParam']['antennaDowntilt'], tx['installationParam']['antennaBeamwidth'],
+                              tx['installationParam']['antennaVerticalBeamwidth'], tx['installationParam']['frontToBackRatio'])
+    else:
+
+        
+        print(gain)
+        
     
-def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
+def antenna_gain_method_b1(dirs, ant_az, peak_ant_gain,
                     hor_pattern, ver_pattern, downtilt):
     """REL2-R3-SGN-52105: Method B1 based antenna gain calculation.
       Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively)
@@ -109,7 +171,7 @@ def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
 
     # horizontal gain at thetaR, G_H (thetaR), vertical gains at phiR and at 180-phiR angle,
     # G_V (phiR) and G_V (180-phiR)
-    [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = get_given_2d_pattern_gains(dirs_relative_boresight,
+    [g_h_theta_r, g_v_phi_r, g_v_phi_rsup] = calculate_gain_from_given_patterns(dirs_relative_boresight,
                                                                         hor_pattern,
                                                                         ver_pattern,
                                                                         ant_az, downtilt)
@@ -123,7 +185,7 @@ def b1_antenna_gain(dirs, ant_az, peak_ant_gain,
     return gain_two_dimensional
 
 
-def c_antenna_gain(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
+def antenna_gain_method_c(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
                    ver_beamwidth, fbr):
     """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation
     Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively)
@@ -211,7 +273,7 @@ def c_antenna_gain(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
     return gain_two_dimensional
 
 
-def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidth, fbr):
+def antenna_gain_method_d(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidth, fbr):
     """REL2-R3-SGN-52107: Method D based Antenna Gain Calculation:
     Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively),
     where the horizontal antenna pattern (denoted as GH(theta)) is recorded in the CBSD Antenna
@@ -274,7 +336,7 @@ def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidt
     dirs_phi_r_sup['ver'] = phi_r_sup
 
     # horizontal gain at thetaR angle, G_H (thetaR)
-    [g_h_theta_r, _, _] = get_given_2d_pattern_gains(dirs_relative_boresight,
+    [g_h_theta_r, _, _] = calculate_gain_from_given_patterns(dirs_relative_boresight,
                                                      hor_pattern=hor_patt,
                                                      ant_azimuth=ant_az)
     # G_H(0)
@@ -301,7 +363,7 @@ def d_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_beamwidt
     return gain_two_dimensional
 
 
-def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
+def antenna_gain_method_e(dirs, ant_az, peak_ant_gain, hor_patt):
     """REL2-R3-SGN-52108: Method E based Antenna Gain Calculation:
     Use of the horizontal antenna pattern (denoted as GH(theta)) recorded in the CBSD 
     Antenna Pattern Database. No vertical antenna pattern information is used.
@@ -345,7 +407,7 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
     dirs_180['hor'] = theta_180
 
     # horizontal gain at thetaR angle, G_H (thetaR)
-    [g_h_theta_r, _, _] = get_given_2d_pattern_gains(dirs_relative_boresight,
+    [g_h_theta_r, _, _] = calculate_gain_from_given_patterns(dirs_relative_boresight,
                                                      hor_pattern=hor_patt,
                                                      ant_azimuth=ant_az)
     # G_H(0)
@@ -364,7 +426,45 @@ def e_antenna_gain(dirs, ant_az, peak_ant_gain, hor_patt):
 
     return gain_two_dimensional
 
+def antenna_gain_method_f(dirs,ant_az,peak_ant_gain,hor_beamwidth):
+    """Computes the antenna gains from a standard antenna defined by beamwidth.
 
+    See R2-SGN-20.
+    This uses the standard 3GPP formula for pattern derivation from a given
+    antenna 3dB cutoff beamwidth.
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.
+
+    Inputs:
+      hor_dirs:       Ray directions in horizontal plane (degrees).
+                      Either a scalar or an iterable.
+      ant_azimut:     Antenna azimuth (degrees).
+      ant_beamwidth:  Antenna 3dB cutoff beamwidth (degrees).
+                      If None, then antenna is isotropic (default).
+      ant_gain:       Antenna gain (dBi).
+
+    Returns:
+      The CBSD antenna gains (in dB).
+      Either a scalar if hor_dirs is scalar or an ndarray otherwise.
+    """
+    is_scalar = np.isscalar(hor_dirs)
+    hor_dirs = np.atleast_1d(hor_dirs)
+
+    if (hor_beamwidth is None or ant_az is None or
+            hor_beamwidth == 0 or hor_beamwidth == 360):
+        gains = peak_ant_gain * np.ones(hor_dirs.shape)
+    else:
+        bore_angle = hor_dirs - ant_az
+        bore_angle[bore_angle > 180] -= 360
+        bore_angle[bore_angle < -180] += 360
+        gains = -12 * (bore_angle / float(hor_beamwidth)) ** 2
+        gains[gains < -20] = -20.
+        gains += peak_ant_gain
+
+    if is_scalar:
+        return gains[0]
+    return gains    
+    
 def get_standard_2d_gains(dirs, ant_azimuth=None, peak_ant_gain=0,
                           ant_mech_downtilt=None, ant_hor_beamwidth=None,
                           ant_ver_beamwidth=None, ant_fbr=None):
@@ -423,7 +523,7 @@ def get_standard_2d_gains(dirs, ant_azimuth=None, peak_ant_gain=0,
     return g_h_theta_r, g_v_phi_r
 
 
-def get_given_2d_pattern_gains(dirs, hor_pattern=None, ver_pattern=None, ant_azimuth=None,
+def calculate_gain_from_given_patterns(dirs, hor_pattern=None, ver_pattern=None, ant_azimuth=None,
                                ant_mech_downtilt=None):
     """ REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
@@ -591,7 +691,7 @@ def get_2d_antenna_gain(dirs, hor_gain, ver_gain, ver_gain_sup_angle, hor_gain_0
     return gain_two_dimensional
 
 
-def get_given_1d_pattern_gains(hor_dirs, ant_azimuth,
+def calculate_gain_from_hor_pattern(hor_dirs, ant_azimuth,
                                hor_pattern,
                                ant_gain=0):
     """Computes the gain for a given antenna pattern.
@@ -628,46 +728,6 @@ def get_given_1d_pattern_gains(hor_dirs, ant_azimuth,
     idx1[idx1 >= 360] -= 360
     gains = (1 - alpha) * hor_pattern[idx0] + alpha * hor_pattern[idx1]
     gains += ant_gain
-
-    if is_scalar:
-        return gains[0]
-    return gains
-
-
-def get_standard_gains(hor_dirs, ant_azimuth=None, ant_beamwidth=None, ant_gain=0):
-    """Computes the antenna gains from a standard antenna defined by beamwidth.
-
-    See R2-SGN-20.
-    This uses the standard 3GPP formula for pattern derivation from a given
-    antenna 3dB cutoff beamwidth.
-    Directions and azimuth are defined compared to the north in clockwise
-    direction and shall be within [0..360] degrees.
-
-    Inputs:
-      hor_dirs:       Ray directions in horizontal plane (degrees).
-                      Either a scalar or an iterable.
-      ant_azimut:     Antenna azimuth (degrees).
-      ant_beamwidth:  Antenna 3dB cutoff beamwidth (degrees).
-                      If None, then antenna is isotropic (default).
-      ant_gain:       Antenna gain (dBi).
-
-    Returns:
-      The CBSD antenna gains (in dB).
-      Either a scalar if hor_dirs is scalar or an ndarray otherwise.
-    """
-    is_scalar = np.isscalar(hor_dirs)
-    hor_dirs = np.atleast_1d(hor_dirs)
-
-    if (ant_beamwidth is None or ant_azimuth is None or
-            ant_beamwidth == 0 or ant_beamwidth == 360):
-        gains = ant_gain * np.ones(hor_dirs.shape)
-    else:
-        bore_angle = hor_dirs - ant_azimuth
-        bore_angle[bore_angle > 180] -= 360
-        bore_angle[bore_angle < -180] += 360
-        gains = -12 * (bore_angle / float(ant_beamwidth)) ** 2
-        gains[gains < -20] = -20.
-        gains += ant_gain
 
     if is_scalar:
         return gains[0]

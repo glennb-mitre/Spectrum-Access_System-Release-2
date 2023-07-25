@@ -50,13 +50,34 @@ class EapProtectionTestcase(McpXprCommonTestcase):
   def tearDown(self):
     self.ShutdownServers()
 
-  def generate_EAP_default_config(self, filename):
-    """ Generates the WinnForum configuration for EAP testcase """
-  @configurable_testcase(generate_EAP_default_config)
 
-  def test_WINNF_FT_S_REL2_RI_EAP(self, config_filename):
+  def test_WINNF_FT_S_REL2_RI_EAP_1(self, config_filename):
     """Interference calculation using the Enhanced Antenna Pattern"""
-  
+    num_cbsd = 12
+    device_cat = 'a'
+    registration_request = []
+    cat_b_devices = []
+    for cbsdIdx in num_cbsd:
+      device_filename_cat_a = 'device_a' + str(cbsdIdx) + '.json'
+      device_a = json_load(
+        os.path.join('testcases', 'testdata', device_filename_cat_a))
+      device_filename_cat_b = 'device_a' + str(cbsdIdx) + '.json'
+      device_b = json_load(
+        os.path.join('testcases', 'testdata', device_filename_cat_b))
+      
+      registration_request.append(device_a)
+      registration_request.append(device_b)
+
+      request = {'registrationRequest': registration_request}
+      response = self._sas.Registration(request)['registrationResponse']
+
+    # Check registration response
+    cbsd_ids = []
+    for resp in response:
+      self.assertEqual(resp['response']['responseCode'], 0)
+      cbsd_ids.append(resp['cbsdId'])
+    del request, response
+      
     
   def generate_EAP_2_default_config(self, filename):
     """ Generates the WinnForum configuration for testcase EAP.2. """
