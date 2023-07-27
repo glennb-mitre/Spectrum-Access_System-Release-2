@@ -99,7 +99,7 @@ def get_multiple_indices(lst: List[Element_Type], key: Element_Type) -> List[int
     """
     indices = []
     lst_copy = lst.copy()
-    for i in range(lst_copy.count(key)):
+    for _ in range(lst_copy.count(key)):
         # the list.index() method is a fast builtin that gets the first index at which the value appears
         idx = lst_copy.index(key)
         indices.append(idx)
