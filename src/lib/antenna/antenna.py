@@ -29,9 +29,10 @@ Typical usage:
   gains = GetFssAntennaGains(hor_dirs, ver_dirs,
                              fss_azimuth, fss_elevation, fss_ant_gain)
 """
-from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping
+from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping, TypeVar
 import numpy as np
 
+Element_Type = TypeVar("Element_Type")
 
 def get_dirs_relative_boresight(
     dirs: Dict[str, Union[int, float]],
@@ -83,6 +84,34 @@ def limit_downtilt_value(downtilt: int) -> int:
     # Use saturating counter behavior
     downtilt = min(downtilt, 15)
     return downtilt
+
+
+def get_multiple_indices(lst: List[Element_Type], key: Element_Type) -> List[int]:
+    """
+    Find multiple list indices at which a certain value is found.
+
+    Returns: A list of integer indices at which the key value is found within lst.
+
+    Args:
+        lst (List of elements of type Element_Type): the List on which to search for the given key.
+        key (a value of type Element_Type): the element for which to obtain the indices in the lst at which the value
+            appears.
+    """
+    indices = []
+    lst_copy = lst.copy()
+    for i in range(lst_copy.count(key)):
+        # the list.index() method is a fast builtin that gets the first index at which the value appears
+        idx = lst_copy.index(key)
+        indices.append(idx)
+        # The Ellipsis ('...') is a Python type that is somewhat equivalent to NotImplemented.
+        # Here, it acts as a sort of Sentinel value because it is extremely
+        # unlikely that it would be used in any real data. We replace the
+        # appearance of the key value with the Ellipsis so that we can use the
+        # fast .index method multiple times. This technique is marginally
+        # faster the (much neater and compact method of) using a list
+        # comprehension over an Enumerate object.
+        lst_copy[idx] = ...
+    return indices
 
 
 def b1_antenna_gain(
@@ -430,7 +459,7 @@ def get_given_2d_pattern_gains(
     if hor_pattern is not None:
         theta_list = hor_pattern['angle']
         g_h_list = hor_pattern['gain']
-        theta_r_idx = [i for i, j in enumerate(theta_list) if j == theta_r]
+        theta_r_idx = get_multiple_indices(theta_list, theta_r)
         if theta_r_idx:
             g_h_theta_r = g_h_list[theta_r_idx[0]]
         else:
@@ -444,10 +473,10 @@ def get_given_2d_pattern_gains(
             # negative
             theta_m_1 = theta_list[theta_diff.index(max(theta_diff_neg))]
 
-            theta_m_idx = [i for i, j in enumerate(theta_list) if j == theta_m]
+            theta_m_idx = get_multiple_indices(theta_list, theta_m)
             g_h_theta_m = g_h_list[theta_m_idx[0]]
 
-            theta_m_1_idx = [i for i, j in enumerate(theta_list) if j == theta_m_1]
+            theta_m_1_idx = get_multiple_indices(theta_list, theta_m_1)
             g_h_theta_m_1 = g_h_list[theta_m_1_idx[0]]
 
             # g_h_theta_r AKA g_h_theta_r_interp
@@ -459,7 +488,7 @@ def get_given_2d_pattern_gains(
         phi_list = list(ver_pattern['angle'])
 
         g_v_list = list(ver_pattern['gain'])
-        phi_r_idx = [i for i, j in enumerate(phi_list) if j == phi_r]
+        phi_r_idx = get_multiple_indices(phi_list, phi_r)
 
         phi_r_supplementary_angle = 180 - phi_r
         phi_r_supplementary_angle = np.atleast_1d(phi_r_supplementary_angle)
@@ -469,7 +498,7 @@ def get_given_2d_pattern_gains(
 
         phi_r_supplementary_angle[phi_r_supplementary_angle >= 180] -= 360
 
-        phi_rs_idx = [i for i, j in enumerate(phi_list) if j == phi_r_supplementary_angle]
+        phi_rs_idx = get_multiple_indices(phi_list, phi_r_supplementary_angle)
 
         if phi_r_idx:
             g_v_phi_r = g_v_list[phi_r_idx[0]]
@@ -482,10 +511,10 @@ def get_given_2d_pattern_gains(
 
             phi_n_1 = phi_list[phi_diff.index(max(phi_diff_neg))]
 
-            phi_n_idx = [i for i, j in enumerate(phi_list) if j == phi_n]
+            phi_n_idx = get_multiple_indices(phi_list, phi_n)
             g_v_phi_n = g_v_list[phi_n_idx[0]]
 
-            phi_n_1_idx = [i for i, j in enumerate(phi_list) if j == phi_n_1]
+            phi_n_1_idx = get_multiple_indices(phi_list, phi_n_1)
             g_v_phi_n_1 = g_v_list[phi_n_1_idx[0]]
 
             # g_v_phi_r AKA g_v_phi_r_interp
@@ -502,10 +531,10 @@ def get_given_2d_pattern_gains(
             phi_rs_diff_neg = [i for i in phi_rsup_diff if i < 0]
             phi_k_1 = phi_list[phi_rsup_diff.index(max(phi_rs_diff_neg))]
 
-            phi_k_idx = [i for i, j in enumerate(phi_list) if j == phi_k]
+            phi_k_idx = get_multiple_indices(phi_list, phi_k)
             g_v_phi_k = g_v_list[phi_k_idx[0]]
 
-            phi_k_1_idx = [i for i, j in enumerate(phi_list) if j == phi_k_1]
+            phi_k_1_idx = get_multiple_indices(phi_list, phi_k_1)
             g_v_phi_k_1 = g_v_list[phi_k_1_idx[0]]
 
             # g_v_phi_rsup AKA g_v_phi_rsup_interp
