@@ -29,10 +29,11 @@ Typical usage:
   gains = GetFssAntennaGains(hor_dirs, ver_dirs,
                              fss_azimuth, fss_elevation, fss_ant_gain)
 """
+import typing, copy
 from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping, TypeVar
 import numpy as np
 
-Element_Type = TypeVar("Element_Type")
+T = TypeVar("T")
 
 def get_dirs_relative_boresight(
     dirs: Dict[str, Union[int, float]],
@@ -86,32 +87,39 @@ def limit_downtilt_value(downtilt: int) -> int:
     return downtilt
 
 
-def get_multiple_indices(lst: List[Element_Type], key: Element_Type) -> List[int]:
+def get_multiple_indices(lst: Union[Iterable[T], np.ndarray], key: T) -> Union[List[int], np.ndarray]:
     """
     Find multiple list indices at which a certain value is found.
 
     Returns: A list of integer indices at which the key value is found within lst.
 
     Args:
-        lst (List of elements of type Element_Type): the List on which to search for the given key.
-        key (a value of type Element_Type): the element for which to obtain the indices in the lst at which the value
+        lst (List of elements of type T): the List on which to search for the given key.
+        key (a value of type T): the element for which to obtain the indices in the lst at which the value
             appears.
     """
-    indices = []
-    lst_copy = lst.copy()
-    for _ in range(lst_copy.count(key)):
-        # the list.index() method is a fast builtin that gets the first index at which the value appears
-        idx = lst_copy.index(key)
-        indices.append(idx)
-        # The Ellipsis ('...') is a Python type that is somewhat equivalent to NotImplemented.
-        # Here, it acts as a sort of Sentinel value because it is extremely
-        # unlikely that it would be used in any real data. We replace the
-        # appearance of the key value with the Ellipsis so that we can use the
-        # fast .index method multiple times. This technique is marginally
-        # faster the (much neater and compact method of) using a list
-        # comprehension over an Enumerate object.
-        lst_copy[idx] = ...
-    return indices
+    if isinstance(lst, np.ndarray):
+        return np.where(lst == key)
+    if isinstance(lst, typing.MutableSequence):
+        indices = []
+        lst_copy = copy.deepcopy(lst)
+        for _ in range(lst_copy.count(key)):
+            idx = lst_copy.index(key)
+            indices.append(idx)
+            # The Ellipsis ('...') is a Python type that is somewhat equivalent
+            # to NotImplemented. Here, it acts as a sort of Sentinel value
+            # because it is extremely unlikely that it would be used in any
+            # real data. We replace the appearance of the key value with the
+            # Ellipsis so that we can use the fast .index method multiple
+            # times. This technique is marginally faster than the (much neater
+            # and compact method of) using a list comprehension over an
+            # Enumerate object.
+            lst_copy[idx] = ...
+        return indices
+    if isinstance(lst, Iterable):
+        return [idx for idx,value in enumerate(lst) if value == key]
+    raise TypeError("lst must be either a numpy array (ndarray) or of an "
+                    "Iterable type.")
 
 
 def b1_antenna_gain(
