@@ -473,6 +473,50 @@ def _get_horz_gain_at_theta_r(
                        g_h_theta_m_1) / (theta_m_1 - theta_m)
     return g_h_theta_r
 
+def _get_vert_gain_at_phi_r(
+    phi_r: Union[float, int],
+    ver_pattern: Optional[Dict[str, List[int]]]
+):
+    """
+    Subfunction of get_given_2d_pattern_gains, which is specified in:
+    REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
+
+    Computes the vertical gain at phi_r angle relative to peak antenna gain, given an antenna pattern.
+
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.
+
+    Args:
+        phi_r: the angle at which to compute the vertical gain
+        ver_pattern: contains vertical plane angles and associated gains
+
+    Returns:
+        g_v_phi_r: cbsd vertical antenna gain(dB) at phi_r angle, relative to peak antenna gain
+    """
+    phi_list = list(ver_pattern['angle'])
+    g_v_list = list(ver_pattern['gain'])
+    phi_r_idx = get_multiple_indices(phi_list, phi_r)
+    if phi_r_idx:
+        g_v_phi_r = g_v_list[phi_r_idx[0]]
+    else:
+        phi_diff = [phi_r - i for i in phi_list]
+        phi_diff_pos = [i for i in phi_diff if i > 0]
+        phi_n = phi_list[phi_diff.index(min(phi_diff_pos))]
+
+        phi_diff_neg = [i for i in phi_diff if i < 0]
+
+        phi_n_1 = phi_list[phi_diff.index(max(phi_diff_neg))]
+
+        phi_n_idx = get_multiple_indices(phi_list, phi_n)
+        g_v_phi_n = g_v_list[phi_n_idx[0]]
+
+        phi_n_1_idx = get_multiple_indices(phi_list, phi_n_1)
+        g_v_phi_n_1 = g_v_list[phi_n_1_idx[0]]
+
+        # g_v_phi_r AKA g_v_phi_r_interp
+        g_v_phi_r = ((phi_n_1 - phi_r) * g_v_phi_n + (phi_r - phi_n)
+                     * g_v_phi_n_1) / (phi_n_1 - phi_n)
+    return g_v_phi_r
 
 
 def get_given_2d_pattern_gains(
@@ -517,6 +561,7 @@ def get_given_2d_pattern_gains(
         g_h_theta_r = _get_horz_gain_at_theta_r(theta_r, hor_pattern)
 
     if ver_pattern is not None:
+        g_v_phi_r = _get_vert_gain_at_phi_r(phi_r, ver_pattern)
 
         phi_list = list(ver_pattern['angle'])
 
