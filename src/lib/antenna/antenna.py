@@ -252,13 +252,13 @@ def c_antenna_gain(
 
 
 def d_antenna_gain(
-    dirs: Union[Mapping, Iterable],
-    ant_az: float,
-    peak_ant_gain: int,
-    hor_patt: Mapping,
-    downtilt: float,
-    ver_beamwidth: float,
-    fbr: float
+    dirs: Dict[str, Union[int, float]],
+    ant_az: Union[int, float],
+    peak_ant_gain: Union[int, float],
+    hor_patt: Dict[str, List[Union[int, float]]],
+    downtilt: Union[int, float],
+    ver_beamwidth: Union[int, float],
+    fbr: Union[int, float],
 ) -> Union[Mapping, np.ndarray]:
     """REL2-R3-SGN-52107: Method D based Antenna Gain Calculation:
     Use of two one-dimensional antenna patterns (denoted as GH(theta) and GV(phi), respectively),
