@@ -426,10 +426,59 @@ def get_standard_2d_gains(
     return g_h_theta_r, g_v_phi_r
 
 
+def _get_horz_gain_at_theta_r(
+    theta_r: Union[float, int],
+    hor_pattern: Optional[Dict[str, List[int]]]
+) -> Union[np.ndarray, float, int]:
+    """
+    Subfunction of get_given_2d_pattern_gains, which is specified in:
+    REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
+
+    Computes the horizontal gain at theta_r angle relative to peak antenna gain, given an antenna pattern.
+
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.
+
+    Args:
+        theta_r: the angle at which to compute the horizontal gain
+        hor_pattern: contains horizontal plane angles and associated gains
+
+    Returns:
+        g_h_theta_r:  cbsd horizontal antenna gain(dB) at theta_r angle relative to peak antenna gain
+    """
+    theta_list = hor_pattern['angle']
+    g_h_list = hor_pattern['gain']
+    theta_r_idx = get_multiple_indices(theta_list, theta_r)
+    if theta_r_idx:
+        g_h_theta_r = g_h_list[theta_r_idx[0]]
+    else:
+        # Find the two values that are closest to theta, one being positive, the other being negative
+        theta_diff = [theta_r - i for i in theta_list]
+        theta_diff_pos = [i for i in theta_diff if i > 0]
+        # positive
+        theta_m = theta_list[theta_diff.index(min(theta_diff_pos))]
+
+        theta_diff_neg = [i for i in theta_diff if i < 0]
+        # negative
+        theta_m_1 = theta_list[theta_diff.index(max(theta_diff_neg))]
+
+        theta_m_idx = get_multiple_indices(theta_list, theta_m)
+        g_h_theta_m = g_h_list[theta_m_idx[0]]
+
+        theta_m_1_idx = get_multiple_indices(theta_list, theta_m_1)
+        g_h_theta_m_1 = g_h_list[theta_m_1_idx[0]]
+
+        # g_h_theta_r AKA g_h_theta_r_interp
+        g_h_theta_r = ((theta_m_1 - theta_r) * g_h_theta_m + (theta_r - theta_m) *
+                       g_h_theta_m_1) / (theta_m_1 - theta_m)
+    return g_h_theta_r
+
+
+
 def get_given_2d_pattern_gains(
-    dirs,
-    hor_pattern: Optional[Mapping] = None,
-    ver_pattern: Optional[Mapping] = None,
+    dirs: Dict[str, Union[Union[int, float], Iterable]],
+    hor_pattern: Optional[Dict[str, List[int]]] = None,
+    ver_pattern: Optional[Dict[str, List[int]]] = None,
     ant_azimuth: Optional[float] = None,
     ant_mech_downtilt: Optional[float] = None
 ) -> Tuple[Union[List, float], ...]:
@@ -465,31 +514,7 @@ def get_given_2d_pattern_gains(
     g_v_phi_rsup = []
 
     if hor_pattern is not None:
-        theta_list = hor_pattern['angle']
-        g_h_list = hor_pattern['gain']
-        theta_r_idx = get_multiple_indices(theta_list, theta_r)
-        if theta_r_idx:
-            g_h_theta_r = g_h_list[theta_r_idx[0]]
-        else:
-            # Find the two values that are closest to theta, one being positive, the other being negative
-            theta_diff = [theta_r - i for i in theta_list]
-            theta_diff_pos = [i for i in theta_diff if i > 0]
-            # positive
-            theta_m = theta_list[theta_diff.index(min(theta_diff_pos))]
-
-            theta_diff_neg = [i for i in theta_diff if i < 0]
-            # negative
-            theta_m_1 = theta_list[theta_diff.index(max(theta_diff_neg))]
-
-            theta_m_idx = get_multiple_indices(theta_list, theta_m)
-            g_h_theta_m = g_h_list[theta_m_idx[0]]
-
-            theta_m_1_idx = get_multiple_indices(theta_list, theta_m_1)
-            g_h_theta_m_1 = g_h_list[theta_m_1_idx[0]]
-
-            # g_h_theta_r AKA g_h_theta_r_interp
-            g_h_theta_r = ((theta_m_1 - theta_r) * g_h_theta_m + (theta_r - theta_m) *
-                           g_h_theta_m_1) / (theta_m_1 - theta_m)
+        g_h_theta_r = _get_horz_gain_at_theta_r(theta_r, hor_pattern)
 
     if ver_pattern is not None:
 
