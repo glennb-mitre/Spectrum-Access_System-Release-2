@@ -518,6 +518,57 @@ def _get_vert_gain_at_phi_r(
                      * g_v_phi_n_1) / (phi_n_1 - phi_n)
     return g_v_phi_r
 
+def _get_vert_gain_at_supp_angle_of_phi_r(
+    phi_r: Union[float, int],
+    ver_pattern: Dict[str, List[int]]
+):
+    """
+    Subfunction of get_given_2d_pattern_gains, which is specified in:
+    REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
+
+    Computes the vertical gain at the supplementary angle of phi_r angle
+    relative to peak antenna gain, given an antenna pattern.
+
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.
+
+    Args:
+        phi_r: the angle at which to compute the vertical gain
+        ver_pattern: contains vertical plane angles and associated gains
+
+    Returns:
+        g_v_phi_rsup: cbsd vertical antenna gain(dB) at supplementary angle of
+            phi_r (180-phi_r), relative to peak antenna gain
+    """
+    phi_list = list(ver_pattern['angle'])
+    g_v_list = list(ver_pattern['gain'])
+
+    phi_r_supplementary_angle = 180 - phi_r
+    phi_r_supplementary_angle = np.atleast_1d(phi_r_supplementary_angle)
+    phi_r_supplementary_angle[phi_r_supplementary_angle >= 180] -= 360
+
+    phi_rs_idx = get_multiple_indices(phi_list, phi_r_supplementary_angle)
+    if phi_rs_idx:
+        g_v_phi_rsup = g_v_list[phi_rs_idx[0]]
+    else:
+        phi_rsup_diff = [phi_r_supplementary_angle - i for i in phi_list]
+        phi_rs_diff_pos = [i for i in phi_rsup_diff if i > 0]
+        phi_k = phi_list[phi_rsup_diff.index(min(phi_rs_diff_pos))]
+
+        phi_rs_diff_neg = [i for i in phi_rsup_diff if i < 0]
+        phi_k_1 = phi_list[phi_rsup_diff.index(max(phi_rs_diff_neg))]
+
+        phi_k_idx = get_multiple_indices(phi_list, phi_k)
+        g_v_phi_k = g_v_list[phi_k_idx[0]]
+
+        phi_k_1_idx = get_multiple_indices(phi_list, phi_k_1)
+        g_v_phi_k_1 = g_v_list[phi_k_1_idx[0]]
+
+        # g_v_phi_rsup AKA g_v_phi_rsup_interp
+        g_v_phi_rsup = ((phi_k_1 - phi_r_supplementary_angle) * g_v_phi_k + (
+                phi_r_supplementary_angle - phi_k) * g_v_phi_k_1) / (phi_k_1 - phi_k)
+    return g_v_phi_rsup
+
 
 def get_given_2d_pattern_gains(
     dirs: Dict[str, Union[Union[int, float], Iterable]],
@@ -563,61 +614,7 @@ def get_given_2d_pattern_gains(
     if ver_pattern is not None:
         g_v_phi_r = _get_vert_gain_at_phi_r(phi_r, ver_pattern)
 
-        phi_list = list(ver_pattern['angle'])
-
-        g_v_list = list(ver_pattern['gain'])
-        phi_r_idx = get_multiple_indices(phi_list, phi_r)
-
-        phi_r_supplementary_angle = 180 - phi_r
-        phi_r_supplementary_angle = np.atleast_1d(phi_r_supplementary_angle)
-
-        # if(phi_r_supplementary_angle>180 or phi_r_supplementary_angle<-180):
-        # print("stop")
-
-        phi_r_supplementary_angle[phi_r_supplementary_angle >= 180] -= 360
-
-        phi_rs_idx = get_multiple_indices(phi_list, phi_r_supplementary_angle)
-
-        if phi_r_idx:
-            g_v_phi_r = g_v_list[phi_r_idx[0]]
-        else:
-            phi_diff = [phi_r - i for i in phi_list]
-            phi_diff_pos = [i for i in phi_diff if i > 0]
-            phi_n = phi_list[phi_diff.index(min(phi_diff_pos))]
-
-            phi_diff_neg = [i for i in phi_diff if i < 0]
-
-            phi_n_1 = phi_list[phi_diff.index(max(phi_diff_neg))]
-
-            phi_n_idx = get_multiple_indices(phi_list, phi_n)
-            g_v_phi_n = g_v_list[phi_n_idx[0]]
-
-            phi_n_1_idx = get_multiple_indices(phi_list, phi_n_1)
-            g_v_phi_n_1 = g_v_list[phi_n_1_idx[0]]
-
-            # g_v_phi_r AKA g_v_phi_r_interp
-            g_v_phi_r = ((phi_n_1 - phi_r) * g_v_phi_n + (phi_r - phi_n) * g_v_phi_n_1) / \
-                        (phi_n_1 - phi_n)
-
-        if phi_rs_idx:
-            g_v_phi_rsup = g_v_list[phi_rs_idx[0]]
-        else:
-            phi_rsup_diff = [phi_r_supplementary_angle - i for i in phi_list]
-            phi_rs_diff_pos = [i for i in phi_rsup_diff if i > 0]
-            phi_k = phi_list[phi_rsup_diff.index(min(phi_rs_diff_pos))]
-
-            phi_rs_diff_neg = [i for i in phi_rsup_diff if i < 0]
-            phi_k_1 = phi_list[phi_rsup_diff.index(max(phi_rs_diff_neg))]
-
-            phi_k_idx = get_multiple_indices(phi_list, phi_k)
-            g_v_phi_k = g_v_list[phi_k_idx[0]]
-
-            phi_k_1_idx = get_multiple_indices(phi_list, phi_k_1)
-            g_v_phi_k_1 = g_v_list[phi_k_1_idx[0]]
-
-            # g_v_phi_rsup AKA g_v_phi_rsup_interp
-            g_v_phi_rsup = ((phi_k_1 - phi_r_supplementary_angle) * g_v_phi_k + (
-                    phi_r_supplementary_angle - phi_k) * g_v_phi_k_1) / (phi_k_1 - phi_k)
+        g_v_phi_rsup = _get_vert_gain_at_supp_angle_of_phi_r(phi_r, ver_pattern)
 
     return g_h_theta_r, g_v_phi_r, g_v_phi_rsup
 
