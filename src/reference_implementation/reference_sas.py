@@ -61,6 +61,7 @@ import sys
 import tempfile
 import uuid
 from datetime import datetime, timedelta
+from typing import Dict, List, Tuple, Optional, Union, NoReturn
 
 import six
 from OpenSSL import crypto
@@ -70,8 +71,6 @@ from six.moves.BaseHTTPServer import HTTPServer
 
 import sas_interface
 
-from typing import Dict, List, Tuple, Optional, Union, NoReturn
-# from sas_types_pydantic import *
 from sas_types_pydantic import (
     RegistrationRequest,
     EscSensorData,
@@ -163,17 +162,18 @@ class FakeSas(sas_interface.SasInterface):
         """
         response = {'registrationResponse': []}
         for req in request['registrationRequest']:
+            req = req.dict()
             if 'fccId' not in req or 'cbsdSerialNumber' not in req:
                 response['registrationResponse'].append(
                     {
-                        'response': self._GetSuccessResponse()
+                        'response': self._get_success_response()
                     }
                 )
                 continue
             response['registrationResponse'].append(
                 {
                     'cbsdId': req['fccId'] + '/' + req['cbsdSerialNumber'],
-                    'response': self._GetSuccessResponse()
+                    'response': self._get_success_response()
                 }
             )
         return response
@@ -207,6 +207,7 @@ class FakeSas(sas_interface.SasInterface):
         """
         response = {'spectrumInquiryResponse': []}
         for req in request['spectrumInquiryRequest']:
+            req = req.dict()
             response['spectrumInquiryResponse'].append(
                 {
                     'cbsdId': req['cbsdId'],
@@ -218,7 +219,7 @@ class FakeSas(sas_interface.SasInterface):
                         'channelType': 'GAA',
                         'ruleApplied': 'FCC_PART_96'
                     },
-                    'response': self._GetSuccessResponse()
+                    'response': self._get_success_response()
                 }
             )
         return response
@@ -250,10 +251,11 @@ class FakeSas(sas_interface.SasInterface):
         """
         response = {'grantResponse': []}
         for req in request['grantRequest']:
+            req = req.dict()
             if 'cbsdId' not in req:
                 response['grantResponse'].append(
                     {
-                        'response': self._GetMissingParamResponse()
+                        'response': self._get_missing_param_response()
                     }
                 )
             else:
@@ -262,7 +264,7 @@ class FakeSas(sas_interface.SasInterface):
                     response['grantResponse'].append(
                         {
                             'cbsdId': req['cbsdId'],
-                            'response': self._GetMissingParamResponse()
+                            'response': self._get_missing_param_response()
                         }
                     )
                 else:
@@ -271,7 +273,7 @@ class FakeSas(sas_interface.SasInterface):
                             'cbsdId': req['cbsdId'],
                             'grantId': f'fake_grant_id_{datetime.utcnow().isoformat()}',
                             'channelType': 'GAA',
-                            'response': self._GetSuccessResponse()
+                            'response': self._get_success_response()
                         }
                     )
         return response
@@ -305,6 +307,7 @@ class FakeSas(sas_interface.SasInterface):
         """
         response = {'heartbeatResponse': []}
         for req in request['heartbeatRequest']:
+            req = req.dict()
             transmit_expire_time = datetime.utcnow().replace(
                 microsecond=0
             ) + timedelta(minutes=1)
@@ -313,7 +316,7 @@ class FakeSas(sas_interface.SasInterface):
                     'cbsdId': req['cbsdId'],
                     'grantId': req['grantId'],
                     'transmitExpireTime': transmit_expire_time.isoformat() + 'Z',
-                    'response': self._GetSuccessResponse()
+                    'response': self._get_success_response()
                 }
             )
         return response
@@ -347,11 +350,12 @@ class FakeSas(sas_interface.SasInterface):
         """
         response = {'relinquishmentResponse': []}
         for req in request['relinquishmentRequest']:
+            req = req.dict()
             response['relinquishmentResponse'].append(
                 {
                     'cbsdId': req['cbsdId'],
                     'grantId': req['grantId'],
-                    'response': self._GetSuccessResponse()
+                    'response': self._get_success_response()
                 }
             )
         return response
@@ -385,17 +389,18 @@ class FakeSas(sas_interface.SasInterface):
         """
         response = {'deregistrationResponse': []}
         for req in request['deregistrationRequest']:
+            req = req.dict()
             if 'cbsdId' not in req:
                 response['deregistrationResponse'].append(
                     {
-                        'response': self._GetMissingParamResponse()
+                        'response': self._get_missing_param_response()
                     }
                 )
             else:
                 response['deregistrationResponse'].append(
                     {
                         'cbsdId': req['cbsdId'],
-                        'response': self._GetSuccessResponse()
+                        'response': self._get_success_response()
                     }
                 )
         return response
@@ -481,10 +486,10 @@ class FakeSas(sas_interface.SasInterface):
         )
         return response
 
-    def _GetSuccessResponse(self) -> Dict:
+    def _get_success_response(self) -> Dict:
         return {'responseCode': 0}
 
-    def _GetMissingParamResponse(self) -> Dict:
+    def _get_missing_param_response(self) -> Dict:
         return {'responseCode': MISSING_PARAM}
 
     def DownloadFile(
@@ -622,7 +627,8 @@ class FakeSasAdmin(sas_interface.SasAdminInterface):
                 SAS under test. For more information about ZoneData please see
                 the SAS-SAS TS (WINNF-16-S-0096) - Section 8.7.
         """
-        return request['record']['id']
+        zone_data_dict = request['record'].dict()
+        return zone_data_dict['id']
 
     def InjectPalDatabaseRecord(
         self,
@@ -897,7 +903,7 @@ class FakeSasHandler(BaseHTTPRequestHandler):
     """
 
     @classmethod
-    def SetVersion(cls, cbsd_sas_version: str, sas_sas_version: str) -> NoReturn:
+    def set_version(cls, cbsd_sas_version: str, sas_sas_version: str) -> NoReturn:
         """
         Sets the protocol version in use for the class.
 
@@ -908,7 +914,7 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         cls.cbsd_sas_version = cbsd_sas_version
         cls.sas_sas_version = sas_sas_version
 
-    def _parseUrl(self, url: str) -> Tuple[str, str]:
+    def _parse_url(self, url: str) -> Tuple[str, str]:
         """
         Parse the URL into the path and value.
 
@@ -925,7 +931,8 @@ class FakeSasHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         """Handles POST requests."""
-
+        # initialize request as an empty JSON string
+        request = ''
         length = int(self.headers.get('content-length'))
         if length > 0:
             request = json.loads(self.rfile.read(length))
@@ -995,7 +1002,7 @@ class FakeSasHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         """Handles GET requests."""
-        path, value = self._parseUrl(self.path)
+        path, value = self._parse_url(self.path)
         if path == f'{self.sas_sas_version}/esc_sensor':
             response = FakeSas().GetEscSensorRecord(value)
         elif path == f'{self.sas_sas_version}/dump':
@@ -1010,7 +1017,7 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         self.wfile.write(six.ensure_binary(json.dumps(response)))
 
 
-def ParseCrlIndex(index_filename: str) -> List[str]:
+def parse_crl_index(index_filename: str) -> List[str]:
     """Returns the list of CRL filenames from a CRL index file."""
     dirname = os.path.dirname(index_filename)
     with open(index_filename) as fp:
@@ -1018,13 +1025,13 @@ def ParseCrlIndex(index_filename: str) -> List[str]:
     return crl_file_names
 
 
-def RunFakeServer(
+def run_fake_server(
     cbsd_sas_version: str,
     sas_sas_version: str,
     is_ecc: bool,
     crl_index: str
 ) -> NoReturn:
-    FakeSasHandler.SetVersion(cbsd_sas_version, sas_sas_version)
+    FakeSasHandler.set_version(cbsd_sas_version, sas_sas_version)
     if is_ecc:
         assert ssl.HAS_ECDH
     server = HTTPServer(('localhost', PORT), FakeSasHandler)
@@ -1037,7 +1044,7 @@ def RunFakeServer(
         ssl_context.verify_flags = ssl.VERIFY_CRL_CHECK_CHAIN
 
         try:
-            crl_files = ParseCrlIndex(crl_index)
+            crl_files = parse_crl_index(crl_index)
         except IOError as e:
             print(f"Failed to parse CRL index file {crl_index}: {e}")
 
@@ -1097,4 +1104,4 @@ if __name__ == '__main__':
     config_parser.read(['sas.cfg'])
     cbsd_sas_version = config_parser.get('SasConfig', 'CbsdSasVersion')
     sas_sas_version = config_parser.get('SasConfig', 'SasSasVersion')
-    RunFakeServer(cbsd_sas_version, sas_sas_version, args.ecc, args.crl_index)
+    run_fake_server(cbsd_sas_version, sas_sas_version, args.ecc, args.crl_index)
