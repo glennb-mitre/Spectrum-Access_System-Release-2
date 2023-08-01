@@ -29,7 +29,6 @@ Typical usage:
   gains = GetFssAntennaGains(hor_dirs, ver_dirs,
                              fss_azimuth, fss_elevation, fss_ant_gain)
 """
-import typing, copy
 from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping, TypeVar
 import numpy as np
 from numpy.typing import NDArray
@@ -88,7 +87,7 @@ def limit_downtilt_value(downtilt: int) -> int:
     return downtilt
 
 
-def get_multiple_indices(lst: Union[Iterable[T], np.ndarray], key: T) -> Union[List[int], np.ndarray]:
+def get_multiple_indices(lst: Union[Iterable[T], np.ndarray], key: T) -> List[int]:
     """
     Find multiple list indices at which a certain value is found.
 
@@ -96,31 +95,15 @@ def get_multiple_indices(lst: Union[Iterable[T], np.ndarray], key: T) -> Union[L
 
     Args:
         lst (List of elements of type T): the List on which to search for the given key.
-        key (a value of type T): the element for which to obtain the indices in the lst at which the value
-            appears.
+        key (a value of type T): the element for which to obtain the indices in
+            the lst at which the value appears.
     """
     if isinstance(lst, np.ndarray):
-        return np.where(lst == key)
-    if isinstance(lst, typing.MutableSequence):
-        indices = []
-        lst_copy = copy.deepcopy(lst)
-        for _ in range(lst_copy.count(key)):
-            idx = lst_copy.index(key)
-            indices.append(idx)
-            # The Ellipsis ('...') is a Python type that is somewhat equivalent
-            # to NotImplemented. Here, it acts as a sort of Sentinel value
-            # because it is extremely unlikely that it would be used in any
-            # real data. We replace the appearance of the key value with the
-            # Ellipsis so that we can use the fast .index method multiple
-            # times. This technique is marginally faster than the (much neater
-            # and compact method of) using a list comprehension over an
-            # Enumerate object.
-            lst_copy[idx] = ...
-        return indices
+        # np.where returns a Tuple of np.ndarray objects
+        return list(np.where(lst == key)[0])
     if isinstance(lst, Iterable):
-        return [idx for idx,value in enumerate(lst) if value == key]
-    raise TypeError("lst must be either a numpy array (ndarray) or of an "
-                    "Iterable type.")
+        return [idx for idx, value in enumerate(lst) if value == key]
+    raise TypeError("lst must be of an Iterable type or Numpy NDArray.")
 
 
 def b1_antenna_gain(
@@ -501,25 +484,26 @@ def get_given_2d_pattern_gains(
 ) -> Tuple[Union[List, float], ...]:
     """ REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
-    Computes the gain at a given direction from a given antenna pattern(horizontal and vertical).
+    Computes the gain at a given direction from a given antenna pattern (horizontal and vertical).
 
     Directions and azimuth are defined compared to the north in clockwise
     direction and shall be within [0..360] degrees.
 
     Inputs:
-      hor_pattern: contains horizontal plane angles and associated gains
-      ver_pattern: contains vertical plane angles and associated gains
-
-      ant_azimuth:     Antenna azimuth (degrees).
-      ant_mechanical_downtilt: antenna mechanical downtilt(degrees), limited to +-15 degrees
+        hor_pattern: contains horizontal plane angles and associated gains
+        ver_pattern: contains vertical plane angles and associated gains
+        ant_azimuth: Antenna azimuth (degrees).
+        ant_mechanical_downtilt: antenna mechanical downtilt(degrees), limited
+            to +-15 degrees
 
     Outputs:
-      g_h_theta_r:  cbsd horizontal antenna gain(dB) at theta_r angle relative to peak antenna gain
-      g_v_phi_r:    cbsd vertical antenna gain(dB) at phi_r angle, relative to peak antenna gain
-      g_v_phi_rsup: cbsd vertical antenna gain(dB) at supplementary angle of phi_r(180-phi_r),
-                    relative to peak antenna gain
+        g_h_theta_r: cbsd horizontal antenna gain(dB) at theta_r angle relative
+            to peak antenna gain
+        g_v_phi_r: cbsd vertical antenna gain(dB) at phi_r angle, relative to
+            peak antenna gain
+        g_v_phi_rsup: cbsd vertical antenna gain(dB) at supplementary angle of
+            phi_r(180-phi_r), relative to peak antenna gain
     """
-
     # horizontal direction
     theta_r = dirs['hor']
 
