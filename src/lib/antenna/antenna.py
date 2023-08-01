@@ -32,6 +32,7 @@ Typical usage:
 import typing, copy
 from typing import List, Dict, Tuple, Optional, Union, Iterable, Mapping, TypeVar
 import numpy as np
+from numpy.typing import NDArray
 
 T = TypeVar("T")
 
@@ -570,6 +571,71 @@ def _get_vert_gain_at_supp_angle_of_phi_r(
     return g_v_phi_rsup
 
 
+def _get_gain_at_angle(
+    angle: Union[float, int, NDArray],
+    pattern: Dict[str, List[int]]
+) -> Union[NDArray, float, int]:
+    """
+    Calculates the gain at a given direction with a given antenna pattern.
+
+    Subfunction of get_given_2d_pattern_gains, which is specified in
+        REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
+
+    Depending on the inputs, this function computes one of the following:
+        g_h_theta_r: cbsd horizontal antenna gain(dB) at theta_r angle relative
+            to peak antenna gain
+        g_v_phi_r: cbsd vertical antenna gain(dB) at phi_r angle, relative to
+            peak antenna gain
+        g_v_phi_rsup: cbsd vertical antenna gain(dB) at supplementary angle of
+            phi_r(180-phi_r), relative to peak antenna gain
+
+    Args:
+        angle: the angle at which to compute the vertical gain OR horizontal
+            gain (depending on the pattern given)
+        pattern: contains either vertical plane angles and associated gains OR
+            horizontal plane angles and associated gains
+
+    Returns:
+        gain_at_given_direction_from_pattern: the CBSD horizontal OR vertical
+            gain at the given angle relative to the peak antenna gain
+    """
+    # this is either the list of angles from the horizontal pattern OR the list
+    # of angles from the vertical pattern
+    angle_list = pattern['angle']
+    # this is either the list of gains from the horizontal pattern OR the list
+    # of gains from the vertical pattern
+    gain_list = pattern['gain']
+
+    angle_idx_list = get_multiple_indices(angle_list, angle)
+    if angle_idx_list:
+        gain_at_given_direction_from_pattern = gain_list[angle_idx_list[0]]
+    else:
+        # Find the two values that are closest to angle, one being positive, the other being negative
+        angle_diff = [angle - i for i in angle_list]
+        positive_angle_diff = [i for i in angle_diff if i > 0]
+        # either theta_m, phi_n, or phi_k in the specification
+        angle_a_pos = angle_list[angle_diff.index(min(positive_angle_diff))]
+
+        negative_angle_diff = [i for i in angle_diff if i < 0]
+        # either theta_m_1, phi_n_1, or angle_a_neg in the spec
+        angle_a_neg = angle_list[angle_diff.index(max(negative_angle_diff))]
+
+        # the index at which angle_a_pos appears in angle_list
+        angle_a_pos_idx = get_multiple_indices(angle_list, angle_a_pos)
+        # the gain at the above index
+        gain_at_pos_angle_idx = gain_list[angle_a_pos_idx[0]]
+
+        # the index at which angle_a_neg appears in angle_list
+        angle_a_neg_idx = get_multiple_indices(angle_list, angle_a_neg)
+        # the gain at the above index
+        gain_at_neg_angle_idx = gain_list[angle_a_neg_idx[0]]
+
+        # either g_h_theta_r, g_v_phi_r, or g_v_phi_rsup in the Spec
+        gain_at_given_direction_from_pattern = ((angle_a_neg - angle) * gain_at_pos_angle_idx + (
+                    angle - angle_a_pos) * gain_at_neg_angle_idx) / (angle_a_neg - angle_a_pos)
+    return gain_at_given_direction_from_pattern
+
+
 def get_given_2d_pattern_gains(
     dirs: Dict[str, Union[Union[int, float], Iterable]],
     hor_pattern: Optional[Dict[str, List[int]]] = None,
@@ -609,12 +675,16 @@ def get_given_2d_pattern_gains(
     g_v_phi_rsup = []
 
     if hor_pattern is not None:
-        g_h_theta_r = _get_horz_gain_at_theta_r(theta_r, hor_pattern)
+        g_h_theta_r = _get_gain_at_angle(theta_r, hor_pattern)
 
     if ver_pattern is not None:
-        g_v_phi_r = _get_vert_gain_at_phi_r(phi_r, ver_pattern)
+        g_v_phi_r = _get_gain_at_angle(phi_r, ver_pattern)
 
-        g_v_phi_rsup = _get_vert_gain_at_supp_angle_of_phi_r(phi_r, ver_pattern)
+        phi_r_supplementary_angle = 180 - phi_r
+        phi_r_supplementary_angle = np.atleast_1d(phi_r_supplementary_angle)
+        phi_r_supplementary_angle[phi_r_supplementary_angle >= 180] -= 360
+
+        g_v_phi_rsup = _get_gain_at_angle(phi_r_supplementary_angle, ver_pattern)
 
     return g_h_theta_r, g_v_phi_r, g_v_phi_rsup
 
