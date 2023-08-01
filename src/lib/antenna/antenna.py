@@ -477,11 +477,11 @@ def _get_gain_at_angle(
 
 def get_given_2d_pattern_gains(
     dirs: Dict[str, Union[Union[int, float], Iterable]],
-    hor_pattern: Optional[Dict[str, List[int]]] = None,
-    ver_pattern: Optional[Dict[str, List[int]]] = None,
+    hor_pattern: Optional[Dict[str, List[Union[int, float]]]] = None,
+    ver_pattern: Optional[Dict[str, List[Union[int, float]]]] = None,
     ant_azimuth: Optional[float] = None,
     ant_mech_downtilt: Optional[float] = None
-) -> Tuple[Union[List, float], ...]:
+) -> Tuple[Union[List, float, NDArray], ...]:
     """ REL2-R3-SGN-52105: Method B1 based Antenna Gain Calculation, step a
 
     Computes the gain at a given direction from a given antenna pattern (horizontal and vertical).
