@@ -176,7 +176,8 @@ if __name__ == '__main__':
 
   # Run the tests
   
-  test = unittest.TestLoader().discover('testcases','WINNF_FT_S_PPR_testcase.py')
+  test = unittest.TestLoader().discover('testcases','WINNF_FT_S_REL2_RI_EAP_testcase.py')
+  #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_PAT_testcase.py')
   unittest.TextTestRunner(verbosity=2).run(test)
 
   

@@ -60,66 +60,87 @@ def calculate_antenna_gain_EAP(tx, rx):
     dirs["hor"] = incidence_angles.hor_cbsd
     dirs["ver"] = incidence_angles.ver_cbsd
     ant_database = import_antenna_pattern_database()
-    antennaModel = tx['installationParam']['antennaModel']
+    gain  = []
+    
+    if 'azimuth' not in tx['installationParam'] or not  tx['installationParam']['azimuth'] :
+        gain  = antenna_gain_method_f(dirs,tx['installationParam']['antennaGain'])
+        return gain
+    
+    if ('frontToBackRatio' not in tx['installationParam']) or not  tx['installationParam']['frontToBackRatio']:
+        tx['installationParam']['frontToBackRatio'] = 20
+
+    if 'antennaModel' in tx['installationParam']:
+        if tx['installationParam']['antennaModel']:        
+            antennaModel = tx['installationParam']['antennaModel'] 
+            if 'horizontalPattern' in antennaModel :
+                if antennaModel['horizontalPattern']:
+                    antennaPatternId = antennaModel['horizontalPattern']['antennaPatternId']
+                    for i, dic in enumerate(ant_database):
+                        if dic['antennaPatternId'] == antennaPatternId:
+                            patt_filename = os.path.dirname(os.path.realpath(__file__)) + '/antenna database/' + dic['azimuthRadiationPattern']
+                            break
+                    hor_pattern = {}
+                    angles = []
+                    gains = []
+                    with open(patt_filename,'r') as csvfile:
+                        csv_reader = csv.reader(csvfile,delimiter=',')
+                        for row in csv_reader:
+                            if any(row):
+                                angles.append(float(row[0]))            
+                                gains.append(float(row[1]))
+                    hor_pattern['angle'] = list(angles)
+                    hor_pattern['gain'] = list(gains)
+                
+                    if 'antennaDowntilt'in tx['installationParam']:
+                        if tx['installationParam']['antennaDowntilt']:
+                            if 'verticalPattern' in antennaModel:
+                                if antennaModel['verticalPattern']:                               
+                                    ver_pattern = {}
+                                    angles = []
+                                    gains = []      
+                                    with open(patt_filename) as csvfile:
+                                        csv_reader = csv.reader(csvfile,delimiter=',')
+                                        for row in csv_reader:
+                                            if any(row):
+                                                angles.append(float(row[0]))            
+                                                gains.append(float(row[1]))              
+                                    ver_pattern['angle'] = list(angles)
+                                    ver_pattern['gain'] = list(gains)
+
+                                    gain  = antenna_gain_method_b1(
+                                        dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
+                                        hor_pattern, ver_pattern,tx['installationParam']['antennaDowntilt'])[0]
+                                    
+                                    return gain
+                                
+                            if 'antennaVerticalBeamwidth' in tx['installationParam']:
+                                if tx['installationParam']['antennaVerticalBeamwidth']:
+                                    gain = antenna_gain_method_d(dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
+                                                hor_pattern, tx['installationParam']['antennaDowntilt'],
+                                                tx['installationParam']['antennaVerticalBeamwidth'], 
+                                                tx['installationParam']['frontToBackRatio'])[0]
+                                    
+                                    return gain
+                                
+                    if not gain:
+                        gain  = antenna_gain_method_e(dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], hor_pattern)[0]
+
+                        return gain
+                
+                      
+    if all(k in tx['installationParam'] for k in ('antennaBeamwidth','antennaDowntilt', 'antennaVerticalBeamwidth')):
+        if  all((tx['installationParam']['antennaBeamwidth'],tx['installationParam']['antennaDowntilt'],tx['installationParam']['antennaVerticalBeamwidth'])):
+            gain = antenna_gain_method_c(dirs, tx['installationParam']['antennaGain'], tx['installationParam']['azimuth'],  
+                                tx['installationParam']['antennaDowntilt'], tx['installationParam']['antennaBeamwidth'],
+                                tx['installationParam']['antennaVerticalBeamwidth'], tx['installationParam']['frontToBackRatio'])[0]
+            return gain
+
+    if not gain:
+        gain  = antenna_gain_method_f(dirs,tx['installationParam']['antennaGain'])
 
     
-    if antennaModel['horizontalPattern']:
-        if antennaModel['verticalPattern']:
-            antennaPatternId = antennaModel['horizontalPattern']['antennaPatternId']
-            for i, dic in enumerate(ant_database):
-                if dic['antennaPatternId'] == antennaPatternId:
-                    hor_patt_filename = os.path.dirname(os.path.realpath(__file__)) + '/antenna database/' + dic['azimuthRadiationPattern']
-                    ver_patt_filename = os.path.dirname(os.path.realpath(__file__)) + '/antenna database/' + dic['elevationRadiationPattern']
-                    break
-            hor_pattern = {}
-            angles = []
-            gains = []
-            with open(hor_patt_filename,'r') as csvfile:
-                csv_reader = csv.reader(csvfile,delimiter=',')
-                for row in csv_reader:
-                    if any(row):
-                        angles.append(float(row[0]))            
-                        gains.append(float(row[1]))
-            hor_pattern['angle'] = list(angles)
-            hor_pattern['gain'] = list(gains)
-
-            ver_pattern = {}
-
-            angles = []
-            gains = []      
-            with open(ver_patt_filename) as csvfile:
-                csv_reader = csv.reader(csvfile,delimiter=',')
-                for row in csv_reader:
-                    if any(row):
-                        angles.append(float(row[0]))            
-                        gains.append(float(row[1]))              
-            ver_pattern['angle'] = list(angles)
-            ver_pattern['gain'] = list(gains)
-
-            gain  = b1_antenna_gain(
-                dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
-                hor_pattern, ver_pattern,tx['installationParam']['antennaDowntilt'] )
         
-        elif(tx['installationParam']['antennaDowntilt'] and tx['installationParam']
-             ['antennaVerticalBeamwidth'] and tx['installationParam']['frontToBackRatio']):
-            gain = d_antenna_gain(
-                dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
-                hor_pattern, tx['installationParam']['antennaDowntilt'],
-                tx['installationParam']['antennaVerticalBeamwidth'], 
-                tx['installationParam']['frontToBackRatio'])
-        else:
-            gain  = antenna_gain_method_e(dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], hor_pattern)
-
-    elif(tx['installationParam']['antennaDowntilt'] and tx['installationParam']['antennaBeamwidth'],
-         tx['installationParam']['antennaVerticalBeamwidth'] and tx['installationParam']['frontToBackRatio']):
-        
-        gain = c_antenna_gain(dirs, tx['installationParam']['azimuth'], tx['installationParam']['antennaGain'], 
-                              tx['installationParam']['antennaDowntilt'], tx['installationParam']['antennaBeamwidth'],
-                              tx['installationParam']['antennaVerticalBeamwidth'], tx['installationParam']['frontToBackRatio'])
-    else:
-
-        
-        print(gain)
+    return gain
         
     
 def antenna_gain_method_b1(dirs, ant_az, peak_ant_gain,
@@ -426,7 +447,7 @@ def antenna_gain_method_e(dirs, ant_az, peak_ant_gain, hor_patt):
 
     return gain_two_dimensional
 
-def antenna_gain_method_f(dirs,ant_az,peak_ant_gain,hor_beamwidth):
+def antenna_gain_method_f(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
     """Computes the antenna gains from a standard antenna defined by beamwidth.
 
     See R2-SGN-20.
@@ -447,6 +468,7 @@ def antenna_gain_method_f(dirs,ant_az,peak_ant_gain,hor_beamwidth):
       The CBSD antenna gains (in dB).
       Either a scalar if hor_dirs is scalar or an ndarray otherwise.
     """
+    hor_dirs = dirs['hor']
     is_scalar = np.isscalar(hor_dirs)
     hor_dirs = np.atleast_1d(hor_dirs)
 

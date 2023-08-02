@@ -1,7 +1,7 @@
 {
   "fccId": "test_fcc_id_a7",
   "userId": "test_user_id_a7",
-  "SerialNumber": "test_serial_number_a7",
+  "cbsdSerialNumber": "test_serial_number_a7",
   "callSign": "callsign_a7",
   "cbsdCategory": "A",
   "airInterface": {

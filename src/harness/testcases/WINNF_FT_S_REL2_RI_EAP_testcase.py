@@ -29,7 +29,7 @@ from util import writeConfig, loadConfig, configurable_testcase, \
   getRandomLatLongInPolygon, makePpaAndPalRecordsConsistent, \
   getCertFilename, getCertificateFingerprint, \
   getFqdnLocalhost, getUnusedPort, json_load
-from reference_models.pre_iap_filtering import pre_iap_filtering
+from reference_models.antenna import antenna
 from database import DatabaseServer
 from test_harness_objects import DomainProxy
 from reference_models.dpa import dpa_mgr
@@ -41,6 +41,12 @@ LOW_FREQUENCY_LIMIT_HZ = 3550000000
 HIGH_FREQUENCY_LIMIT_HZ = 3650000000
 ONE_MHZ = 1000000
 
+def calculate_ref_ant_gain(request):
+    tx = request['cbsd']
+    rx = request['protection_point']
+    gain =  antenna.calculate_antenna_gain_EAP(tx,rx)
+    return gain
+
 class EapProtectionTestcase(McpXprCommonTestcase):
 
   def setUp(self):
@@ -50,32 +56,45 @@ class EapProtectionTestcase(McpXprCommonTestcase):
   def tearDown(self):
     self.ShutdownServers()
 
-
-  def test_WINNF_FT_S_REL2_RI_EAP_1(self, config_filename):
+  def generate_EAP_1_default_config(self, filename):
+    print("test")
+  def test_WINNF_FT_S_REL2_RI_EAP_1(self):
     """Interference calculation using the Enhanced Antenna Pattern"""
     num_cbsd = 12
     device_cat = 'a'
     registration_request = []
     cat_b_devices = []
-    for cbsdIdx in num_cbsd:
-      device_filename_cat_a = 'device_a' + str(cbsdIdx) + '.json'
+    for cbsdIdx in range(0,num_cbsd):
+      device_filename_cat_a = '/device_a' + str(cbsdIdx+1) + '.json'
       device_a = json_load(
-        os.path.join('testcases', 'testdata', device_filename_cat_a))
-      device_filename_cat_b = 'device_a' + str(cbsdIdx) + '.json'
+        os.path.join('testcases', 'testdata', 'EAP_test_data' + device_filename_cat_a))
+      device_filename_cat_b = '/device_b' + str(cbsdIdx+1) + '.json'
       device_b = json_load(
-        os.path.join('testcases', 'testdata', device_filename_cat_b))
+        os.path.join('testcases', 'testdata', 'EAP_test_data'+ device_filename_cat_b))
       
       registration_request.append(device_a)
       registration_request.append(device_b)
 
-      request = {'registrationRequest': registration_request}
-      response = self._sas.Registration(request)['registrationResponse']
+    
+    protection_point = {}
+    protection_point['latitude'] = 39.5
+    protection_point['longitude']= -112.9
+    protection_point['height'] = 9
+    request = {'registrationRequest': registration_request}
+    response = self._sas.Registration(request)['registrationResponse'] 
 
     # Check registration response
     cbsd_ids = []
     for resp in response:
       self.assertEqual(resp['response']['responseCode'], 0)
-      cbsd_ids.append(resp['cbsdId'])
+    for cbsdIdx in range(10,num_cbsd*2):
+    #for cbsdIdx in range(20,num_cbsd*2):
+
+      req = {'cbsd':request['registrationRequest'][cbsdIdx],'protection_point': protection_point}
+      ref_response = calculate_ref_ant_gain(req)
+    #cbsd_ids.append(resp['cbsdId'])
+
+    
     del request, response
       
     

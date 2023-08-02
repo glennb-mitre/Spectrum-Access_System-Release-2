@@ -247,7 +247,7 @@ def computeInterferencePpaGwpzPoint(cbsd_grant, constraint, h_inc_ant,
                                      region=region_type)
 
   # Compute CBSD antenna gain in the direction of protection point
-  ant_gain = antenna.GetStandardAntennaGains(incidence_angles.hor_cbsd,
+  ant_gain = antenna.calculate_antenna_gain_EAP(incidence_angles.hor_cbsd,
                cbsd_grant.antenna_azimuth, cbsd_grant.antenna_beamwidth,
                cbsd_grant.antenna_gain)
 
@@ -308,7 +308,7 @@ def computeInterferenceEsc(cbsd_grant, constraint, esc_antenna_info, max_eirp):
       freq_mhz=FREQ_PROP_MODEL_MHZ)
 
   # Compute CBSD antenna gain in the direction of protection point
-  ant_gain = antenna.GetStandardAntennaGains(
+  ant_gain = antenna.calculate_antenna_gain_EAP(
       incidence_angles.hor_cbsd, cbsd_grant.antenna_azimuth,
       cbsd_grant.antenna_beamwidth, cbsd_grant.antenna_gain)
 
@@ -351,7 +351,7 @@ def computeInterferenceFssCochannel(cbsd_grant, constraint, fss_info, max_eirp):
                                    reliability=-1, freq_mhz=FREQ_PROP_MODEL_MHZ)
 
   # Compute CBSD antenna gain in the direction of protection point
-  ant_gain = antenna.GetStandardAntennaGains(incidence_angles.hor_cbsd,
+  ant_gain = antenna.calculate_antenna_gain_EAP(incidence_angles.hor_cbsd,
                cbsd_grant.antenna_azimuth, cbsd_grant.antenna_beamwidth,
                cbsd_grant.antenna_gain)
 
@@ -435,7 +435,7 @@ def computeInterferenceFssBlocking(cbsd_grant, constraint, fss_info, max_eirp):
                                    freq_mhz=FREQ_PROP_MODEL_MHZ)
 
   # Compute CBSD antenna gain in the direction of protection point
-  ant_gain = antenna.GetStandardAntennaGains(incidence_angles.hor_cbsd,
+  ant_gain = antenna.calculate_antenna_gain_EAP(incidence_angles.hor_cbsd,
                cbsd_grant.antenna_azimuth, cbsd_grant.antenna_beamwidth,
                cbsd_grant.antenna_gain)
 
