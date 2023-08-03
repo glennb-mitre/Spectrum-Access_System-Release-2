@@ -127,7 +127,7 @@ MISSING_PARAM = 102
 INVALID_PARAM = 103
 
 
-class FakeSas(sas_interface.SasInterface):
+class ReferenceSas(sas_interface.SasInterface):
     """ A fake implementation of SasInterface.
 
     Returns success for all requests with plausible fake values for all required
@@ -507,7 +507,7 @@ class FakeSas(sas_interface.SasInterface):
         pass
 
 
-class FakeSasAdmin(sas_interface.SasAdminInterface):
+class ReferenceSasAdmin(sas_interface.SasAdminInterface):
     """Implementation of SAS Admin for this Reference SAS Implementation."""
 
     def Reset(self):
@@ -937,30 +937,30 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         if length > 0:
             request = json.loads(self.rfile.read(length))
         if self.path == f'/{self.cbsd_sas_version}/registration':
-            response = FakeSas().Registration(request)
+            response = ReferenceSas().Registration(request)
         elif self.path == f'/{self.cbsd_sas_version}/spectrumInquiry':
-            response = FakeSas().SpectrumInquiry(request)
+            response = ReferenceSas().SpectrumInquiry(request)
         elif self.path == f'/{self.cbsd_sas_version}/grant':
-            response = FakeSas().Grant(request)
+            response = ReferenceSas().Grant(request)
         elif self.path == f'/{self.cbsd_sas_version}/heartbeat':
-            response = FakeSas().Heartbeat(request)
+            response = ReferenceSas().Heartbeat(request)
         elif self.path == f'/{self.cbsd_sas_version}/relinquishment':
-            response = FakeSas().Relinquishment(request)
+            response = ReferenceSas().Relinquishment(request)
         elif self.path == f'/{self.cbsd_sas_version}/deregistration':
-            response = FakeSas().Deregistration(request)
+            response = ReferenceSas().Deregistration(request)
         elif self.path == '/admin/injectdata/zone':
-            response = FakeSasAdmin().InjectZoneData(request)
+            response = ReferenceSasAdmin().InjectZoneData(request)
         elif self.path == '/admin/trigger/create_ppa':
-            response = FakeSasAdmin().TriggerPpaCreation(request)
+            response = ReferenceSasAdmin().TriggerPpaCreation(request)
         elif self.path == '/admin/get_daily_activities_status':
-            response = FakeSasAdmin().GetDailyActivitiesStatus()
+            response = ReferenceSasAdmin().GetDailyActivitiesStatus()
         elif self.path == '/admin/get_daily_activities_status':
-            response = FakeSasAdmin().GetDailyActivitiesStatus()
+            response = ReferenceSasAdmin().GetDailyActivitiesStatus()
         elif self.path == '/admin/get_ppa_status':
-            response = FakeSasAdmin().GetPpaCreationStatus()
+            response = ReferenceSasAdmin().GetPpaCreationStatus()
         elif self.path == '/admin/query/propagation_and_antenna_model':
             try:
-                response = FakeSasAdmin().QueryPropagationAndAntennaModel(request)
+                response = ReferenceSasAdmin().QueryPropagationAndAntennaModel(request)
             except ValueError:
                 self.send_response(400)
                 self.end_headers()
@@ -1004,9 +1004,9 @@ class FakeSasHandler(BaseHTTPRequestHandler):
         """Handles GET requests."""
         path, value = self._parse_url(self.path)
         if path == f'{self.sas_sas_version}/esc_sensor':
-            response = FakeSas().GetEscSensorRecord(value)
+            response = ReferenceSas().GetEscSensorRecord(value)
         elif path == f'{self.sas_sas_version}/dump':
-            response = FakeSas().GetFullActivityDump(self.sas_sas_version)
+            response = ReferenceSas().GetFullActivityDump(self.sas_sas_version)
         else:
             self.send_response(404)
             self.end_headers()
