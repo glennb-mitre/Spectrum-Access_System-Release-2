@@ -77,7 +77,7 @@ class CbsdInfo(BaseModel, extra=Extra.allow):
 class RadioTechnologyEnum(str, Enum):
     """
     Used to specify the possible choices for the 'radio_technology' parameter of an AirInterface object
-    The peritted values are specified in section 6 of <2>
+    The permitted values are specified in section 6 of <2>
     """
     E_UTRA = "E_UTRA"
     CAMBRIUM_NETWORKS = "CAMBRIUM_NETWORKS"
