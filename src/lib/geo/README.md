@@ -26,7 +26,7 @@ the CONFIG.py file to point to upper level folders:
  
 Modify the CONFIG.py file if using other locations.
 
-You can use the top level `reference_models/test_config.py` script to validate
+You can use the top level `lib/test/test_config.py` script to validate
 the integrity of your geo databases and proper setup:
 
 ```

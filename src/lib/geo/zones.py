@@ -47,9 +47,6 @@ Interface:
   GetUsBorder()
   GetUrbanAreas()
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import logging
 import os
@@ -61,7 +58,7 @@ from pykml import parser
 import zipfile
 import six
 
-from reference_models.geo import CONFIG
+from lib.geo import CONFIG
 
 
 # The reference files.

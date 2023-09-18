@@ -32,18 +32,14 @@ For WinnForum use, only 3 classification are used:
 # from those files.
 # See the src/data/ directory for the scripts doing the regridding.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import threading
 import time
 
 import numpy as np
 
-from reference_models.geo import CONFIG
-from reference_models.geo import tiles
+from lib.geo import CONFIG
+from lib.geo import tiles
 
 
 class LandCoverCodes:

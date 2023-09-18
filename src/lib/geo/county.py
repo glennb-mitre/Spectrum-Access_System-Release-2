@@ -13,9 +13,10 @@
 #    limitations under the License.
 
 """Driver for access to County data."""
+
 import json
 import os
-from reference_models.geo import CONFIG
+from lib.geo import CONFIG
 
 class CountyDriver(object):
   def __init__(self, county_directory=None):

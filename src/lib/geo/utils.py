@@ -15,10 +15,6 @@
 """Utility geometry routines.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import json
 import numpy as np
 import shapely.geometry as sgeo
@@ -26,8 +22,8 @@ import shapely.ops as ops
 import six
 from six.moves import zip
 
-from reference_models.geo import vincenty
-from reference_models.geo import zones
+from lib.geo import vincenty
+from lib.geo import zones
 
 
 WGS_EQUATORIAL_RADIUS_KM2 = 6378.137

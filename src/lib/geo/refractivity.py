@@ -18,10 +18,6 @@ Standalone execution:
   python refractivity.py lat lng
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import logging
 import math
 import os
@@ -29,7 +25,7 @@ import sys
 
 import numpy as np
 
-from reference_models.geo import CONFIG
+from lib.geo import CONFIG
 
 
 class RefractivityIndexer:

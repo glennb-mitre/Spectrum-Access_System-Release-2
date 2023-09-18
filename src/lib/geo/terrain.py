@@ -25,9 +25,6 @@ Original data available at: https://nationalmap.gov/3DEP/.
 # - there is a standard 6-pixel overlap between tiles
 # The terrain tiles are stored in the directory referenced by:
 #     CONFIG.GetTerrainDir()
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import os
 import threading
@@ -35,9 +32,9 @@ import time
 
 import numpy as np
 
-from reference_models.geo import CONFIG
-from reference_models.geo import tiles
-from reference_models.geo import vincenty
+from lib.geo import CONFIG
+from lib.geo import tiles
+from lib.geo import vincenty
 
 
 _RADIUS_EARTH_METERS = 6378.e3 # Mean radius of the Earth in km

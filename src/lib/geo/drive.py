@@ -14,15 +14,12 @@
 
 """Defines all the geo drivers singletons.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
-from reference_models.geo import nlcd
-from reference_models.geo import refractivity
-from reference_models.geo import tropoclim
-from reference_models.geo import terrain
-from reference_models.geo import county
+from lib.geo import nlcd
+from lib.geo import refractivity
+from lib.geo import tropoclim
+from lib.geo import terrain
+from lib.geo import county
 
 
 # Initialize all drivers singletons:

@@ -20,10 +20,6 @@ when reading a tile (such as missing tile) and fail gracefully.
 Also provides a simple statistic counter for tile hit analysis.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 
 
