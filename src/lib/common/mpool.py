@@ -46,10 +46,6 @@ pool.apply_async(...)
 #  - in a function that is not executed at time of import or within
 #    the routines delegated to workers.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from functools import partial
 import multiprocessing
 import time
