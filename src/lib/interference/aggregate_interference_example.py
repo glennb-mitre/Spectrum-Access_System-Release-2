@@ -18,9 +18,6 @@
 # Expected result is dictionary containing aggregate interference
 # value at a protection constraint.
 # =============================================================================
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import json
 import os

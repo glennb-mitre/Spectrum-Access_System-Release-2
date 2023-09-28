@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules=["cache", "data", "mpool",]
+
+[project]
+name = "sas2_interference"
+version = "0.0.1"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
+dependencies = [
+    "json",
+    "logging",
+    "numpy",
+    "os",
+    "time",
+]
+classifiers=[
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+source ='https://github.com/Wireless-Innovation-Forum/Spectrum-Access_System-Release-2/tree/main/src/lib/interference/'
+bugtracker='https://github.com/Wireless-Innovation-Forum/Spectrum-Access_System-Release-2/issues/'
+
