@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules=["wf_itm", "wf_hybrid"]
+
+[project]
+name = "sas2_propagation"
+version = "0.0.1"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
+dependencies = [
+    "csv",
+    "math",
+    "numpy",
+    "os",
+    "random",
+    "six",
+    "unittest",
+]
+classifiers=[
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+source ='https://github.com/Wireless-Innovation-Forum/Spectrum-Access_System-Release-2/tree/main/src/lib/propagation/'
+bugtracker='https://github.com/Wireless-Innovation-Forum/Spectrum-Access_System-Release-2/issues/'
+

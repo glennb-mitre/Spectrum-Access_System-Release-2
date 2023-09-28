@@ -32,9 +32,6 @@ Typical usage:
               freq_mhz=3625.,
               region='URBAN')
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from collections import namedtuple
 import math
