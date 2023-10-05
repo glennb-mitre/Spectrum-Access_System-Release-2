@@ -3,7 +3,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules=["cache", "data", "mpool",]
+py-modules=["aggregate_interference_example", "aggregate_interference",]
 
 [project]
 name = "sas2_interference"
