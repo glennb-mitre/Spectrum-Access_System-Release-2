@@ -34,10 +34,6 @@
 #   - 'calcAggregatedInterference()': calculates the 95% quantile interference for one point
 #==================================================================================
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 from collections import namedtuple, defaultdict
 from enum import Enum
 import functools

@@ -30,10 +30,6 @@
 # Expected result is 'Move list output: [True, True, True, False, True, False]'.
 #================================================================================
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import json
 import os
 from collections import namedtuple

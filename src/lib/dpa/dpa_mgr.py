@@ -38,9 +38,6 @@ Example usage:
   # Check the interference according to Winnforum IPR tests
   status = dpa.CheckInterference(sas_uut_keep_list, margin_db=2)
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from collections import namedtuple
 from datetime import datetime

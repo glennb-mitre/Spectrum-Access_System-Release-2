@@ -27,9 +27,6 @@ A 'default' method is provided. See DpaProtectionMethod() docstring.
 To register a new buider method, use:
   RegisterMethod('mymethod', mymethod_fn)
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import ast
 from collections import namedtuple
