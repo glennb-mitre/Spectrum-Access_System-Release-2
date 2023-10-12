@@ -17,9 +17,6 @@
 This is just an example demonstrating how to call the propagation and antenna
 reference models.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from collections import namedtuple
 import numpy as np

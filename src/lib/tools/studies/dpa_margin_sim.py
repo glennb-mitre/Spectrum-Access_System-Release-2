@@ -158,9 +158,6 @@ Misc notes:
   and rerun detailed analysis with different parameters in interactive sessions
   (advanced use only).
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import argparse
 import copy

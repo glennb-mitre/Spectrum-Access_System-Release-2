@@ -18,9 +18,6 @@ Provides a fake propagation and interference engine that can be used to replace 
 actual models for unit testing functional modules.
 And some other test utilities.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from enum import Enum
 import glob

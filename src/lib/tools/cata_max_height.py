@@ -25,9 +25,6 @@ Usage:
 The tool can also be called on the command line:
   python cata_max_height.py 45 -73
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from reference_models.geo import drive
 

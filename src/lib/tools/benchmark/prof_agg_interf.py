@@ -22,9 +22,6 @@ where idx:
 
 Note: script derived from the aggregate_interference_example.py
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import json
 import os

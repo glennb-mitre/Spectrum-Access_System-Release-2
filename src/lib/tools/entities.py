@@ -18,9 +18,6 @@ Used solely for running various examples of the protection logic, or scenario
 generating scripts.
 This is *NOT* designed to be used within the actual test harness.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from collections import namedtuple
 import numpy as np

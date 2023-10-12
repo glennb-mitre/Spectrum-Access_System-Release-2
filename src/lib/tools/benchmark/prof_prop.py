@@ -23,9 +23,6 @@ Usage:
     - run:
       kernprof -l -v prof_prop.py > line_profile.txt
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from reference_models.propagation import wf_itm
 from reference_models.propagation import wf_hybrid
