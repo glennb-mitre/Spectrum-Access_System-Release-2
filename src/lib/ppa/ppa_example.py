@@ -17,9 +17,6 @@ PPA Reference Model Sample File
 Note: The county in the testdata is not the actual county, 
 it is only intended to be used for testing purpose.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import json
 import logging
