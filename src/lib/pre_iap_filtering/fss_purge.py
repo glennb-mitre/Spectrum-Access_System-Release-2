@@ -17,9 +17,6 @@
 This is a subset of the Pre-IAP reference model which implements the FSS purge list
 algorithm described in R2-SGN-29.
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 from collections import namedtuple
 import logging

@@ -18,9 +18,6 @@
   models to filter out grants and CBSDs before IAP model is invoked.
 ==================================================================================
 """
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
 
 import logging
 from reference_models.pre_iap_filtering import fss_purge
