@@ -63,7 +63,7 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
     return [empty_cbsd_records_domain_proxy] * number_of_elements
 
   def checkMcpConfig(self, config, test_type):
-    self.assertIn(test_type, ('MCP', 'xPR1', 'xPR2'))
+    self.assertIn(test_type, ('MCP', 'xPR1', 'xPR2','EAP2'))
 
     def checkFadConfiguration(fad_config):
       self.assertValidConfig(fad_config, {
@@ -116,7 +116,7 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
                 'clientCert': basestring,
                 'clientKey': basestring
             }, {'conditionalRegistrationData': dict})
-        if 'conditionalRegistrationData' in cbsd_record:
+        if 'conditionalRegistrationData' in cbsd_record and cbsd_record['conditionalRegistrationData']:
           self.assertIn('fccId', cbsd_record['conditionalRegistrationData'])
           self.assertIn('cbsdSerialNumber',
                         cbsd_record['conditionalRegistrationData'])
@@ -174,13 +174,13 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
     # Max. 1 iteration.
     self.assertEqual(
         len(config['iterationData']), 1,
-        'XPR test cases only have one iteration.')
+        'XPR/EAP2 test cases only have one iteration.')
 
     # No DPAs.
     if 'dpas' in config:
       self.assertEqual(
           len(config['dpas']), 0,
-          'XPR does not permit the use of DPAs.')
+          'XPR/EAP2 does not permit the use of DPAs.')
 
     # Max. one protected entity.
     protected_entities = config['iterationData'][0]['protectedEntities']
@@ -204,7 +204,7 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
       ]:
         self.assertEqual(
             getNumberOfEntities(entity_type), 0,
-            'May not define any additional protected entities in an xPR test case; found extra entities in "%s".'
+            'May not define any additional protected entities in an xPR/EAP2 test case; found extra entities in "%s".'
             % entity_type)
     else:
       entity_count = 0
@@ -214,16 +214,16 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
         entity_count += getNumberOfEntities(entity_type)
       self.assertEqual(
           entity_count, 1,
-          'Must define exactly one protected entity for an xPR test case.')
+          'Must define exactly one protected entity for an xPR/EAP2 test case.')
 
-    if test_type == 'xPR1':
+    if test_type == 'xPR1' or test_type == 'EAP2':
       # No SAS test harnesses.
       self.assertEqual(
           len(config['sasTestHarnessConfigs']), 0,
           'xPR.1 does not permit the use of SAS Test Harnesses.')
 
   def executeMcpTestSteps(self, config, test_type):
-    """Execute all teststeps for MCP testcase and for xPR testcases till Step22
+    """Execute all teststeps for MCP testcase and for xPR/EAP2 testcases till Step22
 
     Args:
       config: Testcase configuration
@@ -263,7 +263,7 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
       logging.info('Step 2: deactivate all DPAs')
       self._sas_admin.TriggerBulkDpaActivation({'activate': False})
     else:
-      logging.info('Skipping steps 1 and 2 because this is an xPR test.')
+      logging.info('Skipping steps 1 and 2 because this is an xPR/EAP2 test.')
 
     # Step 3: creates multiple SAS THs.
     logging.info('Step 3: create %d SAS test harnesses' % self.num_peer_sases)
@@ -317,7 +317,7 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
     self.agg_interf_check_executor.shutdown()
 
   def executeSingleMCPIteration(self, iteration_content):
-    """Executes the steps from Step 6 to [end] for MCP and XPR testcases
+    """Executes the steps from Step 6 to [end] for MCP and XPR/EAP2 testcases
 
     Args:
       iteration_content: A dictionary with multiple key-value pairs that contain iteration data
@@ -866,7 +866,7 @@ class McpXprCommonTestcase(sas_testcase.SasTestCase):
                                                cbsd_record['clientKey'])
       conditionalRegistrationData = [
           cbsd_record['conditionalRegistrationData']
-      ] if 'conditionalRegistrationData' in cbsd_record else []
+      ] if 'conditionalRegistrationData' in cbsd_record and cbsd_record['conditionalRegistrationData'] else []
       proxy.registerCbsdsAndRequestGrants([cbsd_record['registrationRequest']],
                                           [cbsd_record['grantRequest']],
                                           conditionalRegistrationData)

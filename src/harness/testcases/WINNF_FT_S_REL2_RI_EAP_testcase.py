@@ -35,7 +35,7 @@ from test_harness_objects import DomainProxy
 from reference_models.dpa import dpa_mgr
 from reference_models.common import data
 from common_types import ResponseCodes
-from testcases.WINNF_FT_S_MCP_testcase import McpXprCommonTestcase
+from WINNF_FT_S_MCP_testcase import McpXprCommonTestcase
 
 LOW_FREQUENCY_LIMIT_HZ = 3550000000
 HIGH_FREQUENCY_LIMIT_HZ = 3650000000
@@ -118,112 +118,115 @@ class EapProtectionTestcase(McpXprCommonTestcase):
                                   'test_user_1'
     )
 
-    # Load devices info
-    device_1 = json_load(
-      os.path.join('testcases', 'testdata', 'device_a.json'))
-    # Moving device_1 to a location within 40 KMs of PPA zone
-    device_1['installationParam']['latitude'] = 38.8203
-    device_1['installationParam']['longitude'] = -97.2741
+    num_cbsd = 12
+    device_idx_within_40km = [0,2,4,6,8,10]
+    lat_within_40km = [38.8203,38.5678,38.785,39.31476,39.0567,39.567]
+    lon_within_40km = [-97.2741,-97.145,-97.356,-96.75139,-96.657,-96.8897]
 
-    device_2 = json_load(
-      os.path.join('testcases', 'testdata', 'device_b.json'))
-    # Moving device_2 to a location outside 40 KMs of PPA zone
-    device_2['installationParam']['latitude'] = 39.31476
-    device_2['installationParam']['longitude'] = -96.75139
+    device_idx_inside_ppa = [1,3,5,7,9,11]
+    lat_inside_ppa = [38.8203,38.5678,38.785,39.31476,39.0567,39.567]
+    lon_inside_ppa = [-97.2741,-97.145,-97.356,-96.75139,-96.657,-96.8897]
 
-    device_3 = json_load(
-      os.path.join('testcases', 'testdata', 'device_c.json'))
-    # Moving device_3 to a location within PPA zone
-    device_3['installationParam']['latitude'], \
-    device_3['installationParam']['longitude'] = getRandomLatLongInPolygon(ppa_record_1)
+    registration_request = []
+    
 
-    device_4 = json_load(
-      os.path.join('testcases', 'testdata', 'device_d.json'))
-    # Moving device_4 to a location within PPA zone
-    device_4['installationParam']['latitude'], \
-    device_4['installationParam']['longitude'] = getRandomLatLongInPolygon(ppa_record_1)
+    device_idx_domain_proxy_0 = [0,1,2,3,4,5]
+    device_idx_domain_proxy_1 = [6,7,8,9,10,11]
 
-    # Load Grant requests
-    grant_request_1 = json_load(
-      os.path.join('testcases', 'testdata', 'grant_0.json'))
-    grant_request_1['operationParam']['operationFrequencyRange']['lowFrequency'] = 3550000000
-    grant_request_1['operationParam']['operationFrequencyRange']['highFrequency'] = 3560000000
+    grant_request_same_freq = json_load(
+      os.path.join('testcases', 'testdata', 'grant_params.json'))
+    grant_request_same_freq['operationParam']['operationFrequencyRange']['lowFrequency'] = 3560000000
+    grant_request_same_freq['operationParam']['operationFrequencyRange']['highFrequency'] = 3570000000
+    grant_req_list_0 = []
+    grant_req_list_1 = []
+    grant_req_list = []
+    reg_request_domain_proxy_0 = []
+    reg_request_domain_proxy_1 = []
 
-    grant_request_2 = json_load(
-      os.path.join('testcases', 'testdata', 'grant_1.json'))
-    grant_request_2['operationParam']['operationFrequencyRange']['lowFrequency'] = 3550000000
-    grant_request_2['operationParam']['operationFrequencyRange']['highFrequency'] = 3560000000
+    for cbsdIdx in range(0,num_cbsd-1):
+      device_filename_cat_a = '/device_a' + str(cbsdIdx+1) + '.json'
+      device_a = json_load(
+        os.path.join('testcases', 'testdata', 'EAP_test_data' + device_filename_cat_a))
+      device_filename_cat_b = '/device_b' + str(cbsdIdx+1) + '.json'
+      device_b = json_load(
+        os.path.join('testcases', 'testdata', 'EAP_test_data'+ device_filename_cat_b))
+      
+      if cbsdIdx in device_idx_within_40km:
+        tempIdx = [i for i,j in enumerate(device_idx_within_40km) if j== cbsdIdx]
+        device_a['installationParam']['latitude'] = lat_within_40km[tempIdx[0]]
+        device_b['installationParam']['longitude'] = lon_within_40km[tempIdx[0]]
+      
+      if cbsdIdx in device_idx_inside_ppa:
+        tempIdx = [i for i,j in enumerate(device_idx_inside_ppa) if j== cbsdIdx]
+        device_a['installationParam']['latitude'] = lat_inside_ppa[tempIdx[0]]
+        device_b['installationParam']['longitude'] = lon_inside_ppa[tempIdx[0]]
 
-    grant_request_3 = json_load(
-      os.path.join('testcases', 'testdata', 'grant_2.json'))
-    grant_request_3['operationParam']['operationFrequencyRange']['lowFrequency'] = 3550000000
-    grant_request_3['operationParam']['operationFrequencyRange']['highFrequency'] = 3560000000
+      if cbsdIdx in device_idx_domain_proxy_0:
+        reg_request_domain_proxy_0.append(device_a)
+        grant_req_list_0.append(grant_request_same_freq)
+        reg_request_domain_proxy_0.append(device_b)
+        grant_req_list_0.append(grant_request_same_freq)
+      elif cbsdIdx in device_idx_domain_proxy_1:
+        reg_request_domain_proxy_1.append(device_a)
+        grant_req_list_1.append(grant_request_same_freq)
+        reg_request_domain_proxy_1.append(device_b)
+        grant_req_list_1.append(grant_request_same_freq)
+      else:
+        registration_request.append(device_a)
+        grant_req_list.append(grant_request_same_freq)
+        registration_request.append(device_b)
+        grant_req_list.append(grant_request_same_freq)
 
-    grant_request_4 = json_load(
-      os.path.join('testcases', 'testdata', 'grant_0.json'))
-    grant_request_4['operationParam']['operationFrequencyRange']['lowFrequency'] = 3550000000
-    grant_request_4['operationParam']['operationFrequencyRange']['highFrequency'] = 3560000000
+      #grant_req_list.append(grant_request_same_freq)
 
-    # device_b and device_d are Category B
-    # Load Conditional Data
-    self.assertEqual(device_2['cbsdCategory'], 'B')
-    conditionals_device_2 = {
-        'cbsdCategory': device_2['cbsdCategory'],
-        'fccId': device_2['fccId'],
-        'cbsdSerialNumber': device_2['cbsdSerialNumber'],
-        'airInterface': device_2['airInterface'],
-        'installationParam': device_2['installationParam'],
-        'measCapability': device_2['measCapability']
-    }
-
-    self.assertEqual(device_4['cbsdCategory'], 'B')
-    conditionals_device_4 = {
-        'cbsdCategory': device_4['cbsdCategory'],
-        'fccId': device_4['fccId'],
-        'cbsdSerialNumber': device_4['cbsdSerialNumber'],
-        'airInterface': device_4['airInterface'],
-        'installationParam': device_4['installationParam'],
-        'measCapability': device_4['measCapability']
-    }
-
-    # Remove conditionals from registration
-    del device_2['cbsdCategory']
-    del device_2['airInterface']
-    del device_2['installationParam']
-    del device_2['measCapability']
-    del device_4['cbsdCategory']
-    del device_4['airInterface']
-    del device_4['installationParam']
-    del device_4['measCapability']
-
-    # Registration and grant records
     cbsd_records_domain_proxy_0 = {
-        'registrationRequests': [device_1, device_2],
-        'grantRequests': [grant_request_1, grant_request_2],
-        'conditionalRegistrationData': [conditionals_device_2]
-    }
-    cbsd_records_domain_proxy_1 = {
-        'registrationRequests': [device_3],
-        'grantRequests': [grant_request_3],
+        'registrationRequests': reg_request_domain_proxy_0,
+        'grantRequests': grant_req_list_0,
         'conditionalRegistrationData': []
     }
+    cbsd_records_domain_proxy_1 = {
+        'registrationRequests': reg_request_domain_proxy_1,
+        'grantRequests': grant_req_list_1,
+        'conditionalRegistrationData': []
+    }
+    device_filename_cat_a = '/device_a' + str(12) + '.json'
+    device_a = json_load(
+        os.path.join('testcases', 'testdata', 'EAP_test_data' + device_filename_cat_a))
+    device_filename_cat_b = '/device_b' + str(12) + '.json'
+    device_b = json_load(
+        os.path.join('testcases', 'testdata', 'EAP_test_data'+ device_filename_cat_b))
+    
+    device_a['installationParam']['latitude'] = lat_within_40km[-1]
+    device_b['installationParam']['longitude'] = lon_within_40km[-1]
+    #cbsd_records_domain_proxy_0 = reg_request_domain_proxy_0
+    #cbsd_records_domain_proxy_1 = reg_request_domain_proxy_1
 
     # Protected entity record
     protected_entities = {
         'palRecords': pal_records_1,
         'ppaRecords': [ppa_record_1]
     }
-
+    
     iteration_config = {
         'cbsdRequestsWithDomainProxies': [cbsd_records_domain_proxy_0,
                                           cbsd_records_domain_proxy_1],
-        'cbsdRecords': [{
-            'registrationRequest': device_4,
-            'grantRequest': grant_request_4,
-            'conditionalRegistrationData': conditionals_device_4,
+        'cbsdRecords': 
+        [{
+            'registrationRequest': device_a,
+            'grantRequest': grant_request_same_freq,
+            'conditionalRegistrationData': {},
+            'clientCert': getCertFilename('device_d.cert'),
+            'clientKey': getCertFilename('device_d.key')
+        },
+        {
+            'registrationRequest': device_b,
+            'grantRequest': grant_request_same_freq,
+            'conditionalRegistrationData': {},
             'clientCert': getCertFilename('device_d.cert'),
             'clientKey': getCertFilename('device_d.key')
         }],
+         
+                                      
         'protectedEntities': protected_entities,
         'dpaActivationList': [],
         'dpaDeactivationList': [],
@@ -257,51 +260,49 @@ class EapProtectionTestcase(McpXprCommonTestcase):
 
   def generate_EAP_3_default_config(self, filename):
     """ Generates the WinnForum configuration for EAP.3 testcase """
-        # Load Devices.
+    num_cbsd = 12
+
+    device_idx_N2 = [0,1,2,3,4,5]
+    
+
+    registration_request_N2 = []
+    registration_request_N3 = []
+    grant_req_list_N2 = []
+    grant_req_list_N3 = []
+
+    grant_request_same_freq = json_load(
+      os.path.join('testcases', 'testdata', 'grant_params.json'))
+    grant_request_same_freq['operationParam']['operationFrequencyRange']['lowFrequency'] = 3550000000
+    grant_request_same_freq['operationParam']['operationFrequencyRange']['highFrequency'] = 3560000000
+    
+
+    for cbsdIdx in range(0,num_cbsd):
+      device_filename_cat_a = '/device_a' + str(cbsdIdx+1) + '.json'
+      device_a = json_load(
+        os.path.join('testcases', 'testdata', 'EAP_test_data' + device_filename_cat_a))
+      device_filename_cat_b = '/device_b' + str(cbsdIdx+1) + '.json'
+      device_b = json_load(
+        os.path.join('testcases', 'testdata', 'EAP_test_data'+ device_filename_cat_b))
+      if cbsdIdx in device_idx_N2:
+        registration_request_N2.append(device_a)
+        grant_req_list_N2.append(grant_request_same_freq)
+        registration_request_N2.append(device_b)
+        grant_req_list_N2.append(grant_request_same_freq)
+      else:
+        registration_request_N3.append(device_a)
+        grant_req_list_N3.append(grant_request_same_freq)
+        registration_request_N3.append(device_b)
+        grant_req_list_N3.append(grant_request_same_freq)        
+
+      #grant_req_list.append(grant_request_same_freq)
+
     device_a = json_load(
-        os.path.join('testcases', 'testdata', 'device_a.json'))
+    os.path.join('testcases', 'testdata', 'device_a.json'))
     device_a['installationParam']['latitude'] = 30.71570
     device_a['installationParam']['longitude'] = -88.09350
-
-    device_b = json_load(
-        os.path.join('testcases', 'testdata', 'device_b.json'))
-    device_b['installationParam']['latitude'] = 30.71570
-    device_b['installationParam']['longitude'] = -88.09350
-    device_c = json_load(
-        os.path.join('testcases', 'testdata', 'device_c.json'))
-    device_c['installationParam']['latitude'] = 30.71570
-    device_c['installationParam']['longitude'] = -88.09350
-
-    # Pre-load conditionals and remove reg conditional fields from registration
-    # request.
-    conditional_keys = [
-        'cbsdCategory', 'fccId', 'cbsdSerialNumber', 'airInterface',
-        'installationParam', 'measCapability'
-    ]
-    reg_conditional_keys = [
-        'cbsdCategory', 'airInterface', 'installationParam', 'measCapability'
-    ]
-    conditionals_b = {key: device_b[key] for key in conditional_keys}
-    conditionals_c = {key: device_c[key] for key in conditional_keys}
-    device_b = {
-        key: device_b[key]
-        for key in device_b
-        if key not in reg_conditional_keys
-    }
-    device_c = {
-        key: device_c[key]
-        for key in device_c
-        if key not in reg_conditional_keys
-    }
-
-    # Load grant requests.
     grant_a = json_load(
         os.path.join('testcases', 'testdata', 'grant_0.json'))
-    grant_b = json_load(
-        os.path.join('testcases', 'testdata', 'grant_0.json'))
-    grant_c = json_load(
-        os.path.join('testcases', 'testdata', 'grant_0.json'))
-
+    
     sas_test_harness_config = {
         'sasTestHarnessName': 'SAS-Test-Harness-1',
         'hostName': getFqdnLocalhost(),
@@ -312,8 +313,7 @@ class EapProtectionTestcase(McpXprCommonTestcase):
         'fullActivityDumpRecords': [
             generateCbsdRecords([device_a], [[grant_a]])
         ]
-    }
-
+    }    
     dpa_1 = {
         'dpaId': 'Pascagoula',
         'frequencyRange': {
@@ -322,18 +322,19 @@ class EapProtectionTestcase(McpXprCommonTestcase):
         },
         'points_builder': 'default (25, 10, 10, 10)',
         'movelistMargin': 10
-    }
-
+    }    
+    
     config = {
         'sasTestHarnessConfigs': [sas_test_harness_config],
-        'registrationRequestsN2': [device_b],
-        'grantRequestsN2': [grant_b],
-        'conditionalRegistrationDataN2': [conditionals_b],
-        'registrationRequestsN3': [device_c],
-        'grantRequestsN3': [grant_c],
-        'conditionalRegistrationDataN3': [conditionals_c],
+        'registrationRequestsN2': [registration_request_N2],
+        'grantRequestsN2': [grant_req_list_N2],
+        'conditionalRegistrationDataN2': [],
+        'registrationRequestsN3': [registration_request_N3],
+        'grantRequestsN3': [grant_req_list_N3],
+        'conditionalRegistrationDataN3': [],
         'dpas': [dpa_1]
-    }
+    }    
+    
     writeConfig(filename, config)
 
   @configurable_testcase(generate_EAP_3_default_config)

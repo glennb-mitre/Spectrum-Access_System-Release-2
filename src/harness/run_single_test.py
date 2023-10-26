@@ -175,8 +175,12 @@ if __name__ == '__main__':
                                nlcd_dir=None, cache_size=num_tiles_worker_nlcd)
 
   # Run the tests
-  
+  #sys.path.remove('/home/rrahman/winnf/Spectrum-Access-System/src/harness/')
   test = unittest.TestLoader().discover('testcases','WINNF_FT_S_REL2_RI_EAP_testcase.py')
+  #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_IPR_testcase.py')
+  #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_PPR_testcase.py')
+  #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_MCP_testcase.py')
+
   #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_PAT_testcase.py')
   unittest.TextTestRunner(verbosity=2).run(test)
 
