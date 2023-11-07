@@ -186,28 +186,28 @@ class TestEnhancedAntenna(unittest.TestCase):
           gains - 5 * np.ones(4))), 0)
 
       # Back lobe: maximum attenuation
-      gain = antenna.get_standard_gains(180, 0, 120, 10)
+      gain = antenna.calculate_gain_from_hor_pattern(180, 0, 120, 10)
       self.assertEqual(gain, -10)
       # At beamwidth, cutoff by 3dB (by definition)
-      gain = antenna.get_standard_gains(60, 0, 120, 10)
+      gain = antenna.calculate_gain_from_hor_pattern(60, 0, 120, 10)
       self.assertEqual(gain, 10-3)
-      gain = antenna.get_standard_gains(5.5, 50.5, 90, 10)
+      gain = antenna.calculate_gain_from_hor_pattern(5.5, 50.5, 90, 10)
       self.assertEqual(gain, 10-3)
       # Bore sight: full gain
-      gain = antenna.get_standard_gains(50.5, 50.5, 90, 10)
+      gain = antenna.calculate_gain_from_hor_pattern(50.5, 50.5, 90, 10)
       self.assertEqual(gain, 10)
       # At half beamwidth, -0.75dB + integer values well managed
-      gain = antenna.get_standard_gains(25, 50, 100, 10)
+      gain = antenna.calculate_gain_from_hor_pattern(25, 50, 100, 10)
       self.assertEqual(gain, 10-0.75)
       # At twice beamwidth, -12dB
-      gain = antenna.get_standard_gains(310, 50, 100, 10)
+      gain = antenna.calculate_gain_from_hor_pattern(310, 50, 100, 10)
       self.assertEqual(gain, 10-12)
 
       # Vectorized vs scalar
       hor_dirs = [3.5, 47.3, 342]
-      gains = antenna.get_standard_gains(hor_dirs, 123.3, 90, 12.4)
+      gains = antenna.calculate_gain_from_hor_pattern(hor_dirs, 123.3, 90, 12.4)
       for k, hor in enumerate(hor_dirs):
-        gain = antenna.get_standard_gains(hor, 123.3, 90, 12.4)
+        gain = antenna.calculate_gain_from_hor_pattern(hor, 123.3, 90, 12.4)
         self.assertEqual(gain, gains[k])
      
   def test_get_standard_2d_gains(self):
