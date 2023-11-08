@@ -180,8 +180,9 @@ if __name__ == '__main__':
   #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_IPR_testcase.py')
   #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_PPR_testcase.py')
   #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_MCP_testcase.py')
-
   #test = unittest.TestLoader().discover('testcases','WINNF_FT_S_PAT_testcase.py')
+
+  test = unittest.TestLoader().discover('testcases','WINNF_FT_S_EAP_testcase.py')
   unittest.TextTestRunner(verbosity=2).run(test)
 
   
