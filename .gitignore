@@ -2,3 +2,10 @@
 .idea
 *DPA=*.csv
 *.swp
+*.cert
+*.key
+*.crl
+*.pem
+*.pyc
+__pycache__/
+
