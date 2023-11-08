@@ -1,1 +1,0 @@
-V	260906171522Z		55731E050BE8682627CA99191E4512E0E87B895D	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost

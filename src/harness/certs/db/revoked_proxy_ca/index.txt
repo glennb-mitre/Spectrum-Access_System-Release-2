@@ -1,1 +1,0 @@
-V	260906171537Z		5A615D1B6AA2A3EE173AE30CA1CDA24AACF5DD20	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum Domain Proxy Certificate/CN=0123456789:0010 - Revoked

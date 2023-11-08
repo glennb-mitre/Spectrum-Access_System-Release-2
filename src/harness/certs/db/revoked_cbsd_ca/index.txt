@@ -1,1 +1,0 @@
-V	260906171532Z		1CBFBCE53C954CE45204EE2D9453BECA110852FE	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id:revoked

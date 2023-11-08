@@ -1,4 +1,0 @@
-cbsd_ca.crl
-sas_ca.crl
-proxy_ca.crl
-root_ca.crl
