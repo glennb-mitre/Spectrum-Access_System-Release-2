@@ -162,7 +162,8 @@ class TestEnhancedAntenna(unittest.TestCase):
 
       gain  = antenna.antenna_gain_method_e(dirs, ant_azimuth, peak_ant_gain, hor_pattern)
   
-  def test_MethodFbasedAntennaGainCalculation(self):
+  
+  def test_get_standard_gains_hor_ver(self):
       
       # Vectorized vs scalar
       dirs = {'hor':[3.5, 47.3, 342]}
@@ -170,10 +171,10 @@ class TestEnhancedAntenna(unittest.TestCase):
       peak_ant_gain = 12.4
       ant_beamwidth = 90     
       
-      gains = antenna.antenna_gain_method_f(dirs, 123.3, 90, 12.4)
+      gains = antenna.get_standard_antenna_gain(dirs, 123.3, 90, 12.4)
       for k, hor in enumerate(dirs['hor']):
         dir = {'hor': hor}
-        gain = antenna.antenna_gain_method_f(dir, 123.3, 90, 12.4)
+        gain = antenna.get_standard_antenna_gain(dir, 123.3, 90, 12.4)
         self.assertEqual(gain, gains[k])
 
       dirs = {'hor':[0, 90, 180, 270]}
@@ -182,7 +183,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       ant_beamwidth = None
 
           # Isotropic antenna
-      gains = antenna.antenna_gain_method_f(dirs,
+      gains = antenna.get_standard_antenna_gain(dirs,
                                         peak_ant_gain, ant_azimuth, ant_beamwidth)
       self.assertEqual(np.max(np.abs(
           gains - 5 * np.ones(4))), 0)
@@ -192,7 +193,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       peak_ant_gain = 5
       ant_beamwidth = 90
 
-      gains = antenna.antenna_gain_method_f(dirs, 5, None, 90)
+      gains = antenna.get_standard_antenna_gain(dirs, 5, None, 90)
       self.assertEqual(np.max(np.abs(
           gains - 5 * np.ones(4))), 0)
       
@@ -201,7 +202,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       peak_ant_gain = 5
       ant_beamwidth = 0      
 
-      gains = antenna.antenna_gain_method_f(dirs,5, 0, 0)
+      gains = antenna.get_standard_antenna_gain(dirs,5, 0, 0)
                                         
       self.assertEqual(np.max(np.abs(
           gains - 5 * np.ones(4))), 0)
@@ -211,7 +212,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       peak_ant_gain = 5
       ant_beamwidth = 360
 
-      gains = antenna.antenna_gain_method_f(dirs,5, 0, 360)
+      gains = antenna.get_standard_antenna_gain(dirs,5, 0, 360)
                                         
       self.assertEqual(np.max(np.abs(
           gains - 5 * np.ones(4))), 0)
@@ -221,7 +222,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       peak_ant_gain = 10
       ant_beamwidth = 120
       # Back lobe: maximum attenuation
-      gain = antenna.antenna_gain_method_f(dirs, 10, 0, 120)
+      gain = antenna.get_standard_antenna_gain(dirs, 10, 0, 120)
       self.assertEqual(gain, -10)
 
       # At beamwidth, cutoff by 3dB (by definition)
@@ -230,14 +231,14 @@ class TestEnhancedAntenna(unittest.TestCase):
       peak_ant_gain = 10
       ant_beamwidth = 120
       
-      gain = antenna.antenna_gain_method_f(dirs, 10, 0, 120)
+      gain = antenna.get_standard_antenna_gain(dirs, 10, 0, 120)
       self.assertEqual(gain, 10-3)
 
       dirs = {'hor':5.5}
       ant_azimuth = 50.5
       peak_ant_gain = 10
       ant_beamwidth = 90
-      gain = antenna.antenna_gain_method_f(dirs, 10, 50.5, 90)
+      gain = antenna.get_standard_antenna_gain(dirs, 10, 50.5, 90)
       self.assertEqual(gain, 10-3)
 
       # Bore sight: full gain
@@ -245,7 +246,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       ant_azimuth = 50.5
       peak_ant_gain = 10
       ant_beamwidth = 90      
-      gain = antenna.antenna_gain_method_f(dirs, 10, 50.5, 90)
+      gain = antenna.get_standard_antenna_gain(dirs, 10, 50.5, 90)
       self.assertEqual(gain, 10)
 
       # At half beamwidth, -0.75dB + integer values well managed
@@ -253,7 +254,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       ant_azimuth = 50
       peak_ant_gain = 10
       ant_beamwidth = 100      
-      gain = antenna.antenna_gain_method_f(dirs, 10, 50, 100)
+      gain = antenna.get_standard_antenna_gain(dirs, 10, 50, 100)
       self.assertEqual(gain, 10-0.75)
 
       # At twice beamwidth, -12dB
@@ -261,11 +262,10 @@ class TestEnhancedAntenna(unittest.TestCase):
       ant_azimuth = 50
       peak_ant_gain = 10
       ant_beamwidth = 100      
-      gain = antenna.antenna_gain_method_f(dirs, 10, 50, 100)
+      gain = antenna.get_standard_antenna_gain(dirs, 10, 50, 100)
       self.assertEqual(gain, 10-12)
 
- 
-     
+
   def test_get_standard_gains_hor_ver(self):
       #dirs = [{'hor':3.5,'ver':-30},{'hor':47.3,'ver':45},{'hor':342,'ver':70}]
       #gains = antenna.GetStandardAntennaGainsHorAndVer(dirs,30,10,peak_ant_gain = 5)
@@ -292,7 +292,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r    
 
-      [hor_gain,ver_gain] = antenna.get_standard_gains_hor_ver(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
+      [hor_gain,ver_gain] = antenna.get_standard_antenna_gains_hor_ver(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
                                                           ant_hor_beamwidth = beamwidth_hor, ant_ver_beamwidth = beamwidth_ver, peak_ant_gain = peak_gain)
       if not isinstance(dirs,list):
         if isinstance(hor_gain,np.ndarray):
@@ -317,7 +317,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r 
 
-      [hor_gain,ver_gain] = antenna.get_standard_gains_hor_ver(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
+      [hor_gain,ver_gain] = antenna.get_standard_antenna_gains_hor_ver(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
                                                           ant_hor_beamwidth = beamwidth_hor, ant_ver_beamwidth = beamwidth_ver, peak_ant_gain = peak_gain)
       if not isinstance(dirs,list):
         if isinstance(hor_gain,np.ndarray):
@@ -347,7 +347,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       dirs_relative_boresight['hor'] = theta_r
       dirs_relative_boresight['ver'] = phi_r 
 
-      [hor_gain,ver_gain] = antenna.get_standard_gains_hor_ver(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
+      [hor_gain,ver_gain] = antenna.get_standard_antenna_gains_hor_ver(dirs_relative_boresight, ant_azimuth = ant_az, ant_mech_downtilt = downtilt,
                                                           ant_hor_beamwidth = beamwidth_hor, ant_ver_beamwidth = beamwidth_ver, peak_ant_gain = peak_gain)
 
       if not isinstance(dirs,list):

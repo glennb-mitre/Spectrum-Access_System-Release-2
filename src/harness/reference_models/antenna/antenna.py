@@ -254,7 +254,7 @@ def antenna_gain_method_c(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
     dirs_relative_boresight['ver'] = phi_r
 
     # horizontal gain at thetaR, vertical gains at phiR
-    [g_h_theta_r, g_v_phi_r] = get_standard_gains_hor_ver(dirs_relative_boresight,
+    [g_h_theta_r, g_v_phi_r] = get_standard_antenna_gains_hor_ver(dirs_relative_boresight,
                                                      ant_az, peak_ant_gain,
                                                      downtilt, hor_beamwidth,
                                                      ver_beamwidth, ant_fbr=fbr)
@@ -273,15 +273,15 @@ def antenna_gain_method_c(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
     dirs_phi_r_sup['ver'] = phi_r_sup
 
     # horizontal gain at 0 degrees, G_H (0)
-    [g_h_theta_0, _] = get_standard_gains_hor_ver(dirs_0, ant_az, peak_ant_gain,
+    [g_h_theta_0, _] = get_standard_antenna_gains_hor_ver(dirs_0, ant_az, peak_ant_gain,
                                              ant_hor_beamwidth=hor_beamwidth,
                                              ant_fbr=fbr)
     # horizontal gain at 180 degrees, G_H (180)
-    [g_h_theta_180, _] = get_standard_gains_hor_ver(dirs_180, ant_az, peak_ant_gain,
+    [g_h_theta_180, _] = get_standard_antenna_gains_hor_ver(dirs_180, ant_az, peak_ant_gain,
                                                ant_hor_beamwidth=hor_beamwidth,
                                                ant_fbr=fbr)
     # vertical gain at 180-phiR vertical angle, G_V (180-phiR)
-    [_, g_v_phi_r_sup] = get_standard_gains_hor_ver(dirs_phi_r_sup, ant_az, peak_ant_gain,
+    [_, g_v_phi_r_sup] = get_standard_antenna_gains_hor_ver(dirs_phi_r_sup, ant_az, peak_ant_gain,
                                                ant_mech_downtilt=downtilt,
                                                ant_ver_beamwidth=ver_beamwidth,
                                                ant_fbr=fbr)
@@ -366,12 +366,12 @@ def antenna_gain_method_d(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_b
     g_h_theta_180 = hor_patt['gain'][0]
 
     # G_V(phiR)
-    [_, g_v_phi_r] = get_standard_gains_hor_ver(dirs_relative_boresight, ant_az,
+    [_, g_v_phi_r] = get_standard_antenna_gains_hor_ver(dirs_relative_boresight, ant_az,
                                            peak_ant_gain,
                                            ant_mech_downtilt=downtilt,
                                            ant_ver_beamwidth=ver_beamwidth, ant_fbr=fbr)
     # G_V(180-phiR)
-    [_, g_v_phi_r_sup] = get_standard_gains_hor_ver(dirs_phi_r_sup, ant_az, peak_ant_gain,
+    [_, g_v_phi_r_sup] = get_standard_antenna_gains_hor_ver(dirs_phi_r_sup, ant_az, peak_ant_gain,
                                                ant_mech_downtilt=downtilt,
                                                ant_ver_beamwidth=ver_beamwidth,
                                                ant_fbr=fbr)
@@ -448,7 +448,36 @@ def antenna_gain_method_e(dirs, ant_az, peak_ant_gain, hor_patt):
     return gain_two_dimensional
 
 def antenna_gain_method_f(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
+    """Use of the horizontal antenna pattern (denoted as GH(θ)) derived 
+    from the CBSD Registration parameters (i.e., Release 1 method specified in R2-SGN-20 [1]).
+    
+    Directions and azimuth are defined compared to the north in clockwise
+    direction and shall be within [0..360] degrees.    
+    
+    Inputs:
+
+      dirs:       Ray directions in horizontal plane (degrees).
+                      Either a scalar or an iterable.
+      ant_az:     Antenna azimuth (degrees).
+      hor_beamwidth:  Antenna 3dB cutoff beamwidth (degrees).
+                      If None, then antenna is isotropic (default).
+      peak_ant_gain:       Antenna gain (dBi).
+    
+    
+    Returns:
+    The CBSD  antenna gains (in dBi) in horizontal plane relative to peak antenna gain, 
+    Either a scalar if dirs is scalar or an ndarray otherwise.
+    
+    """
+
+    gain = get_standard_antenna_gain(dirs,peak_ant_gain,ant_az,hor_beamwidth)
+
+    return gain
+
+def get_standard_antenna_gain(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
+    
     """Computes the antenna gains from a standard antenna defined by beamwidth.
+    (This has been copied from the Rel-1 codebase)
 
     See R2-SGN-20.
     This uses the standard 3GPP formula for pattern derivation from a given
@@ -457,15 +486,15 @@ def antenna_gain_method_f(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
     direction and shall be within [0..360] degrees.
 
     Inputs:
-      hor_dirs:       Ray directions in horizontal plane (degrees).
+      dirs:       Ray directions in horizontal plane (degrees).
                       Either a scalar or an iterable.
-      ant_azimut:     Antenna azimuth (degrees).
-      ant_beamwidth:  Antenna 3dB cutoff beamwidth (degrees).
+      ant_az:     Antenna azimuth (degrees).
+      hor_beamwidth:  Antenna 3dB cutoff beamwidth (degrees).
                       If None, then antenna is isotropic (default).
-      ant_gain:       Antenna gain (dBi).
+      peak_ant_gain:       Antenna gain (dBi).
 
     Returns:
-      The CBSD antenna gains (in dB).
+      The CBSD antenna gains (in dBi) in horizontal plane.
       Either a scalar if hor_dirs is scalar or an ndarray otherwise.
     """
     hor_dirs = dirs['hor']
@@ -487,7 +516,7 @@ def antenna_gain_method_f(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
         return gains[0]
     return gains    
     
-def get_standard_gains_hor_ver(dirs, ant_azimuth=None, peak_ant_gain=0,
+def get_standard_antenna_gains_hor_ver(dirs, ant_azimuth=None, peak_ant_gain=0,
                           ant_mech_downtilt=None, ant_hor_beamwidth=None,
                           ant_ver_beamwidth=None, ant_fbr=None):
     """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation, step a
