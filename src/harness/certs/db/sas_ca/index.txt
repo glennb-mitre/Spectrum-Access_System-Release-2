@@ -1,0 +1,9 @@
+V	260906171522Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FEF	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost
+V	260906171522Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF0	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost
+V	260906171522Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF1	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate 001/CN=localhost
+V	260906171524Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF2	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum Admin Certificate/CN=SAS admin Example
+V	260906171528Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF3	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost
+R	260906171529Z	230609171529Z	27E8F65D7B115319A7361BE9B5E8C7166AB02FF4	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost
+V	260906171530Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF5	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost
+V	160214120000Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF6	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=expired.example.org
+V	260906171531Z		27E8F65D7B115319A7361BE9B5E8C7166AB02FF7	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost

@@ -1,0 +1,8 @@
+{
+  "cbsdId": "sas1/cbsd1",
+  "grantId": "sas1/grant1",
+  "grantRenew": true,
+  "operationState": "AUTHORIZED",
+  "measReport": {
+  }
+}

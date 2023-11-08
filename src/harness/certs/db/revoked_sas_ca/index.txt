@@ -1,0 +1,1 @@
+V	260906171538Z		22B16534C75A0BFA1EF13A1C930C50A22DD57454	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum SAS Provider Certificate/CN=localhost - Revoked

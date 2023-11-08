@@ -1,0 +1,13 @@
+{
+    "description": "Load localhost FAD to SAS UUT",
+    "files": [
+        {
+            "checksum": "40e576cb0f170bf8a9b2c36656e90e1aeaf29981",
+            "recordType": "cbsd",
+            "size": 4291,
+            "url": "https://localhost:9011/v1.3/cbsd/activity_dump_file_cbsd0.json",
+            "version": "v1.3"
+        }
+    ],
+    "generationDateTime": "2023-06-15T15:43:22Z"
+}

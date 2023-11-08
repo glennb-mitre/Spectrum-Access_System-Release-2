@@ -1,0 +1,70 @@
+{
+    "endTime": "2023-06-15T16:54:54Z",
+    "recordData": [
+        {
+            "grants": [
+                {
+                    "channelType": "GAA",
+                    "grantExpireTime": "2025-04-20T07:22:56Z",
+                    "id": "SAMPLE_ID_69815",
+                    "operationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3630000000,
+                            "lowFrequency": 3620000000
+                        }
+                    },
+                    "requestedOperationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3630000000,
+                            "lowFrequency": 3620000000
+                        }
+                    },
+                    "terminated": false
+                },
+                {
+                    "channelType": "GAA",
+                    "grantExpireTime": "2025-04-20T07:22:56Z",
+                    "id": "SAMPLE_ID_94966",
+                    "operationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3640000000,
+                            "lowFrequency": 3630000000
+                        }
+                    },
+                    "requestedOperationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3640000000,
+                            "lowFrequency": 3630000000
+                        }
+                    },
+                    "terminated": false
+                }
+            ],
+            "id": "cbsd/test_fcc_id_l/544fce4ed19d1269c8d53a0a5cae11083d9cea0e",
+            "registration": {
+                "airInterface": {
+                    "radioTechnology": "E_UTRA"
+                },
+                "callSign": "callsign_f",
+                "cbsdCategory": "A",
+                "fccId": "test_fcc_id_l",
+                "installationParam": {
+                    "antennaAzimuth": 0,
+                    "antennaBeamwidth": 60,
+                    "antennaGain": 90,
+                    "height": 3.4,
+                    "heightType": "AGL",
+                    "indoorDeployment": true,
+                    "latitude": 38.815291,
+                    "longitude": -100.253004
+                },
+                "measCapability": []
+            }
+        }
+    ],
+    "startTime": "2023-06-15T16:54:54Z"
+}

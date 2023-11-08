@@ -1,0 +1,7 @@
+{
+  "cbsdId": "sas1/cbsd1",
+  "measReportConfig": [ "EutraCarrierRssiAlways" ],
+  "response": {
+     "responseCode": 0
+  }
+}

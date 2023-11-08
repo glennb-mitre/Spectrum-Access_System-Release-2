@@ -1,0 +1,6 @@
+{
+  "cbsdId": "sas1/cbsd1",
+  "inquiredSpectrum": [
+    { "lowFrequency": 3550000000, "highFrequency": 3700000000 }
+  ]
+}

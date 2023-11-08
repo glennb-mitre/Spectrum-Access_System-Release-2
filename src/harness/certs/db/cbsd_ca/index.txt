@@ -1,0 +1,14 @@
+V	260906171522Z		177878FAEA9657B79D96B70F31034367BDB20A20	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_a:test_serial_number_a
+V	260906171522Z		177878FAEA9657B79D96B70F31034367BDB20A21	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_b:test_serial_number_b
+V	260906171522Z		177878FAEA9657B79D96B70F31034367BDB20A22	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_c:test_serial_number_c
+V	260906171523Z		177878FAEA9657B79D96B70F31034367BDB20A23	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_d:test_serial_number_d
+V	260906171523Z		177878FAEA9657B79D96B70F31034367BDB20A24	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_e:test_serial_number_e
+V	260906171523Z		177878FAEA9657B79D96B70F31034367BDB20A25	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_f:test_serial_number_f
+V	260906171523Z		177878FAEA9657B79D96B70F31034367BDB20A26	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_g:test_serial_number_g
+V	260906171523Z		177878FAEA9657B79D96B70F31034367BDB20A27	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_h:test_serial_number_h
+V	260906171523Z		177878FAEA9657B79D96B70F31034367BDB20A28	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_i:test_serial_number_i
+V	260906171524Z		177878FAEA9657B79D96B70F31034367BDB20A29	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_j:test_serial_number_j
+R	260906171528Z	230609171528Z	177878FAEA9657B79D96B70F31034367BDB20A2A	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id:sn_0001
+V	160214120000Z		177878FAEA9657B79D96B70F31034367BDB20A2B	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id:0002
+V	260906171529Z		177878FAEA9657B79D96B70F31034367BDB20A2C	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_a:test_serial_number_a
+V	260906171531Z		177878FAEA9657B79D96B70F31034367BDB20A2D	unknown	/C=US/O=Wireless Innovation Forum/OU=WInnForum CBSD Certificate/CN=test_fcc_id_a:test_serial_number_a

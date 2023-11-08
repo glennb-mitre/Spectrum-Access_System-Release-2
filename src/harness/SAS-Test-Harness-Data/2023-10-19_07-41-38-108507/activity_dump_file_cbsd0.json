@@ -1,0 +1,138 @@
+{
+    "endTime": "2023-10-19T11:41:39Z",
+    "recordData": [
+        {
+            "grants": [
+                {
+                    "channelType": "GAA",
+                    "grantExpireTime": "2025-10-18T07:41:32Z",
+                    "id": "SAMPLE_ID_07594",
+                    "operationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3630000000,
+                            "lowFrequency": 3620000000
+                        }
+                    },
+                    "requestedOperationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3630000000,
+                            "lowFrequency": 3620000000
+                        }
+                    },
+                    "terminated": false
+                }
+            ],
+            "id": "cbsd/test_fcc_id_a/d7a9fe1be84243ebdd50c1359cf0630c3d273350",
+            "registration": {
+                "airInterface": {
+                    "radioTechnology": "E_UTRA"
+                },
+                "callSign": "callsign_a",
+                "cbsdCategory": "A",
+                "fccId": "test_fcc_id_a",
+                "installationParam": {
+                    "antennaAzimuth": 90,
+                    "antennaBeamwidth": 30,
+                    "antennaGain": 16,
+                    "height": 9.3,
+                    "heightType": "AGL",
+                    "indoorDeployment": true,
+                    "latitude": 30.23534,
+                    "longitude": -87.93972
+                },
+                "measCapability": []
+            }
+        },
+        {
+            "grants": [
+                {
+                    "channelType": "GAA",
+                    "grantExpireTime": "2025-10-18T07:41:32Z",
+                    "id": "SAMPLE_ID_50592",
+                    "operationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3630000000,
+                            "lowFrequency": 3620000000
+                        }
+                    },
+                    "requestedOperationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3630000000,
+                            "lowFrequency": 3620000000
+                        }
+                    },
+                    "terminated": false
+                }
+            ],
+            "id": "cbsd/test_fcc_id_c/33c81df2998eb5d587cea7dede0d35d034e79bcd",
+            "registration": {
+                "airInterface": {
+                    "radioTechnology": "E_UTRA"
+                },
+                "callSign": "callsign_c",
+                "cbsdCategory": "A",
+                "fccId": "test_fcc_id_c",
+                "installationParam": {
+                    "antennaAzimuth": 270,
+                    "antennaBeamwidth": 0,
+                    "antennaGain": -127,
+                    "height": 4.5,
+                    "heightType": "AMSL",
+                    "indoorDeployment": false,
+                    "latitude": 30.31534,
+                    "longitude": -86.08972
+                },
+                "measCapability": []
+            }
+        },
+        {
+            "grants": [
+                {
+                    "channelType": "GAA",
+                    "grantExpireTime": "2025-10-18T07:41:32Z",
+                    "id": "SAMPLE_ID_94431",
+                    "operationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3620000000,
+                            "lowFrequency": 3610000000
+                        }
+                    },
+                    "requestedOperationParam": {
+                        "maxEirp": 10,
+                        "operationFrequencyRange": {
+                            "highFrequency": 3620000000,
+                            "lowFrequency": 3610000000
+                        }
+                    },
+                    "terminated": false
+                }
+            ],
+            "id": "cbsd/test_fcc_id_e/1a57a6a304f29ccc1a5b814d661a8f8ef235bb9d",
+            "registration": {
+                "airInterface": {
+                    "radioTechnology": "E_UTRA"
+                },
+                "callSign": "callsign_e",
+                "cbsdCategory": "A",
+                "fccId": "test_fcc_id_e",
+                "installationParam": {
+                    "antennaAzimuth": 180,
+                    "antennaBeamwidth": 20,
+                    "antennaGain": 93,
+                    "height": 2.6,
+                    "heightType": "AGL",
+                    "indoorDeployment": true,
+                    "latitude": 44.47642,
+                    "longitude": -124.08096
+                },
+                "measCapability": []
+            }
+        }
+    ],
+    "startTime": "2023-10-19T11:41:39Z"
+}
