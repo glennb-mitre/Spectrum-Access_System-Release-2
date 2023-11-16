@@ -9,15 +9,11 @@ py-modules=["ppa_example", "ppa_test", "ppa",]
 name = "sas2_ppa"
 version = "0.0.1"
 requires-python = ">=3.10"
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSE"}
 keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
 dependencies = [
-    "json",
-    "logging",
     "numpy",
-    "os",
-    "shapely.geometry",
-    "unittest",
+    "shapely",
     "util2",
 ]
 classifiers=[

@@ -9,16 +9,10 @@ py-modules=["iap", "iap_example",]
 name = "sas2_iap"
 version = "0.0.1"
 requires-python = ">=3.10"
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSE"}
 keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
 dependencies = [
-    "iap",
-    "json",
-    "logging",
-    "multiprocessing",
     "numpy",
-    "os",
-    "time",
 ]
 classifiers=[
     "License :: OSI Approved :: Apache Software License",

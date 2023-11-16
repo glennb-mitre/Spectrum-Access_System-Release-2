@@ -13,21 +13,11 @@ license = {file = "LICENSE"}
 keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
 dependencies = [
     "cartopy",
-    "collections",
-    "copy",
-    "cProfile",
-    "csv",
-    "glob",
-    "json",
-    "math",
     "matplotlib",
-    "multiprocessing",
     "numpy",
-    "os",
     "scipy",
     "shapely",
     "six",
-    "zipfile",
 ]
 classifiers=[
     "License :: OSI Approved :: Apache Software License",

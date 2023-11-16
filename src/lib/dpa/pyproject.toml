@@ -9,21 +9,12 @@ py-modules=["dpa_builder", "dpa_mgr_example","dpa_mgr_test","dpa_mgr","move_list
 name = "sas2_dpa"
 version = "0.0.1"
 requires-python = ">=3.10"
-license = {file = "LICENSE.txt"}
+license = {file = "LICENSE"}
 keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
 dependencies = [
-    "ast",
-    "functools",
-    "json",
-    "logging",
     "numpy",
-    "os",
-    "shapely.geometry",
-    "shutil",
+    "shapely",
     "six",
-    "tempfile",
-    "time",
-    "unittest",
 ]
 classifiers=[
     "License :: OSI Approved :: Apache Software License",

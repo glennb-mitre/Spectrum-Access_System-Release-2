@@ -12,20 +12,10 @@ requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = ["winnf", "WINNFORUM", "Spectrum Access System", "CBRS"]
 dependencies = [
-    "six",
     "pykml",
-    "json",
-    "logging",
-    "math",
     "numpy",
-    "os",
-    "re",
     "shapely",
     "six",
-    "sys",
-    "threading",
-    "time",
-    "zipfile",
 ]
 classifiers=[
     "License :: OSI Approved :: Apache Software License",
