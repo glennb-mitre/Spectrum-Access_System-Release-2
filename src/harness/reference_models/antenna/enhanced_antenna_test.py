@@ -163,7 +163,7 @@ class TestEnhancedAntenna(unittest.TestCase):
       gain  = antenna.antenna_gain_method_e(dirs, ant_azimuth, peak_ant_gain, hor_pattern)
   
   
-  def test_get_standard_gains_hor_ver(self):
+  def test_get_standard_gains_hor(self):
       
       # Vectorized vs scalar
       dirs = {'hor':[3.5, 47.3, 342]}
