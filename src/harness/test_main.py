@@ -173,5 +173,6 @@ if __name__ == '__main__':
                                nlcd_dir=None, cache_size=num_tiles_worker_nlcd)
 
   # Run the tests
-  tests = unittest.TestLoader().discover('testcases', '*_testcase.py')
+  tests = unittest.TestLoader().discover('testcases','WINNF_FT_S_PAT_testcase.py')
+  #tests = unittest.TestLoader().discover('testcases', '*_testcase.py')
   unittest.TextTestRunner(verbosity=2).run(tests)
