@@ -255,8 +255,7 @@ def antenna_gain_method_c(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
 
     # horizontal gain at thetaR, vertical gains at phiR
     [g_h_theta_r, g_v_phi_r] = get_standard_antenna_gains_hor_ver(dirs_relative_boresight,
-                                                     ant_az, peak_ant_gain,
-                                                     downtilt, hor_beamwidth,
+                                                     ant_az,downtilt, hor_beamwidth,
                                                      ver_beamwidth, ant_fbr=fbr)
 
     # in degrees
@@ -273,15 +272,15 @@ def antenna_gain_method_c(dirs, ant_az, peak_ant_gain, downtilt, hor_beamwidth,
     dirs_phi_r_sup['ver'] = phi_r_sup
 
     # horizontal gain at 0 degrees, G_H (0)
-    [g_h_theta_0, _] = get_standard_antenna_gains_hor_ver(dirs_0, ant_az, peak_ant_gain,
+    [g_h_theta_0, _] = get_standard_antenna_gains_hor_ver(dirs_0, ant_az,
                                              ant_hor_beamwidth=hor_beamwidth,
                                              ant_fbr=fbr)
     # horizontal gain at 180 degrees, G_H (180)
-    [g_h_theta_180, _] = get_standard_antenna_gains_hor_ver(dirs_180, ant_az, peak_ant_gain,
+    [g_h_theta_180, _] = get_standard_antenna_gains_hor_ver(dirs_180, ant_az,
                                                ant_hor_beamwidth=hor_beamwidth,
                                                ant_fbr=fbr)
     # vertical gain at 180-phiR vertical angle, G_V (180-phiR)
-    [_, g_v_phi_r_sup] = get_standard_antenna_gains_hor_ver(dirs_phi_r_sup, ant_az, peak_ant_gain,
+    [_, g_v_phi_r_sup] = get_standard_antenna_gains_hor_ver(dirs_phi_r_sup, ant_az,
                                                ant_mech_downtilt=downtilt,
                                                ant_ver_beamwidth=ver_beamwidth,
                                                ant_fbr=fbr)
@@ -367,11 +366,10 @@ def antenna_gain_method_d(dirs, ant_az, peak_ant_gain, hor_patt, downtilt, ver_b
 
     # G_V(phiR)
     [_, g_v_phi_r] = get_standard_antenna_gains_hor_ver(dirs_relative_boresight, ant_az,
-                                           peak_ant_gain,
                                            ant_mech_downtilt=downtilt,
                                            ant_ver_beamwidth=ver_beamwidth, ant_fbr=fbr)
     # G_V(180-phiR)
-    [_, g_v_phi_r_sup] = get_standard_antenna_gains_hor_ver(dirs_phi_r_sup, ant_az, peak_ant_gain,
+    [_, g_v_phi_r_sup] = get_standard_antenna_gains_hor_ver(dirs_phi_r_sup, ant_az,
                                                ant_mech_downtilt=downtilt,
                                                ant_ver_beamwidth=ver_beamwidth,
                                                ant_fbr=fbr)
@@ -470,11 +468,12 @@ def antenna_gain_method_f(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
     
     """
 
-    gain = get_standard_antenna_gain(dirs,peak_ant_gain,ant_az,hor_beamwidth)
+    gain = get_standard_antenna_gain(dirs,ant_az,hor_beamwidth)
+    gain += peak_ant_gain
 
     return gain
 
-def get_standard_antenna_gain(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None):
+def get_standard_antenna_gain(dirs,ant_az=None,hor_beamwidth=None):
     
     """Computes the antenna gains from a standard antenna defined by beamwidth.
     (This has been copied from the Rel-1 codebase)
@@ -503,20 +502,19 @@ def get_standard_antenna_gain(dirs,peak_ant_gain,ant_az=None,hor_beamwidth=None)
 
     if (hor_beamwidth is None or ant_az is None or
             hor_beamwidth == 0 or hor_beamwidth == 360):
-        gains = peak_ant_gain * np.ones(hor_dirs.shape)
+        gains = 0 * np.ones(hor_dirs.shape)
     else:
         bore_angle = hor_dirs - ant_az
         bore_angle[bore_angle > 180] -= 360
         bore_angle[bore_angle < -180] += 360
         gains = -12 * (bore_angle / float(hor_beamwidth)) ** 2
         gains[gains < -20] = -20.
-        gains += peak_ant_gain
 
     if is_scalar:
         return gains[0]
     return gains    
     
-def get_standard_antenna_gains_hor_ver(dirs, ant_azimuth=None, peak_ant_gain=0,
+def get_standard_antenna_gains_hor_ver(dirs, ant_azimuth=None,
                           ant_mech_downtilt=None, ant_hor_beamwidth=None,
                           ant_ver_beamwidth=None, ant_fbr=None):
     """REL2-R3-SGN-52106: Method C based Antenna Gain Calculation, step a
@@ -556,20 +554,19 @@ def get_standard_antenna_gains_hor_ver(dirs, ant_azimuth=None, peak_ant_gain=0,
         theta_r = np.atleast_1d(theta_r)
         if (ant_hor_beamwidth is None or ant_azimuth is None or
                 ant_hor_beamwidth == 0 or ant_hor_beamwidth == 360):
-            g_h_theta_r = peak_ant_gain * np.ones(theta_r.shape)
+            g_h_theta_r = 0 * np.ones(theta_r.shape)
         else:
             g_h_theta_r = -min([12 * (theta_r / float(ant_hor_beamwidth)) ** 2, ant_fbr])
-            g_h_theta_r += peak_ant_gain
 
     if 'ver' in dirs_keys:
         phi_r = dirs['ver']
         phi_r = np.atleast_1d(phi_r)
         if (ant_ver_beamwidth is None or ant_mech_downtilt is None or
                 ant_ver_beamwidth == 0 or ant_ver_beamwidth == 360):
-            g_v_phi_r = peak_ant_gain * np.ones(phi_r.shape)
+            g_v_phi_r = 0 * np.ones(phi_r.shape)
         else:
             g_v_phi_r = -min([12 * (phi_r / float(ant_ver_beamwidth)) ** 2, ant_fbr])
-            g_v_phi_r += peak_ant_gain
+            
 
     return g_h_theta_r, g_v_phi_r
 
@@ -641,9 +638,6 @@ def calculate_gain_from_given_patterns(dirs, hor_pattern=None, ver_pattern=None,
 
         phi_r_supplementary_angle = 180 - phi_r
         phi_r_supplementary_angle = np.atleast_1d(phi_r_supplementary_angle)
-
-        # if(phi_r_supplementary_angle>180 or phi_r_supplementary_angle<-180):
-        # print("stop")
 
         phi_r_supplementary_angle[phi_r_supplementary_angle >= 180] -= 360
 
